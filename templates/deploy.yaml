@@ -1,0 +1,76 @@
+resource_registry:
+
+  # These lines activate our network interface configuration files.
+  # Notice that because we are using pre-provisioned servers, our
+  # roles are named ComputeDeployedServer and
+  # ControllerDeployedServer, rather than Compute and Controller.
+  OS::TripleO::ComputeDeployedServer::Net::SoftwareConfig: /home/stack/templates/network/config/compute.yaml
+  OS::TripleO::ControllerDeployedServer::Net::SoftwareConfig: /home/stack/templates/network/config/controller.yaml
+
+parameter_defaults:
+
+  ##
+  ## Server counts
+  ##
+
+  # For a normal install these would be ControllerCount and
+  # ComputeCount, but since we're using pre-provisioned servers the
+  # roles have different names.
+  ControllerDeployedServerCount: 3
+  ComputeDeployedServerCount: 2
+
+  ##
+  ## Network configuration
+  ##
+
+  # The InternalApi network is used for OpenStack REST API traffic
+  # between the controllers and compute nodes, as well as for AMQ
+  # traffic, database access, and most other traffic internal to the
+  # overcloud.
+  InternalApiNetCidr: 192.168.32.0/22
+  InternalApiAllocationPools:
+    - start: 192.168.32.XX
+      end: 192.168.32.XX
+  InternalApiNetworkVlanID: 3702
+
+  # The Storage network is used for Cinder, Ceph, and Swift.
+  StorageNetCidr: 192.168.16.0/22
+  StorageAllocationPools:
+    - start: 192.168.16.XX
+      end: 192.168.16.XX
+  StorageNetworkVlanID: 3700
+
+  # The Tenant network is used for tenant-created networks.
+  TenantNetCidr: 192.168.202.0/24
+  TenantAllocationPools:
+    - start: 192.168.202.20
+      end: 192.168.202.200
+
+  ExternalNetCidr: 192.12.185.0/24
+  ExternalInterfaceDefaulrRoute: 192.12.185.1
+  ExternalAllocationPools:
+    - start: 192.12.185.XX
+      end: 192.12.185.XX
+  ExternalNetworkVlanID: 105
+
+  ControlPlaneDefaultRoute: 192.168.24.1
+
+  # The overcloud nodes access the OpenStack metadata service at the
+  # EC2MetadataIp address.
+  EC2MetadataIp: 192.168.24.1
+
+  # Setting NeutronExternalNetworkBridge to '' means that floating ips
+  # can use any bridge. This maps to the `external_network_bridge`
+  # Neutron configuration option.
+  NeutronExternalNetworkBridge: "''"
+
+  # In the stock configuration, CephCluster and SwiftMgmt traffic goes
+  # over the StorageManagement network, but I've disabled that in this
+  # deployment.  The default rules means that in the absence of the
+  # StorageManagement network, this traffic would instead go over the
+  # ControlPlane network.  The following stanza modifies that default
+  # so that the CephCluster and SwiftMgmt traffic goes over the
+  # Storage network instead.
+  ServiceNetMap:
+    CephClusterNetwork: storage
+    SwiftMgmtNetwork: storage
