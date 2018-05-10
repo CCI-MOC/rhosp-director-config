@@ -1,0 +1,15 @@
+[undercloud]
+kumo-undercloud
+
+[controller]
+kumo-control-01
+kumo-control-02
+kumo-control-03
+
+[compute]
+kumo-compute-01
+kumo-compute-02
+
+[overcloud:children]
+controller
+compute
