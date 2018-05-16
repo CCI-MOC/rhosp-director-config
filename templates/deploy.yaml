@@ -29,31 +29,34 @@ parameter_defaults:
   # overcloud.
   InternalApiNetCidr: 192.168.32.0/22
   InternalApiAllocationPools:
-    - start: 192.168.32.XX
-      end: 192.168.32.XX
+    - start: 192.168.32.10
+      end: 192.168.32.254
   InternalApiNetworkVlanID: 3702
 
   # The Storage network is used for Cinder, Ceph, and Swift.
   StorageNetCidr: 192.168.16.0/22
   StorageAllocationPools:
-    - start: 192.168.16.XX
-      end: 192.168.16.XX
+    - start: 192.168.17.10
+      end: 192.168.17.254
   StorageNetworkVlanID: 3700
 
   # The Tenant network is used for tenant-created networks.
-  TenantNetCidr: 192.168.202.0/24
+  TenantNetCidr: 192.168.28.0/22
   TenantAllocationPools:
-    - start: 192.168.202.20
-      end: 192.168.202.200
+    - start: 192.168.28.10
+      end: 192.168.28.254
 
   ExternalNetCidr: 192.12.185.0/24
-  ExternalInterfaceDefaulrRoute: 192.12.185.1
+  ExternalInterfaceDefaultRoute: 192.12.185.1
   ExternalAllocationPools:
-    - start: 192.12.185.XX
-      end: 192.12.185.XX
+    - start: 192.12.185.10
+      end: 192.12.185.254
   ExternalNetworkVlanID: 105
 
+  FloatingNetworkVlanID: 3803
+
   ControlPlaneDefaultRoute: 192.168.24.1
+  ControlPlaneNetworkVlanID: 3703
 
   # The overcloud nodes access the OpenStack metadata service at the
   # EC2MetadataIp address.
