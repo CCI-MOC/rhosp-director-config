@@ -1,0 +1,177 @@
+---
+# This file defines the network interface configuration to be used on
+# Compute nodes.
+
+heat_template_version: pike
+description: >
+  Software Config to drive os-net-config to configure multiple
+  interfaces for the compute role.
+parameters:
+  ControlPlaneIp:
+    default: ''
+    description: IP address/subnet on the ctlplane network
+    type: string
+  ExternalIpSubnet:
+    default: ''
+    description: IP address/subnet on the external network
+    type: string
+  InternalApiIpSubnet:
+    default: ''
+    description: IP address/subnet on the internal_api network
+    type: string
+  StorageIpSubnet:
+    default: ''
+    description: IP address/subnet on the storage network
+    type: string
+  StorageMgmtIpSubnet:
+    default: ''
+    description: IP address/subnet on the storage_mgmt network
+    type: string
+  TenantIpSubnet:
+    default: ''
+    description: IP address/subnet on the tenant network
+    type: string
+  # Only populated when including environments/network-management.yaml
+  ManagementIpSubnet:
+    default: ''
+    description: IP address/subnet on the management network
+    type: string
+  ControlPlaneNetworkVlanID:
+    description: Vlan ID for the control plane network
+    type: number
+  FloatingNetworkVlanID:
+    description: Vlan ID for the control plane network
+    type: number
+  ExternalNetworkVlanID:
+    default: 10
+    description: Vlan ID for the external network traffic.
+    type: number
+  InternalApiNetworkVlanID:
+    default: 20
+    description: Vlan ID for the internal_api network traffic.
+    type: number
+  StorageNetworkVlanID:
+    default: 30
+    description: Vlan ID for the storage network traffic.
+    type: number
+  StorageMgmtNetworkVlanID:
+    default: 40
+    description: Vlan ID for the storage mgmt network traffic.
+    type: number
+  TenantNetworkVlanID:
+    default: 50
+    description: Vlan ID for the tenant network traffic.
+    type: number
+  ManagementNetworkVlanID:
+    default: 60
+    description: Vlan ID for the management network traffic.
+    type: number
+  ControlPlaneSubnetCidr:
+    default: '24'
+    description: The subnet CIDR of the control plane network.
+    type: string
+  ControlPlaneDefaultRoute:
+    description: The default route of the control plane network.
+    type: string
+  ExternalInterfaceDefaultRoute: # Not used by default in this template
+    default: 10.0.0.1
+    description: The default route of the external network.
+    type: string
+  ManagementInterfaceDefaultRoute: # Commented out by default in this template
+    default: unset
+    description: The default route of the management network.
+    type: string
+  DnsServers:
+    default: []
+    description: >
+      A list of DNS servers (2 max for some implementations) that will
+      be added to resolv.conf.
+    type: comma_delimited_list
+  EC2MetadataIp:
+    description: The IP address of the EC2 metadata server.
+    type: string
+
+resources:
+  OsNetConfigImpl:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: script
+      config:
+        str_replace:
+          template:
+            get_file: /usr/share/openstack-tripleo-heat-templates/network/scripts/run-os-net-config.sh
+          params:
+            # This is where the network interface configuration
+            # actually begins.  We're defining a template variable
+            # named "$network_config" that will be substituted into the
+            # script mentioned in the preceding get_file directive.
+            $network_config:
+              network_config:
+              # eth0 is the foreman provisioning network and is not
+              # configured by director.
+
+              # Put storage on eth1
+              - type: vlan
+                device: eth1
+                vlan_id:
+                  get_param: StorageNetworkVlanID
+                use_dhcp: false
+                addresses:
+                - ip_netmask:
+                    get_param: StorageIpSubnet
+
+              # Attach ControlPlane, InternalApi, Storage, and
+              # External networks to eth2
+              - type: interface
+                name: eth2
+
+              - type: vlan
+                device: eth2
+                vlan_id:
+                  get_param: ControlPlaneNetworkVlanID
+                use_dhcp: false
+                addresses:
+                - ip_netmask:
+                    list_join:
+                    - /
+                    - - get_param: ControlPlaneIp
+                      - get_param: ControlPlaneSubnetCidr
+
+                routes:
+                # This sets up a static route to the OpenStack
+                # metadata service.  This will be placed into
+                # /etc/sysconfig/network-scripts/routes-eth1 by
+                # os-net-config.
+                - ip_netmask: 169.254.169.254/32
+                  next_hop:
+                    get_param: EC2MetadataIp
+
+              - type: vlan
+                device: eth2
+                vlan_id:
+                  get_param: InternalApiNetworkVlanID
+                use_dhcp: false
+                addresses:
+                - ip_netmask:
+                    get_param: InternalApiIpSubnet
+
+              # Set up an OpenvSwitch bridge to use for creating
+              # tenant networks.
+              - type: ovs_bridge
+                name: br-tenant
+                use_dhcp: false
+                addresses:
+                - ip_netmask:
+                    get_param: TenantIpSubnet
+                members:
+                - type: vlan
+                  device: eth2
+                  vlan_id:
+                    get_param: TenantNetworkVlanID
+                  primary: true
+
+outputs:
+  OS::stack_id:
+    description: The OsNetConfigImpl resource.
+    value:
+      get_resource: OsNetConfigImpl
