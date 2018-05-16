@@ -4,8 +4,8 @@ resource_registry:
   # Notice that because we are using pre-provisioned servers, our
   # roles are named ComputeDeployedServer and
   # ControllerDeployedServer, rather than Compute and Controller.
-  OS::TripleO::ComputeDeployedServer::Net::SoftwareConfig: /home/stack/templates/network/config/compute.yaml
-  OS::TripleO::ControllerDeployedServer::Net::SoftwareConfig: /home/stack/templates/network/config/controller.yaml
+  OS::TripleO::ComputeDeployedServer::Net::SoftwareConfig: network/config/compute.yaml
+  OS::TripleO::ControllerDeployedServer::Net::SoftwareConfig: network/config/controller.yaml
 
 parameter_defaults:
 
