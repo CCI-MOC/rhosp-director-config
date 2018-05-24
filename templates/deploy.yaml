@@ -41,6 +41,7 @@ parameter_defaults:
   StorageNetworkVlanID: 3700
 
   # The Tenant network is used for tenant-created networks.
+  TenantNetworkVlanID: 3704
   TenantNetCidr: 192.168.28.0/22
   TenantAllocationPools:
     - start: 192.168.28.10
