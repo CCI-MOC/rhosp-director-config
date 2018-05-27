@@ -122,9 +122,6 @@ resources:
 
               # Attach ControlPlane, InternalApi, Storage, and
               # External networks to eth2
-              - type: interface
-                name: eth2
-
               - type: vlan
                 device: eth2
                 vlan_id:
@@ -155,20 +152,14 @@ resources:
                 - ip_netmask:
                     get_param: InternalApiIpSubnet
 
-              # Set up an OpenvSwitch bridge to use for creating
-              # tenant networks.
-              - type: ovs_bridge
-                name: br-tenant
+              - type: vlan
+                device: eth2
+                vlan_id:
+                  get_param: TenantNetworkVlanID
                 use_dhcp: false
                 addresses:
                 - ip_netmask:
                     get_param: TenantIpSubnet
-                members:
-                - type: vlan
-                  device: eth2
-                  vlan_id:
-                    get_param: TenantNetworkVlanID
-                  primary: true
 
 outputs:
   OS::stack_id:

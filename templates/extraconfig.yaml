@@ -1,0 +1,56 @@
+---
+heat_template_version: pike
+
+parameters:
+  servers:
+    type: json
+  FloatingNetworkVlanID:
+    type: string
+
+resources:
+  ExtraConfig:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: script
+      config:
+        str_replace:
+          template: |
+            #!/bin/sh
+            iface=vlan@VLANID@
+
+            # if the target interface does not exist, exit
+            # with no changes
+            if ! ip addr show $iface; then
+              exit 0
+            fi
+
+            # if br-ex does not exist, exit with no changes
+            if ! ovs-vsctl list-ports br-ex; then
+              exit 0
+            fi
+
+            # if the interface has already been added to the bridge,
+            # exit with no changes
+            if ovs-vsctl list-ports br-ex | grep -q $iface; then
+              exit 0
+            fi
+
+            # add the target interface to the bridge
+            ovs-vsctl add-port br-ex $iface
+          params:
+            "@VLANID@": {get_param: FloatingNetworkVlanID}
+
+  ExtraDeployments:
+    type: OS::Heat::SoftwareDeploymentGroup
+    properties:
+      servers: {get_param: servers}
+      config: {get_resource: ExtraConfig}
+      actions: ['CREATE']
+
+outputs:
+  deploy_status_code:
+    value: {get_attr: [ExtraDeployments, deploy_status_codes]}
+  deploy_stdouts:
+    value: {get_attr: [ExtraDeployments, deploy_stdouts]}
+  deploy_stderrs:
+    value: {get_attr: [ExtraDeployments, deploy_stderrs]}
