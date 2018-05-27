@@ -68,13 +68,19 @@ parameter_defaults:
   # Neutron configuration option.
   NeutronExternalNetworkBridge: "''"
 
-  # In the stock configuration, CephCluster and SwiftMgmt traffic goes
-  # over the StorageManagement network, but I've disabled that in this
-  # deployment.  The default rules means that in the absence of the
-  # StorageManagement network, this traffic would instead go over the
-  # ControlPlane network.  The following stanza modifies that default
-  # so that the CephCluster and SwiftMgmt traffic goes over the
-  # Storage network instead.
   ServiceNetMap:
+    # In the stock configuration, CephCluster and SwiftMgmt traffic goes
+    # over the StorageManagement network, but I've disabled that in this
+    # deployment.  The default rules means that in the absence of the
+    # StorageManagement network, this traffic would instead go over the
+    # ControlPlane network.  The following lines modify that default
+    # so that the CephCluster and SwiftMgmt traffic goes over the
+    # Storage network instead.
     CephClusterNetwork: storage
     SwiftMgmtNetwork: storage
+
+    # Director likes to place the Keystone 'admin' endpoint on the
+    # ControlPlane network, but since in our environment that network
+    # won't be accessible from anywhere other than the undercloud,
+    # we're moving that to the external network.
+    KeystoneAdminApiNetwork: external
