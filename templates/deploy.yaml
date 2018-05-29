@@ -9,6 +9,11 @@ resource_registry:
   OS::TripleO::ControllerDeployedServer::Net::SoftwareConfig: network/config/controller.yaml
   OS::TripleO::NodeExtraConfigPost: extraconfig.yaml
 
+  # Disable swift
+  OS::TripleO::Services::SwiftProxy: OS::Heat::None
+  OS::TripleO::Services::SwiftStorage: OS::Heat::None
+  OS::TripleO::Services::SwiftRingBuilder: OS::Heat::None
+
 parameter_defaults:
 
   ##
@@ -20,6 +25,8 @@ parameter_defaults:
   # roles have different names.
   ControllerDeployedServerCount: 3
   ComputeDeployedServerCount: 2
+
+  KeystoneRegion: moc-kumo
 
   ##
   ## Network configuration
@@ -86,3 +93,6 @@ parameter_defaults:
     # won't be accessible from anywhere other than the undercloud,
     # we're moving that to the external network.
     KeystoneAdminApiNetwork: external
+
+  # Set timezone of deployed hosts
+  TimeZone: "US/Eastern"
