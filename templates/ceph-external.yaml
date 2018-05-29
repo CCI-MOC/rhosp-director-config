@@ -20,7 +20,7 @@ parameter_defaults:
 
   # 
   # Type: string
-  CephClientUserName: openstack
+  CephClientUserName: kumostack
 
   # The Ceph cluster FSID. Must be a UUID.
   # Mandatory. This parameter must be set by the user.
@@ -41,7 +41,7 @@ parameter_defaults:
 
   # 
   # Type: string
-  CinderRbdPoolName: kumo
+  CinderRbdPoolName: kumostack
 
   # The short name of the Glance backend to use. Should be one of swift, rbd, cinder, or file
   # Type: string
@@ -49,7 +49,7 @@ parameter_defaults:
 
   # 
   # Type: string
-  GlanceRbdPoolName: kumo
+  GlanceRbdPoolName: kumostack
 
   # The short name of the Gnocchi backend to use. Should be one of swift, rbd, or file
   # Type: string
@@ -57,7 +57,7 @@ parameter_defaults:
 
   # 
   # Type: string
-  GnocchiRbdPoolName: kumo
+  GnocchiRbdPoolName: kumostack
 
   # Whether to enable or not the Rbd backend for Nova
   # Type: boolean
@@ -65,7 +65,7 @@ parameter_defaults:
 
   # 
   # Type: string
-  NovaRbdPoolName: kumo
+  NovaRbdPoolName: kumostack
 
   # The default features enabled when creating a block device image. Only applies to format 2 images. Set to '1' for Jewel clients using older Ceph servers.
   # Type: string
