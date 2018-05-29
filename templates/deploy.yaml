@@ -60,7 +60,7 @@ parameter_defaults:
   ExternalInterfaceDefaultRoute: 192.12.185.1
   ExternalAllocationPools:
     - start: 192.12.185.10
-      end: 192.12.185.254
+      end: 192.12.185.100
   ExternalNetworkVlanID: 105
 
   FloatingNetworkVlanID: 3803

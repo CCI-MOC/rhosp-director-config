@@ -23,5 +23,5 @@ openstack overcloud deploy \
 	-e $TEMPLATES/environments/deployed-server-pacemaker-environment.yaml \
 	-r $TEMPLATES/deployed-server/deployed-server-roles-data.yaml \
 	-e $PWD/templates/deploy.yaml \
-	-e $PWD/template/ceph-external.yaml \
+	-e $PWD/templates/ceph-external.yaml \
 	-e $PWD/templates/credentials.yaml

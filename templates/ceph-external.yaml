@@ -72,7 +72,7 @@ parameter_defaults:
   RbdDefaultFeatures: ''
 
 resource_registry:
+  OS::TripleO::Services::CephExternal: /usr/share/openstack-tripleo-heat-templates/puppet/services/ceph-external.yaml
   OS::TripleO::Services::CephClient: OS::Heat::None
-  OS::TripleO::Services::CephExternal: ceph-external.yaml
   OS::TripleO::Services::CephMon: OS::Heat::None
   OS::TripleO::Services::CephOSD: OS::Heat::None
