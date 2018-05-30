@@ -107,8 +107,10 @@ resources:
             # script mentioned in the preceding get_file directive.
             $network_config:
               network_config:
-              # eth0 is the foreman provisioning network and is not
-              # configured by director.
+              # eth0 is the foreman provisioning network
+              - type: interface
+                name: eth0
+                use_dhcp: true
 
               # Put storage on eth1
               - type: vlan
