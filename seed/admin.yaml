@@ -1,0 +1,77 @@
+---
+- hosts: localhost
+  tags: [compute]
+  tasks:
+    - name: create flavors
+      os_nova_flavor:
+        name: "{{ item.name }}"
+        ram: "{{ item.ram }}"
+        vcpus: "{{ item.vcpus }}"
+        disk: "{{ item.disk }}"
+      loop: "{{ seed_flavors }}"
+
+- hosts: localhost
+  tags: [image]
+  tasks:
+    - name: fetch cirros image
+      get_url:
+        url: "{{ cirros_image_url }}"
+        dest: ./cirros.qcow2
+
+    - name: create images
+      os_image:
+        name: cirros
+        container_format: bare
+        disk_format: qcow2
+        filename: cirros.qcow2
+        is_public: true
+
+- hosts: localhost
+  tags: [network]
+  tasks:
+    - name: create external network
+      os_network:
+        name: external
+        external: true
+        provider_network_type: flat
+        provider_physical_network: datacentre
+        shared: true
+
+    - name: create external subnet
+      os_subnet:
+        name: external-subnet
+        network_name: external
+        cidr: 128.31.28.0/24
+        enable_dhcp: false
+
+- hosts: localhost
+  tags: [identity]
+  tasks:
+    - name: create projects
+      os_project:
+        name: "{{ item }}"
+        domain: default
+      loop: "{{ seed_projects }}"
+
+    - name: create users
+      os_user:
+        name: "{{ item.name }}"
+        email: "{{ item.email }}"
+        default_project: "{{ item.project }}"
+        password: "{{ lookup('password', 'credentials/' + item.name + '-password length=20') }}"
+        domain: default
+        update_password: on_create
+      loop: "{{ seed_users }}"
+
+    - name: assign user membership
+      os_user_role:
+        user: "{{ item.name }}"
+        project: "{{ item.project }}"
+        role: _member_
+      loop: "{{ seed_users }}"
+
+    - name: create credentials files
+      template:
+        src: ./keystonerc.in
+        dest: "credentials/keystonerc-{{ item.name }}"
+      loop: "{{ seed_users }}"

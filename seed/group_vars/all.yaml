@@ -1,0 +1,20 @@
+---
+seed_flavors:
+  - name: tiny
+    ram: 256
+    vcpus: 1
+    disk: 1
+
+seed_projects:
+  - mocoper
+
+seed_users:
+  - name: lars
+    email: lars@redhat.com
+    project: mocoper
+
+  - name: rado
+    email: radonm@bu.edu
+    project: mocoper
+
+cirros_image_url: http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img
