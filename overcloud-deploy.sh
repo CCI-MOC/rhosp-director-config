@@ -21,6 +21,7 @@ openstack overcloud deploy \
 	-e $TEMPLATES/environments/deployed-server-environment.yaml \
 	-e $TEMPLATES/environments/deployed-server-bootstrap-environment-rhel.yaml \
 	-e $TEMPLATES/environments/deployed-server-pacemaker-environment.yaml \
+	-e $TEMPLATES/environments/ssl/enable-tls.yaml \
 	-r $TEMPLATES/deployed-server/deployed-server-roles-data.yaml \
 	-e $PWD/templates/deploy.yaml \
 	-e $PWD/templates/ceph-external.yaml \
