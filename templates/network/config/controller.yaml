@@ -189,6 +189,7 @@ resources:
               - type: ovs_bridge
                 name: br-ex
                 use_dhcp: false
+                members: []
 
 outputs:
   OS::stack_id:
