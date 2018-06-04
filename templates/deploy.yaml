@@ -96,3 +96,20 @@ parameter_defaults:
 
   # Set timezone of deployed hosts
   TimeZone: "US/Eastern"
+
+  ExtraConfig:
+    tripleo::firewall::firewall_rules:
+      "003 accept ssh ipv4":
+        port: 22
+        proto: tcp
+        source: 10.13.96.0/22
+        state: NEW
+        action: accept
+
+  PublicVirtualFixedIPs:
+    - ip_address: 192.12.185.13
+
+  NovaApiPolicies:
+    allow_users_to_reset:
+      key: 'os_compute_api:os-admin-actions:reset_state'
+      value: 'rule:admin_or_owner'
