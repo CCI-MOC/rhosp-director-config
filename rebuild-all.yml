@@ -1,0 +1,6 @@
+- hosts: localhost
+  tasks:
+    - name: trigger rebuild on overcloud hosts
+      command: >-
+        hammer host update --build true --name {{item}}
+      loop: "{{ groups.overcloud }}"
