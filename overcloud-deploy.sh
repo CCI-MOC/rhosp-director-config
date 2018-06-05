@@ -11,6 +11,9 @@ TEMPLATES=/usr/share/openstack-tripleo-heat-templates
 # configuration you provide would be lost and replaced with the
 # defaults.
 
+# clean up any old credentials
+rm -f overcloudrc overcloudrc.v3
+
 openstack overcloud deploy \
 	--templates $TEMPLATES \
 	--disable-validations --deployed-server \
