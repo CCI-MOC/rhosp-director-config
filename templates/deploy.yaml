@@ -99,8 +99,8 @@ parameter_defaults:
     # Director likes to place the Keystone 'admin' endpoint on the
     # ControlPlane network, but since in our environment that network
     # won't be accessible from anywhere other than the undercloud,
-    # we're moving that to the external network.
-    KeystoneAdminApiNetwork: external
+    # we're moving that to the internal network.
+    KeystoneAdminApiNetwork: internal_api
 
   # Set timezone of deployed hosts
   TimeZone: "US/Eastern"
