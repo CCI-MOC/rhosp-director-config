@@ -111,6 +111,7 @@ resources:
               - type: interface
                 name: eth0
                 use_dhcp: true
+                defroute: false
 
               # Put storage on eth1
               - type: vlan
