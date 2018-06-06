@@ -9,10 +9,10 @@ export OS_PROJECT_NAME={{ item.project }}
 export OS_PASSWORD="{{ lookup('password', 'credentials/' + item.name + '-password length=20') }}"
 export OS_NO_CACHE=True
 export COMPUTE_API_VERSION=1.1
-export no_proxy=,192.12.185.12,192.12.185.12
+export no_proxy={{ lookup('env', 'no_proxy') }}
 export OS_VOLUME_API_VERSION=3
 export OS_CLOUDNAME=overcloud-{{ item.name }}
-export OS_AUTH_URL=http://192.12.185.12:5000/v3
+export OS_AUTH_URL={{ lookup('env', 'OS_AUTH_URL') }}
 export IRONIC_API_VERSION=1.34
 export OS_IDENTITY_API_VERSION=3
 export OS_IMAGE_API_VERSION=2
