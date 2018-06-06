@@ -1,0 +1,275 @@
+<%#
+kind: provision
+name: Kickstart KUMO default
+oses:
+- RedHat 4
+- RedHat 5
+- RedHat 6
+- RedHat 7
+%>
+<%#
+This template accepts the following parameters:
+- lang: string (default="en_US.UTF-8")
+- selinux: string (default="enforcing")
+- keyboard: string (default="us")
+- time-zone: string (default="UTC")
+- http-proxy: string (default="")
+- http-proxy-port: string (default="")
+- force-puppet: boolean (default=false)
+- enable-puppetlabs-repo: boolean (default=false)
+- salt_master: string (default=undef)
+- ntp-server: string (default="0.fedora.pool.ntp.org")
+- bootloader-append: string (default="nofb quiet splash=quiet")
+%>
+<%
+  os_major = @host.operatingsystem.major.to_i
+  # safemode renderer does not support unary negation
+  pm_set = @host.puppetmaster.empty? ? false : true
+  proxy_uri = @host.params['http-proxy'] ? "http://#{@host.params['http-proxy']}:#{@host.params['http-proxy-port']}" : nil
+  proxy_string = proxy_uri ? " --proxy=#{proxy_uri}" : ''
+  puppet_enabled = pm_set || @host.param_true?('force-puppet')
+  salt_enabled = @host.params['salt_master'] ? true : false
+  section_end = os_major <= 5 ? '' : '%end'
+%>
+install
+<%= @mediapath %><%= proxy_string %>
+lang <%= @host.params['lang'] || 'en_US.UTF-8' %>
+selinux --<%= @host.params['selinux'] || 'enforcing' %>
+keyboard <%= @host.params['keyboard'] || 'us' %>
+skipx
+
+<% subnet = @host.subnet -%>
+<% if subnet.respond_to?(:dhcp_boot_mode?) -%>
+  <% dhcp = subnet.dhcp_boot_mode? && !@static -%>
+<% else -%>
+  <% dhcp = !@static -%>
+<% end -%>
+network --bootproto <%= dhcp ? 'dhcp' : "static --ip=#{@host.ip} --netmask=#{subnet.mask} --gateway=#{subnet.gateway} --nameserver=#{[subnet.dns_primary, subnet.dns_secondary].select(&:present?).join(',')}" %> --hostname <%= @host %><%= os_major >= 6 ? " --device=#{@host.mac}" : '' -%>
+
+rootpw --iscrypted <%= root_pass %>
+firewall --<%= os_major >= 6 ? 'service=' : '' %>ssh
+authconfig --useshadow --passalgo=sha256 --kickstart
+timezone America/New_York
+
+<% if os_major >= 7 && @host.info['parameters']['realm'] && @host.realm && @host.realm.realm_type == 'Active Directory' -%>
+# One-time password will be requested at install time. Otherwise, $HOST[OTP] is used as a placeholder value.
+realm join --one-time-password=<%= @host.otp || "$HOST[OTP]" %> <%= @host.realm %>
+<% end -%>
+
+<% if os_major > 4 -%>
+services --disabled gpm,sendmail,cups,pcmcia,isdn,rawdevices,hpoj,bluetooth,openibd,avahi-daemon,avahi-dnsconfd,hidd,hplip,pcscd
+
+#repo --name="EPEL" --mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=epel-<%= @host.operatingsystem.major %>&arch=<%= @host.architecture %><%= proxy_string %>
+<% if puppet_enabled && @host.param_true?('enable-puppetlabs-repo') -%>
+#repo --name=puppetlabs-products --baseurl=http://yum.puppetlabs.com/el/<%= @host.operatingsystem.major %>/products/<%= @host.architecture %><%= proxy_string %>
+#repo --name=puppetlabs-deps --baseurl=http://yum.puppetlabs.com/el/<%= @host.operatingsystem.major %>/dependencies/<%= @host.architecture %><%= proxy_string %>
+<% end -%>
+<% end -%>
+
+bootloader --location=mbr --append="<%= @host.params['bootloader-append'] || 'nofb quiet splash=quiet' %>" <%= grub_pass %>
+<% if os_major == 5 -%>
+key --skip
+<% end -%>
+
+
+<% if @dynamic -%>
+%include /tmp/diskpart.cfg
+<% else -%>
+<%= @host.diskLayout %>
+<% end -%>
+
+text
+reboot
+
+%packages
+yum
+dhclient
+ntp
+wget
+mc
+net-tools
+bind-utils
+deltarpm
+smartmontools
+hdparm
+traceroute
+@Core
+<% if os_major >= 6 -%>
+redhat-lsb-core
+<% end -%>
+#epel-release
+<% if puppet_enabled && @host.param_true?('enable-puppetlabs-repo') -%>
+#puppetlabs-release
+<% end -%>
+<% if salt_enabled %>
+salt-minion
+<% end -%>
+<%= section_end -%>
+
+<% if @dynamic -%>
+%pre
+<%= @host.diskLayout %>
+<%= section_end -%>
+<% end -%>
+
+%post --nochroot
+exec < /dev/tty3 > /dev/tty3
+#changing to VT 3 so that we can see whats going on....
+/usr/bin/chvt 3
+(
+cp -va /etc/resolv.conf /mnt/sysimage/etc/resolv.conf
+/usr/bin/chvt 1
+) 2>&1 | tee /mnt/sysimage/root/install.postnochroot.log
+<%= section_end -%>
+
+%post
+logger "Starting anaconda <%= @host %> postinstall"
+exec < /dev/tty3 > /dev/tty3
+#changing to VT 3 so that we can see whats going on....
+/usr/bin/chvt 3
+(
+<% if subnet.respond_to?(:dhcp_boot_mode?) -%>
+<%= snippet 'kumostack_networking_setup' %>
+<% end -%>
+
+#update local time
+echo "updating system time"
+/usr/sbin/ntpdate -sub <%= @host.params['ntp-server'] || '0.fedora.pool.ntp.org' %>
+/usr/sbin/hwclock --systohc
+mkdir /root/.ssh 
+cat <<EOF > /root/.ssh/authorized_keys
+ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAgEAiEjZW0KjTDIuQlv0V5oSpYhAfwRLSraFSNI5ZP25NBK6GOhdrxigYOrCsqhkzLpAEZy63y1uA3R6hJyQ9vuDKG8vq4bhrFon8BdCpBT6BKHWiWMg+ffru9OLWvqOGH1fcSiyGFFsIWDCSEpGdVT+TI6tSRRlKqJnPA+cFGdDrFYcuWVy1vQmUEVgjc1KPVnZaB+GRijx8YAQ1Kiq0xEB3u4EZArnqUp52b91/pISARJSFlm6+ifNHJMPrj4xql33Kpu0PPxWknnfHbrvBsjXjadI4dVkLnWavi1Ydw6rkWx83e8erzNwy2kb1G1EEIc4UGtJlBGEfqB7UU0SF7RIS5xrMDOe4ywXxPTWh4OE4XM9OznfxFVE4/Fq8a6Ujc5XFIkinQpLJ43JU1X/b7jA7Azl/TVG1y12pQ8lPCZNAbvg/AJza/FYjqBNAAXvQvnccciin78vFjRuXsBDHwtqtW+YwicDukBK6FnTwvoopP5vdT+TeKTi5m3hZizlP/oOTCCC2vs93z6fK7ztVBrfN+Fzf/rq41UHpp+Sv38Vap69u6TGijwxvYjaI31ur1qHfBML9No1+cfkdtAl/RAuP1qoKjsExoZGHoKIWQaTabjuYitYvpSZLOOWrbX/a1+ctqgUNhBr3aaiAs/vhQA1xWXBEe2JO2JFOdP83X1h/K0= rado-20111209
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDHU+dRblINH9VOKWKluyyE1xz0GG6YMIiTCgUlDrEzvybC0Y0luIj87rQFHmihYFrmYdrCe2v2dFo1LggJEMPh3jfrXzJVl7KjbTOdsUSVwWCHD07uAiyNmH7aNGFuS4B6oiQj5NSTzl5C0Mvt/JIZmkky2305tZoF40bGlHP/U3tXoU+QPRqV44HR0AdkMArHADQoR/cpEQJantNuQsV2BouzfOJ8GcFLDU2ZPESgubrd4CxQ7p2+uujl0WsTsz0Ip3FkJINBHBnOGM9NteHVsiGJgmg3oeOhcH31bjYOToRNKvjAiepAsQMjhfm3GE850DcFJO6kEGD8umbhRiXZIfGJkqw1HWzcaN09q9cOWczMUytGBy6BGc7eNdf03F9FHLOO8c5gcA6Sd7rJFZD6LbRv+O8mtbLpL9Bi41I/5vNgNo0HI0Z2w56r9F8rRQ+jy4HR29hvV5yR7LZHC2kJ3TZiZBeqy5UG6SlQI4fOq1JHQ9/IzT4wV+sxQz38k3Yir6RE/Yg9N8wTMxpYG5/LsXa/eGRThCRbbaY5IgSK4NAWDDhMEt9TqTwrNSzEMi6Xv5DLROtyctUNN5fcN2M+evcJ4GqUgaw87e6Jk89cyQj/f3XLRjO2Yxudl5uLDd4f5aOnMJxsr8+3j5xMe8BNM9VkZqhPM/FEhi40xAl9lQ== lars@redhat
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDAdO0nT5TtaJEgII1yY1uQFEnHYI7nb+N5zj08NzJfH8B2uWrpKKoUGN3L86r3yELhm/MXjJzXEABBXb01WDgNKMy0/GqM1Ii8yuZnubtRo2nFV4EnM6lirqx1OdKeqXaH6M7jUiEl6CPlcM75xsrb+fhZHnwX1ejBXhFEughT8f4g5jWordltAepDc1isiy+QgVwGWxCWWJoBR0+Fs4K6YPi9WzbsEDXDIqr+S8O4Wtte3qI8v5Dq7lzlwuFAQ0zvd1KE2AaZUdc6jGu+NfRQjXAoFL7TMwInAkJDOu0HUt4PFhlGmiLstK3NdaMNLH57gT+X8sWb4nyMQeUUwsir ck@ck-ThinkPad-T42
+ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEArmoN6JoONN7JtXCTK8IplnoDO0P1CsuhZlfqrT2eYGTh7w73e63WM+wDfdWMK06D/ffQGkJQeCLT20HMNSRMlWmu+SU0CqnD/C4THxoTGZZvBHA/bMgZT+asBk6EX3pDrZOl4ucaYFY2fh1NRrhUZVae9rdXS2e07yrOq+M8xCRHD40RLaQJ+srBvNHyG7avsonlu02Q9ftoBsypM4tPh5E3Pwh/RdEtpPRNf+nL/kf0XADp/RLHgJO/3PEBNEyPOXZgH6UNQGLtmXraugKo9FFmcQdtA5lXGNl2JCXD6UC/jPZdx0A3v04n1CL+6BPVSW3U97osRnyRIkfSK1R+GQ== pjd@peter-desnoyerss-mac-mini.local
+EOF
+chmod 700 /root/.ssh
+chmod 600 /root/.ssh/authorized_keys
+chmod +x /etc/rc.d/rc.local
+
+echo fs.file-max = 100000 >> /etc/sysctl.conf 
+echo '*      soft nproc 10000' >> /etc/security/limits.conf
+echo '*      hard nproc 10000' >> /etc/security/limits.conf
+echo '*      soft nofile 10000' >> /etc/security/limits.conf
+echo '*      hard nofile 10000' >> /etc/security/limits.conf
+
+mkdir /etc/systemd/system/mariadb.service.d/
+echo '[Service]' > /etc/systemd/system/mariadb.service.d/limits.conf
+echo 'LimitNOFILE=infinity' >> /etc/systemd/system/mariadb.service.d/limits.conf
+echo 'LimitMEMLOCK=infinity' >> /etc/systemd/system/mariadb.service.d/limits.conf
+
+echo "Setting local repos and updating..."
+wget http://repos/repos/epel7local.repo -O /etc/yum.repos.d/epel7local.repo
+grep -i 'red hat' /etc/redhat-release && wget http://repos/repos/rhel7local.repo -O /etc/yum.repos.d/rhel7local.repo 
+grep -i centos /etc/redhat-release && wget http://repos/repos/centos7local.repo -O /etc/yum.repos.d/centos7local.repo && rm -rf /etc/yum.repos.d/Cent*
+wget http://repos/repos/suricata7local.repo -O /etc/yum.repos.d/suricata7local.repo
+wget http://repos/repos/sensulocal.repo -O /etc/yum.repos.d/sensulocal.repo
+yum -y update
+yum -y install python-heat-agent python-heat-agent-ansible python-heat-agent-apply-config python-heat-agent-docker-cmd python-heat-agent-hiera python-heat-agent-json-file python-heat-agent-puppet
+
+useradd -c 'Director user' stack
+install -d -m 700 -o stack -g stack /home/stack/.ssh
+install -m 600 -o stack -g stack /dev/null /home/stack/.ssh/authorized_keys
+cat > /home/stack/.ssh/authorized_keys <<EOF
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCp+o4l8efXw7xz9772v3TjEruviV0LiyRk37QrVeSK7xLAD0lJhdGv4rnuTPzo74HUJL0LjHzavxzWlwxZuFVt1nVw71kBiXFv45Wxe3loccWWmDkJdMxzmoxrH3rQFBTECuAhqAkKxJFwsSNxC7MSXAM33pCYpqRhHA13LGKi5DnJsP+NvsAv9FvrtrBr95fZ4SrvtA9yDfgVqfKxh3HIbaOltR9v4MWL//0IrO49ednvzeV0A06Bi1HceU+lONjUQTPcW/49nynfCinOEX0BJM6jPn1iRoW+pocqRPr5cLIAkV0rRWO136uTEsZ51QqmDPgY832vtnR+IViHEFWJ stack@kumo-undercloud.kumo.int
+EOF
+
+install -m 440 -o root -g root /dev/null /etc/sudoers.d/stack
+cat > /etc/sudoers.d/stack <<EOF
+stack ALL = NOPASSWD: ALL
+EOF
+
+cat > /etc/sysconfig/network-scripts/route-eth0 <<EOF
+192.168.24.1 via 10.13.97.31 metric 1000
+EOF
+
+sed -i '/wheel/d' /etc/sudoers
+sed -i '/Defaults    requiretty/d' /etc/sudoers
+echo '%wheel  ALL=(ALL)       NOPASSWD: ALL'  >> /etc/sudoers
+
+grep radonm /etc/aliases > /dev/null && exit
+yum -y install mailx
+echo root: radonm@bu.edu >> /etc/aliases
+newaliases
+
+if [ "`dmidecode |grep 'Vendor: LENOVO'`" ]; then
+  yum -y install wget glibc.i686 tcsh
+  wget repos/misc/ibm_utl_msm_14.05.02.03_linux_32-64.bin
+  chmod +x ibm_utl_msm_14.05.02.03_linux_32-64.bin
+  ./ibm_utl_msm_14.05.02.03_linux_32-64.bin -x megacli
+  cd megacli/64bit
+  ./install.csh -c
+  echo '*/5 * * * *     root   [ "`/usr/local/MegaRAID\ Storage\ Manager/StorCLI/storcli64 show|tail -n 11|head -n1| cut -d " " -f 41`" == "Opt" ] || echo `/usr/local/MegaRAID\ Storage\ Manager/StorCLI/storcli64 show`|mail -s "Check raid on `hostname`" root' > /etc/cron.d/checkraid
+fi
+
+if [ "`dmidecode |grep 'PowerEdge R730'`" ]; then
+  wget repos/msic/perccli_7.3-007.0318_linux.tar.gz
+  tar -xzvf perccli_7.3-007.0318_linux.tar.gz
+  yum -y install perccli_7.3-007.0318_linux/Linux/perccli-007.0318.0000.0000-1.noarch.rpm
+  echo '*/5 * * * *     root   [ "`/opt/MegaRAID/perccli/perccli64 show | tail -n 12|head -n1|cut -d " " -f 41`" == "Opt" ] || echo `/opt/MegaRAID/perccli/perccli64 show` | mail -s "Check raid on `hostname`" root' > /etc/cron.d/checkraid
+  echo '*/5 * * * *     root   [ "`/opt/MegaRAID/perccli/perccli64 show | tail -n 12|head -n1|cut -d " " -f 29`" == "Msng" ] ||  [ "`/opt/MegaRAID/perccli/perccli64 show | tail -n 12|head -n1|cut -d " " -f 29`" == "Opt" ]  || echo `/opt/MegaRAID/perccli/perccli64 show` | mail -s "Check raid on `hostname`" root' >> /etc/cron.d/checkraid
+fi
+
+#echo *******************************Network setup*************************************
+#chmod +x /etc/rc.local
+#echo /etc/scripts/mtuset >> /etc/rc.local
+#mkdir /etc/scripts
+#echo 'ip=$(nslookup `hostname`|grep -i address|tail -n1|cut -d " " -f 2)
+#iface=$(ip a|grep $ip|cut -d . -f 7|cut -d " " -f 6)
+#grep MTU=9050 /etc/sysconfig/network-scripts/ifcfg-$iface > /dev/null||echo MTU=9050 >> /etc/sysconfig/network-scripts/ifcfg-$iface
+#sed -i "/dhcp/d" /etc/sysconfig/network-scripts/ifcfg-$iface
+#ifconfig $iface mtu 9050
+#sed -i "/mtuset/d" /etc/rc.local
+#'> /etc/scripts/mtuset
+#chmod +x /etc/scripts/mtuset
+
+sed -i 's|PasswordAuthentication yes|PasswordAuthentication no|g' /etc/ssh/sshd_config
+
+<%= snippet 'redhat_register' %>
+
+<% if @host.info['parameters']['realm'] && @host.realm && @host.realm.realm_type == 'FreeIPA' -%>
+<%= snippet 'freeipa_register' %>
+<% end -%>
+
+<% if proxy_uri -%>
+# Yum proxy
+echo 'proxy = <%= proxy_uri %>' >> /etc/yum.conf
+<% end -%>
+
+# update all the base packages from the updates repository
+yum -t -y -e 0 update
+
+#<% if puppet_enabled %>
+## and add the puppet package
+#yum -t -y -e 0 install puppet
+
+#echo "Configuring puppet"
+#cat > /etc/puppet/puppet.conf << EOF
+#<%= snippet 'puppet.conf' %>
+#EOF
+
+# Setup puppet to run on system reboot
+#/sbin/chkconfig --level 345 puppet off
+
+#/usr/bin/puppet agent --config /etc/puppet/puppet.conf -o --tags no_such_tag <%= @host.puppetmaster.blank? ? '' : "--server #{@host.puppetmaster}" %> --no-daemonize
+#<% end -%>
+
+<% if salt_enabled %>
+cat > /etc/salt/minion << EOF
+<%= snippet 'saltstack_minion' %>
+EOF
+# Setup salt-minion to run on system reboot
+/sbin/chkconfig --level 345 salt-minion on
+# Running salt-call to trigger key signing
+salt-call --no-color --grains >/dev/null
+<% end -%>
+
+sync
+
+# Inform the build system that we are done.
+echo "Informing Foreman that we are built"
+wget -q -O /dev/null --no-check-certificate <%= foreman_url('built') %>
+) 2>&1 | tee /root/install.post.log
+exit 0
+
+<%= section_end -%>
