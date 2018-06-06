@@ -16,6 +16,11 @@ resource_registry:
 
 parameter_defaults:
 
+  CloudName: kumo.massopen.cloud
+  DnsServers:
+    - 10.13.96.1
+    - 10.13.96.252
+
   ##
   ## Server counts
   ##
