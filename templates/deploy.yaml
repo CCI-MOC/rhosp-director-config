@@ -107,7 +107,7 @@ parameter_defaults:
 
   ExtraConfig:
     tripleo::firewall::firewall_rules:
-      "003 accept ssh ipv4":
+      "003 accept ssh":
         port: 22
         proto: tcp
         source: 10.13.96.0/22
