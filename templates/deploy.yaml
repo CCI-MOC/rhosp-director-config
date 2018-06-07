@@ -5,25 +5,24 @@ resource_registry:
   # Notice that because we are using pre-provisioned servers, our
   # roles are named ComputeDeployedServer and
   # ControllerDeployedServer, rather than Compute and Controller.
-  OS::TripleO::ComputeDeployedServer::Net::SoftwareConfig: network/config/compute.yaml
-  OS::TripleO::ControllerDeployedServer::Net::SoftwareConfig: network/config/controller.yaml
+  OS::TripleO::ComputeDeployedServer::Net::SoftwareConfig:
+    network/config/compute.yaml
+  OS::TripleO::ControllerDeployedServer::Net::SoftwareConfig:
+    network/config/controller.yaml
   OS::TripleO::NodeExtraConfigPost: extraconfig.yaml
 
-  # Disable swift
+  # Disable swift (because we're using Ceph Rados Gateway).
   OS::TripleO::Services::SwiftProxy: OS::Heat::None
   OS::TripleO::Services::SwiftStorage: OS::Heat::None
   OS::TripleO::Services::SwiftRingBuilder: OS::Heat::None
 
 parameter_defaults:
 
+  # The CloudName is used in public API endpoints.
   CloudName: kumo.massopen.cloud
   DnsServers:
     - 10.13.96.1
     - 10.13.96.252
-
-  ##
-  ## Server counts
-  ##
 
   # For a normal install these would be ControllerCount and
   # ComputeCount, but since we're using pre-provisioned servers the
@@ -106,6 +105,9 @@ parameter_defaults:
   TimeZone: "US/Eastern"
 
   NovaApiPolicies:
-    allow_users_to_reset:
+    # Allow Nova instance owners to use the "reset-state" command.
+    # Note that the key here ("allow_owners_to_reset") is not
+    # significant (but it should be unique).
+    allow_owners_to_reset:
       key: 'os_compute_api:os-admin-actions:reset_state'
       value: 'rule:admin_or_owner'
