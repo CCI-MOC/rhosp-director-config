@@ -11,11 +11,6 @@ resource_registry:
     network/config/controller.yaml
   OS::TripleO::NodeExtraConfigPost: extraconfig.yaml
 
-  # Disable swift (because we're using Ceph Rados Gateway).
-  OS::TripleO::Services::SwiftProxy: OS::Heat::None
-  OS::TripleO::Services::SwiftStorage: OS::Heat::None
-  OS::TripleO::Services::SwiftRingBuilder: OS::Heat::None
-
 parameter_defaults:
 
   # The CloudName is used in public API endpoints.

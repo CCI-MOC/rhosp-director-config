@@ -37,11 +37,16 @@ deploy_args=(
 	# Use Docker registry on the undercloud.
 	-e $PWD/templates/overcloud_images.yaml
 
+	# Enable external Ceph cluster
+	-e $TEMPLATES/environments/ceph-ansible/ceph-ansible-external.yaml
+	-e $PWD/templates/ceph-external.yaml
+
+	# Enable external Ceph RadosGW (object storage)
+	-e $TEMPLATES/environments/swift-external.yaml
+	-e $PWD/templates/swift-external.yaml
+
 	# Most of our custom configuration.
 	-e $PWD/templates/deploy.yaml
-
-	# Support for an external Ceph cluster.
-	-e $PWD/templates/ceph-external.yaml
 
 	# Passwords and other credentials (this file is not included in
 	# the repository).
