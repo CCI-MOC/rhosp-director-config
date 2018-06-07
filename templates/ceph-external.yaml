@@ -8,8 +8,11 @@
 # description: |
 #   A Heat environment file which can be used to enable the
 #   use of an externally managed Ceph cluster.
+
+---
 parameter_defaults:
-  # The Ceph admin client key. Can be created with ceph-authtool --gen-print-key.
+  # The Ceph admin client key. Can be created with ceph-authtool
+  # --gen-print-key.
   # Type: string
   CephAdminKey: ''
 
@@ -18,7 +21,6 @@ parameter_defaults:
   # Type: string
   CephClientKey: <None>
 
-  # 
   # Type: string
   CephClientUserName: kumostack
 
@@ -27,52 +29,57 @@ parameter_defaults:
   # Type: string
   CephClusterFSID: <None>
 
-  # List of externally managed Ceph Mon Host IPs. Only used for external Ceph deployments.
+  # List of externally managed Ceph Mon Host IPs. Only used for
+  # external Ceph deployments.
   # Type: string
   CephExternalMonHost: ''
 
   # Whether to enable or not the Iscsi backend for Cinder
   # Type: boolean
-  CinderEnableIscsiBackend: False
+  CinderEnableIscsiBackend: false
 
   # Whether to enable or not the Rbd backend for Cinder
   # Type: boolean
-  CinderEnableRbdBackend: True
+  CinderEnableRbdBackend: true
 
-  # 
+  CinderBackupBackend: ceph
+
   # Type: string
   CinderRbdPoolName: kumostack
+  CinderBackupRbdPoolName: kumostack
 
-  # The short name of the Glance backend to use. Should be one of swift, rbd, cinder, or file
+  # The short name of the Glance backend to use. Should be one of
+  # swift, rbd, cinder, or file
   # Type: string
   GlanceBackend: rbd
 
-  # 
   # Type: string
   GlanceRbdPoolName: kumostack
 
-  # The short name of the Gnocchi backend to use. Should be one of swift, rbd, or file
+  # The short name of the Gnocchi backend to use. Should be one of
+  # swift, rbd, or file
   # Type: string
   GnocchiBackend: rbd
 
-  # 
   # Type: string
   GnocchiRbdPoolName: kumostack
 
   # Whether to enable or not the Rbd backend for Nova
   # Type: boolean
-  NovaEnableRbdBackend: True
+  NovaEnableRbdBackend: true
 
-  # 
   # Type: string
   NovaRbdPoolName: kumostack
 
-  # The default features enabled when creating a block device image. Only applies to format 2 images. Set to '1' for Jewel clients using older Ceph servers.
+  # The default features enabled when creating a block device image.
+  # Only applies to format 2 images. Set to '1' for Jewel clients
+  # using older Ceph servers.
   # Type: string
   RbdDefaultFeatures: ''
 
 resource_registry:
-  OS::TripleO::Services::CephExternal: /usr/share/openstack-tripleo-heat-templates/puppet/services/ceph-external.yaml
+  OS::TripleO::Services::CephExternal:
+    /usr/share/openstack-tripleo-heat-templates/puppet/services/ceph-external.yaml
   OS::TripleO::Services::CephClient: OS::Heat::None
   OS::TripleO::Services::CephMon: OS::Heat::None
   OS::TripleO::Services::CephOSD: OS::Heat::None
