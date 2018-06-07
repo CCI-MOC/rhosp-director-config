@@ -31,6 +31,10 @@ parameter_defaults:
   ## Network configuration
   ##
 
+  # Use the openvswitch firewall driver for implementing security
+  # groups.
+  NeutronOVSFirewallDriver: openvswitch
+
   # The InternalApi network is used for OpenStack REST API traffic
   # between the controllers and compute nodes, as well as for AMQ
   # traffic, database access, and most other traffic internal to the
