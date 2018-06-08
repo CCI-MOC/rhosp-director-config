@@ -110,3 +110,6 @@ parameter_defaults:
     allow_owners_to_reset:
       key: 'os_compute_api:os-admin-actions:reset_state'
       value: 'rule:admin_or_owner'
+
+  ControllerDeployedServerExtraConfig:
+    swift::keystone::auth::auth_name: ceph
