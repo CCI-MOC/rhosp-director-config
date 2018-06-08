@@ -1,6 +1,6 @@
 ---
 resource_registry:
-  OS::TripleO::Services::KeystoneFederation: services/keystone-federation.yaml
+  OS::TripleO::Services::Keystone: services/keystone.yaml
 
 parameter_defaults:
   ControllerDeployedServerServices:
@@ -58,7 +58,6 @@ parameter_defaults:
     - OS::TripleO::Services::Keepalived
     - OS::TripleO::Services::Kernel
     - OS::TripleO::Services::Keystone
-    - OS::TripleO::Services::KeystoneFederation
     - OS::TripleO::Services::ManilaApi
     - OS::TripleO::Services::ManilaBackendCephFs
     - OS::TripleO::Services::ManilaBackendGeneric
