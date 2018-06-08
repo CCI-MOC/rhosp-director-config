@@ -47,6 +47,9 @@ deploy_args=(
 	-e $TEMPLATES/environments/ceph-ansible/ceph-ansible-external.yaml
 	-e $PWD/templates/ceph-external.yaml
 
+	# Enable keystone federation
+	-e $PWD/templates/single-signon.yaml
+
 	# Enable external Ceph RadosGW (object storage)
 	-e $TEMPLATES/environments/swift-external.yaml
 	-e $PWD/templates/swift-external.yaml
