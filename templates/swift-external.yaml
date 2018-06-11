@@ -4,4 +4,4 @@ parameter_defaults:
   ExternalPublicUrl: 'https://kumo-rgw.massopen.cloud/swift/v1'
   ExternalInternalUrl: 'https://kumo-rgw.massopen.cloud/swift/v1'
   ExternalAdminUrl: 'https://kumo-rgw.massopen.cloud/swift/v1'
-  ExternalSwiftUserTenant: 'service'
+  ExternalSwiftUserTenant: 'admin'
