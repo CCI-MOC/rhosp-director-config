@@ -54,6 +54,10 @@ deploy_args=(
 	-e $TEMPLATES/environments/swift-external.yaml
 	-e $PWD/templates/swift-external.yaml
 
+	# Override default horizon service template with one that enables
+	# the lbaas ui
+	-e $PWD/templates/enable-lbaas-ui.yaml
+
 	# Most of our custom configuration.
 	-e $PWD/templates/deploy.yaml
 
