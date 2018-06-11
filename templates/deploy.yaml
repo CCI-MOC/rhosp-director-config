@@ -54,10 +54,10 @@ parameter_defaults:
 
   # The Tenant network is used for tenant-created networks.
   TenantNetworkVlanID: 3704
-  TenantNetCidr: 192.168.28.0/22
+  TenantNetCidr: 192.168.12.0/22
   TenantAllocationPools:
-    - start: 192.168.28.10
-      end: 192.168.28.254
+    - start: 192.168.12.10
+      end: 192.168.12.254
 
   ExternalNetCidr: 192.12.185.0/24
   ExternalInterfaceDefaultRoute: 192.12.185.1
