@@ -34,8 +34,13 @@ deploy_args=(
 	-e $TEMPLATES/environments/ssl/enable-tls.yaml
 	-e $TEMPLATES/environments/tls-endpoints-public-dns.yaml
 
-	# Enable Neutron LBaaS service
+	# Enable Neutron LBaaS service.
 	-e $TEMPLATES/environments/services/neutron-lbaasv2.yaml
+
+	# Override default horizon service template with one that enables
+	# the lbaas ui This is a workaround for
+	# https://bugzilla.redhat.com/show_bug.cgi?id=1573808
+	-e $PWD/templates/enable-lbaas-ui.yaml
 
 	# Enable Sahara
 	-e $TEMPLATES/environments/services/sahara.yaml
@@ -51,10 +56,6 @@ deploy_args=(
 	-e $TEMPLATES/environments/swift-external.yaml
 	-e $PWD/templates/swift-external.yaml
 
-	# Override default horizon service template with one that enables
-	# the lbaas ui
-	-e $PWD/templates/enable-lbaas-ui.yaml
-
 	# Most of our custom configuration.
 	-e $PWD/templates/deploy.yaml
 
@@ -68,4 +69,5 @@ openstack overcloud deploy \
 	--disable-validations --deployed-server \
 	--libvirt-type kvm \
 	--ntp-server pool.ntp.org \
-	"${deploy_args[@]}"
+	"${deploy_args[@]}" \
+	"$@"
