@@ -61,6 +61,11 @@ deploy_args=(
 	-e $PWD/templates/credentials.yaml
 )
 
+if [ -d patches/puppet-modules ]; then
+	upload-puppet-modules -d patches/puppet-modules
+	deploy_args+=(-e $HOME/.tripleo/environments/puppet-modules-url.yaml)
+fi
+
 openstack overcloud deploy \
 	--templates $TEMPLATES \
 	--disable-validations --deployed-server \
