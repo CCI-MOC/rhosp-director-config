@@ -11,9 +11,6 @@ TEMPLATES=/usr/share/openstack-tripleo-heat-templates
 # configuration you provide would be lost and replaced with the
 # defaults.
 
-# clean up any old credentials
-rm -f overcloudrc overcloudrc.v3
-
 deploy_args=(
 	# network_data.yaml defines a custom network configuration. In 
 	# particular, we disable the StorageMgmt network, since we're not
