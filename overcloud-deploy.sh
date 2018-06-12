@@ -49,6 +49,9 @@ deploy_args=(
 	# Use Docker registry on the undercloud.
 	-e $PWD/templates/overcloud_images.yaml
 
+	# Enable keystone federation
+	-e $PWD/templates/single-signon.yaml
+
 	# Enable external Ceph cluster
 	-e $TEMPLATES/environments/ceph-ansible/ceph-ansible-external.yaml
 	-e $PWD/templates/ceph-external.yaml
