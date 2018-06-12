@@ -1,6 +1,10 @@
 #!/bin/bash
 
-TEMPLATES=/usr/share/openstack-tripleo-heat-templates
+if [ -d patches/tripleo-heat-templates ]; then
+	TEMPLATES=$PWD/patches/tripleo-heat-templates
+else
+	TEMPLATES=/usr/share/openstack-tripleo-heat-templates
+fi
 
 # When passing environment files (`-e ...`) to the `overcloud deploy`
 # command, order is important! Your custom configuration
