@@ -46,6 +46,9 @@ deploy_args=(
 	# Enable Sahara
 	-e $TEMPLATES/environments/services/sahara.yaml
 
+	# Enable OpenIDC federation
+	-e $TEMPLATES/environments/enable-federation-openidc.yaml
+
 	# Use Docker registry on the undercloud.
 	-e $PWD/templates/overcloud_images.yaml
 
