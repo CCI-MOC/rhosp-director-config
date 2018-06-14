@@ -1,5 +1,5 @@
 ---
-title: Boston University MoC Director Configuration
+title: MOC OSP Director Configuration
 ---
 
 ## Hosts
