@@ -2,7 +2,7 @@
 parameter_defaults:
   KeystoneTrustedDashboards:
     - https://massopen.cloud/engage1/signup/invitations/accept
-    - https://engage1.massopen.cloud/dashboard/auth/websso/
+    - https://kumo.massopen.cloud/dashboard/auth/websso/
 
   KeystoneOpenIdcIdpName: moc
   KeystoneOpenIdcProviderMetadataUrl:
