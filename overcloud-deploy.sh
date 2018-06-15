@@ -1,6 +1,10 @@
 #!/bin/bash
 
-TEMPLATES=/usr/share/openstack-tripleo-heat-templates
+if [ -d patches/tripleo-heat-templates ]; then
+	TEMPLATES=$PWD/patches/tripleo-heat-templates
+else
+	TEMPLATES=/usr/share/openstack-tripleo-heat-templates
+fi
 
 # When passing environment files (`-e ...`) to the `overcloud deploy`
 # command, order is important! Your custom configuration
@@ -42,8 +46,14 @@ deploy_args=(
 	# Enable Sahara
 	-e $TEMPLATES/environments/services/sahara.yaml
 
+	# Enable OpenIDC federation
+	-e $TEMPLATES/environments/enable-federation-openidc.yaml
+
 	# Use Docker registry on the undercloud.
 	-e $PWD/templates/overcloud_images.yaml
+
+	# Enable keystone federation
+	-e $PWD/templates/single-signon.yaml
 
 	# Enable external Ceph cluster
 	-e $TEMPLATES/environments/ceph-ansible/ceph-ansible-external.yaml
@@ -60,6 +70,11 @@ deploy_args=(
 	# the repository).
 	-e $PWD/templates/credentials.yaml
 )
+
+if [ -d patches/puppet-modules ]; then
+	upload-puppet-modules -d patches/puppet-modules
+	deploy_args+=(-e $HOME/.tripleo/environments/puppet-modules-url.yaml)
+fi
 
 openstack overcloud deploy \
 	--templates $TEMPLATES \
