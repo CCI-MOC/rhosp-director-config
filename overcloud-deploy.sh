@@ -67,13 +67,20 @@ deploy_args=(
 )
 
 if [ -d patches/puppet-modules ]; then
-	echo "patching puppet modules..."
+	echo "archiving puppet modules..."
+	tar -cz -f puppet-modules.tar.gz -C patches/puppet-modules .
 
-	tar -cz -f patches/puppet-modules.tar.gz \
-		--transform "s|patches/puppet-modules|usr/share/openstack-puppet/modules|" \
-		patches/puppet-modules
-	upload-swift-artifacts -f patches/puppet-modules.tar.gz
-	deploy_args+=(-e $HOME/.tripleo/environments/deployment-artifacts.yaml)
+	echo "uploading puppet modules..."
+	upload-swift-artifacts \
+		-f puppet-modules.tar.gz \
+		--environment $PWD/templates/local_deploy.yaml
+
+	sed -i s/DeployArtifactURLs/PuppetModuleUrls/ \
+		$PWD/templates/local_deploy.yaml
+fi
+
+if [ -f local_deploy_config.sh ]; then
+	. local_deploy_config.sh
 fi
 
 openstack overcloud deploy \
