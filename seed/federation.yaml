@@ -1,0 +1,20 @@
+---
+- hosts: localhost
+  tags: [compute]
+  name: configure keystone federation
+  tasks:
+    - name: create idp
+      command: >-
+        openstack identity provider create
+        --remote-id https://sso.massopen.cloud/auth/realms/moc moc
+
+    - name: create mapping
+      command: >-
+        openstack mapping create --rules rules.json moc_mapping
+
+    - name: create federation protocol
+      command: >-
+        openstack federation protocol create openid
+        --mapping moc_mapping
+        --identity-provider moc
+
