@@ -107,15 +107,15 @@ resources:
             # script mentioned in the preceding get_file directive.
             $network_config:
               network_config:
-              # eth0 is the foreman provisioning network.
+              # eth2 is the foreman provisioning network.
               - type: interface
-                name: eth0
+                name: eth2
                 use_dhcp: true
                 defroute: false
 
-              # Put storage on eth1
+              # Put storage on eth3
               - type: vlan
-                device: eth1
+                device: eth3
                 vlan_id:
                   get_param: StorageNetworkVlanID
                 use_dhcp: false
