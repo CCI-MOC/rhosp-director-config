@@ -38,11 +38,6 @@ deploy_args=(
 	# Enable Neutron LBaaS service.
 	-e $TEMPLATES/environments/services/neutron-lbaasv2.yaml
 
-	# Override default horizon service template with one that enables
-	# the lbaas ui This is a workaround for
-	# https://bugzilla.redhat.com/show_bug.cgi?id=1573808
-	-e $PWD/templates/enable-lbaas-ui.yaml
-
 	# Enable Sahara
 	-e $TEMPLATES/environments/services/sahara.yaml
 
