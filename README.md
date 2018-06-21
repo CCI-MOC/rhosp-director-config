@@ -78,12 +78,6 @@ process of deploying RHOSP.
   This contains the bulk of our custom configuration (including
   information about network address ranges and vlan ids).
 
-- `templates/services/horizon.yaml`
-
-  This is a patched version of
-  `/usr/share/openstack-tripleo-heat-templates/docker/services/horizon.yaml`
-  that enables the Neutron LBaaS dashboard.
-
 - `templates/extraconfig.yaml`
 
   Contains some post-deploy actions required to finalize the network
