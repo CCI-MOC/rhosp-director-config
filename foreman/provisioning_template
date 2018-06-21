@@ -179,8 +179,8 @@ cat > /etc/sudoers.d/stack <<EOF
 stack ALL = NOPASSWD: ALL
 EOF
 
-cat > /etc/sysconfig/network-scripts/route-eth0 <<EOF
-192.168.24.1 via 10.13.97.31 metric 1000
+cat > /etc/sysconfig/network-scripts/route-eth2 <<EOF
+192.168.24.1 via 172.16.1.1 metric 1000
 EOF
 
 sed -i '/wheel/d' /etc/sudoers
