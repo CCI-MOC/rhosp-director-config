@@ -59,6 +59,7 @@ deploy_args=(
 	-e $PWD/templates/swift-external.yaml
 
 	# Most of our custom configuration.
+	-e $PWD/templates/services.yaml
 	-e $PWD/templates/deploy.yaml
 
 	# Passwords and other credentials (this file is not included in
