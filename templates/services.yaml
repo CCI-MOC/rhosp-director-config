@@ -1,7 +1,19 @@
 ---
 resource_registry:
+
+  # These lines activate our network interface configuration files.
+  # Notice that because we are using pre-provisioned servers, our
+  # roles are named ComputeDeployedServer and
+  # ControllerDeployedServer, rather than Compute and Controller.
+  OS::TripleO::ComputeDeployedServer::Net::SoftwareConfig:
+    network/config/compute.yaml
+  OS::TripleO::ControllerDeployedServer::Net::SoftwareConfig:
+    network/config/controller.yaml
+  OS::TripleO::NodeExtraConfigPost: extraconfig.yaml
   OS::Tripleo::Services::PatchPuppetModules:
     ./services/patch-puppet-modules.yaml
+  OS::Tripleo::Services::ConfigureKeystoneFederation:
+    ./services/configure-keystone-federation.yaml
 
 parameter_defaults:
   ControllerDeployedServerServices:
@@ -60,6 +72,7 @@ parameter_defaults:
     - OS::TripleO::Services::Keepalived
     - OS::TripleO::Services::Kernel
     - OS::TripleO::Services::Keystone
+    - OS::Tripleo::Services::ConfigureKeystoneFederation
     - OS::TripleO::Services::ManilaApi
     - OS::TripleO::Services::ManilaBackendCephFs
     - OS::TripleO::Services::ManilaBackendIsilon

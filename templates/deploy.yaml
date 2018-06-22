@@ -1,16 +1,4 @@
 ---
-resource_registry:
-
-  # These lines activate our network interface configuration files.
-  # Notice that because we are using pre-provisioned servers, our
-  # roles are named ComputeDeployedServer and
-  # ControllerDeployedServer, rather than Compute and Controller.
-  OS::TripleO::ComputeDeployedServer::Net::SoftwareConfig:
-    network/config/compute.yaml
-  OS::TripleO::ControllerDeployedServer::Net::SoftwareConfig:
-    network/config/controller.yaml
-  OS::TripleO::NodeExtraConfigPost: extraconfig.yaml
-
 parameter_defaults:
 
   # The CloudName is used in public API endpoints.
@@ -224,3 +212,9 @@ parameter_defaults:
     qm5vjLyb4lddJIGvl5echK1srDdMZvNhkREg5L4wn3qkKQmw4TRfZHcYQFHfjDCm
     rw==
     -----END CERTIFICATE-----
+
+  KeystoneIdentityProviders:
+    moc:
+      remote_id: https://sso.massopen.cloud/auth/realms/moc
+      rules: {get_file: ./rules.json}
+      protocol: openid
