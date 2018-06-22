@@ -1,1 +1,3 @@
 templates/credentials.yaml
+templates/overcloud_images.yaml
+local_registry_images.yaml
