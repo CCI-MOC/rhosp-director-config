@@ -1,0 +1,6 @@
+#!/usr/bin/ansible-playbook
+
+- hosts: controller
+  tasks:
+    - shell: >-
+        docker restart keystone
