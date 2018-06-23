@@ -110,6 +110,9 @@ resources:
                 - file:
                     path: /etc/openstack
                     state: directory
+                    owner: root
+                    group: root
+                    mode: 0700
 
                 - copy:
                     dest: /etc/openstack/clouds.yaml
