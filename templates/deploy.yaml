@@ -9,7 +9,7 @@ resource_registry:
     network/config/compute.yaml
   OS::TripleO::ControllerDeployedServer::Net::SoftwareConfig:
     network/config/controller.yaml
-  OS::TripleO::NodeExtraConfigPost: extraconfig.yaml
+  OS::TripleO::NodeExtraConfigPost: postconfig.yaml
 
 parameter_defaults:
 
