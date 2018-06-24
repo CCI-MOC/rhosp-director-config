@@ -50,6 +50,74 @@ resources:
       config: {get_resource: FinishNetworkConfig}
       actions: ['CREATE']
 
+  # Create /etc/openstack/clouds.yaml on all controllers.  You can
+  # use this to provide authentication information to the 'openstack'
+  # cli (as in 'openstack --os-cloud overcloud ...').
+  CreateCloudYamlConfig:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ansible
+      config: |
+        - hosts: localhost
+          connection: local
+          tasks:
+            # In order to identify whether or not we're running on a
+            # controller, we look at the list of active service names.
+            - name: get service names
+              command: hiera -c /etc/puppet/hiera.yaml service_names
+              register: service_names
+
+            - set_fact:
+                has_keystone: >-
+                  {{ 'keystone' in service_names.stdout|from_json }}
+
+            - when: has_keystone
+              block:
+                - name: get keystone admin password
+                  command: >-
+                    hiera -c /etc/puppet/hiera.yaml
+                    keystone::admin_password
+                  register: keystone_admin_password
+
+                - name: get keystone internal endpoint
+                  command: >-
+                    hiera -c /etc/puppet/hiera.yaml
+                    keystone::endpoint::internal_url
+                  register: keystone_endpoint_internal
+
+                - name: get keystone region
+                  command: hiera -c /etc/puppet/hiera.yaml keystone::endpoint::region
+                  register: keystone_region
+
+                - file:
+                    path: /etc/openstack
+                    state: directory
+                    owner: root
+                    group: root
+                    mode: 0700
+
+                - copy:
+                    dest: /etc/openstack/clouds.yaml
+                    owner: root
+                    group: root
+                    mode: "0600"
+                    content: |-
+                      clouds:
+                        overcloud:
+                          auth:
+                            username: admin
+                            project_name: admin
+                            password: "{{ keystone_admin_password.stdout }}"
+                            auth_url: "{{ keystone_endpoint_internal.stdout }}"
+                          region: "{{ keystone_region.stdout }}"
+                          identity_api_version: 3
+
+  CreateCloudYamlDeployments:
+    type: OS::Heat::SoftwareDeploymentGroup
+    properties:
+      servers: {get_param: servers}
+      config: {get_resource: CreateCloudYamlConfig}
+
   KeystoneFederationConfig:
     type: OS::Heat::SoftwareConfig
     properties:
@@ -89,46 +157,11 @@ resources:
                   command: "mktemp -td federationXXXXXX"
                   register: tempdir
 
-                - name: get keystone admin password
-                  command: hiera -c /etc/puppet/hiera.yaml keystone::admin_password
-                  register: keystone_admin_password
-
-                - name: get keystone internal endpoint
-                  command: hiera -c /etc/puppet/hiera.yaml keystone::endpoint::internal_url
-                  register: keystone_endpoint_internal
-
-                - name: get keystone region
-                  command: hiera -c /etc/puppet/hiera.yaml keystone::endpoint::region
-                  register: keystone_region
-
                 - name: write mapping rules to tempdir
                   copy:
                     dest: "{{ tempdir.stdout }}/rules-{{ item.key }}.json"
                     content: "{{ item.value.rules|to_nice_json }}"
                   with_dict: "{{ keystone_identity_providers }}"
-
-                - file:
-                    path: /etc/openstack
-                    state: directory
-                    owner: root
-                    group: root
-                    mode: 0700
-
-                - copy:
-                    dest: /etc/openstack/clouds.yaml
-                    owner: root
-                    group: root
-                    mode: "0600"
-                    content: |-
-                      clouds:
-                        overcloud:
-                          auth:
-                            username: admin
-                            project_name: admin
-                            password: "{{ keystone_admin_password.stdout }}"
-                            auth_url: "{{ keystone_endpoint_internal.stdout }}"
-                          region: "{{ keystone_region.stdout }}"
-                          identity_api_version: 3
 
                 - name: check if identity providers exist
                   command: >-
@@ -183,9 +216,9 @@ resources:
 
   KeystoneFederationDeployments:
     type: OS::Heat::SoftwareDeploymentGroup
+    depends_on: CreateCloudYamlDeployments
     properties:
       servers: {get_param: servers}
       config: {get_resource: KeystoneFederationConfig}
-      actions: ['CREATE']
       input_values:
         keystone_identity_providers: {get_param: KeystoneIdentityProviders}
