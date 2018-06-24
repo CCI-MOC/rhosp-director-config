@@ -74,10 +74,12 @@ if [ -d patches/puppet-modules ]; then
 	echo "uploading puppet modules..."
 	upload-swift-artifacts \
 		-f puppet-modules.tar.gz \
-		--environment $PWD/templates/local_deploy.yaml
+		--environment $PWD/templates/puppet_modules.yaml
 
 	sed -i s/DeployArtifactURLs/PuppetModuleUrls/ \
-		$PWD/templates/local_deploy.yaml
+		$PWD/templates/puppet_modules.yaml
+
+	deploy_args+=(-e $PWD/templates/puppet_modules.yaml)
 fi
 
 if [ -f local_deploy_config.sh ]; then

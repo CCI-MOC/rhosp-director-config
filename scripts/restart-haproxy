@@ -1,0 +1,7 @@
+#!/usr/bin/ansible-playbook
+
+- hosts: controller
+  tasks:
+    - shell: >-
+        docker container ls -q --filter name=haproxy |
+        xargs -ICID docker restart CID
