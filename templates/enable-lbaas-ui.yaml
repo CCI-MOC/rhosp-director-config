@@ -1,4 +1,0 @@
----
-resource_registry:
-
-  OS::TripleO::Services::Horizon: services/horizon.yaml
