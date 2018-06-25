@@ -27,6 +27,12 @@ parameter_defaults:
 
   KeystoneRegion: moc-kumo
 
+  NtpServer:
+    - 128.30.2.167
+    - 128.30.2.89
+    - 128.30.3.19
+    - 18.26.0.36
+
   ##
   ## Network configuration
   ##
