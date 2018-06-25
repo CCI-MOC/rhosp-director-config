@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ "$OS_CLOUDNAME" != "undercloud" ]; then
+	echo "ERROR: missing undercloud credentials" >&2
+	exit 1
+fi
+
 if [ -d patches/tripleo-heat-templates ]; then
 	TEMPLATES=$PWD/patches/tripleo-heat-templates
 else
