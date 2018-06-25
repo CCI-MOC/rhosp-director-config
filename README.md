@@ -58,8 +58,8 @@ process of deploying RHOSP.
 - `templates/network/network_data.yaml`
 
   This overrides the stock list of overcloud networks. We disable the
-  "storage management", since we're running all of our storage traffic
-  over a single vlan.
+  "storage management" network, since we're running all of our storage
+  traffic over a single vlan.
 
 - `templates/network/config/compute.yaml`
   
@@ -79,21 +79,32 @@ process of deploying RHOSP.
   This contains the bulk of our custom configuration (including
   information about network address ranges and vlan ids).
 
-- `templates/extraconfig.yaml`
+- `templates/postconfig.yaml`
 
-  Contains some post-deploy actions required to finalize the network
-  configuration.
+  Contains post-deploy actions that take care of:
 
-- `templates/enable-lbaas-ui.yaml`
-
-  This replaces the stock `horizon.yaml` service template with our
-  local override.
+  - Finalizing the network configuration for br-ex
+  - Creating the necessary keystone resources to support federation
+    authentication
 
 - `templates/swift-external.yaml`
 
   Configures the overcloud to use Ceph RadosGW for the object storage
   service, rather than deploying Swift as part of the overcloud
   install.
+
+- `templates/services/patch-puppet-modules.yaml`
+
+  Deploys patched puppet modules (from `patches/puppet-modules`) onto
+  the overcloud nodes.  This is a replacement for the existing
+  [DeployArtifacts][] feature, which was not suitable for this
+  purpose.
+
+  [deployartifacts]: http://hardysteven.blogspot.com/2016/08/tripleo-deploy-artifacts-and-puppet.html
+
+- `templates/single-signon.yaml`
+
+  Configuring for enabling Keystone federated authentication.
 
 ### Credentials
 
