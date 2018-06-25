@@ -1,8 +1,0 @@
----
-- hosts: controller
-  become: true
-  tasks:
-    - name: installing missing lbaas packages
-      package:
-        name: openstack-neutron-lbaas
-        state: installed
