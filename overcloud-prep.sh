@@ -20,4 +20,7 @@ openstack overcloud container image prepare \
   --namespace=192.168.24.1:8787/rhosp12 \
   --prefix=openstack- \
   --tag=$tag \
-  --output-env-file=$PWD/templates/overcloud_images.yaml
+  --output-env-file=$PWD/patches/docker/overcloud_images.yaml
+
+# Patch the stock images with our local changes
+./scripts/build-docker-images
