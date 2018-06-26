@@ -1,0 +1,18 @@
+#!/usr/bin/ansible-playbook
+
+- hosts: controller
+  become: true
+  tasks:
+    - shell: >-
+        docker container ls -q --filter name=horizon |
+        xargs -ICID docker rm -f CID
+
+    - shell: >-
+        docker image ls | awk '/horizon/ {print $3}' |
+        xargs --no-run-if-empty docker image rm -f
+
+- hosts: localhost
+  tasks:
+    - shell: >-
+        docker image ls | awk '/horizon/ {print $3}' |
+        xargs --no-run-if-empty docker image rm -f

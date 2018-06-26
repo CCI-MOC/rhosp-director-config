@@ -1,0 +1,139 @@
+#!/usr/bin/python
+
+from __future__ import print_function
+
+import argparse
+import datetime
+import docker
+import jinja2
+import logging
+import os
+import re
+import subprocess
+import sys
+import yaml
+
+LOG = logging.getLogger(__name__)
+ARGS = None
+
+re_image_name = re.compile(
+    '(?P<server>[^/]+)/(?P<repo_path>[^/]+)/(?P<repo_name>[^:]+):'
+    '(?P<version>[^-]+)-(?P<date>[^.]+).(?P<rev>\d+)'
+)
+
+
+class FatalError(Exception):
+    pass
+
+
+def parse_args():
+    p = argparse.ArgumentParser()
+    p.add_argument('--docker-directory', '-d',
+                   default='.')
+    p.add_argument('--docker_images', '-D',
+                   default='docker_images.yaml')
+    p.add_argument('--overcloud-images', '-O',
+                   default='overcloud_images.yaml')
+    p.add_argument('--output', '-o',
+                   default='local_images.yaml')
+    p.add_argument('--repository-path', '-p',
+                   default='local')
+    p.add_argument('--no-cache', '-n',
+                   action='store_true')
+
+    p.add_argument('names', nargs='*')
+
+    return p.parse_args()
+
+
+def build_one_image(image_name, image_path, image_info, new_name):
+    with open(os.path.join(image_path, 'Dockerfile.in')) as fd:
+        dockerfile = jinja2.Template(fd.read())
+
+    with open(os.path.join(image_path, 'Dockerfile'), 'w') as fd:
+        fd.write(dockerfile.render(image_name=image_name,
+                                   image_info=image_info))
+
+    LOG.info('building %s from %s', new_name, image_info['build_from_image'])
+    cmd = ['docker', 'build', '-t', new_name]
+    if ARGS.no_cache:
+        cmd.append('--no-cache')
+    cmd.append(image_path)
+    subprocess.check_call(cmd)
+
+    LOG.info('pushing %s', new_name)
+    subprocess.check_call(['docker', 'push', new_name])
+
+
+def main():
+    global ARGS
+    ARGS = parse_args()
+    logging.basicConfig(level='INFO')
+
+    with open(ARGS.docker_images) as fd:
+        docker_images = yaml.load(fd)
+
+    with open(ARGS.overcloud_images) as fd:
+        overcloud_images = yaml.load(fd)
+
+    now = datetime.datetime.now().strftime('%Y%m%d')
+    client = docker.Client()
+
+    build_images = []
+    for image_name, image_info in docker_images['images'].items():
+        if ARGS.names and image_name not in ARGS.names:
+            LOG.info('skipping image %s (not selected)', image_name)
+            continue
+
+        image_path = os.path.join(ARGS.docker_directory, image_name)
+        if not os.path.isdir(image_path):
+            raise FatalError('no directory for image {}'.format(image_name))
+
+        build_from_key = image_info['from']
+        try:
+            build_from_image = overcloud_images['parameter_defaults'][build_from_key]
+        except KeyError:
+            raise FatalError('image key {} does not exist'.format(build_from_key))
+
+        image_info['build_from_image'] = build_from_image
+
+        build_parsed = re_image_name.match(build_from_image)
+        if not build_parsed:
+            LOG.error('unable to parse image name %s', build_from_image)
+            continue
+
+        new_base = '{server}/{path}/{name}:{version}-{date}'.format(
+            server=build_parsed.group('server'), path=ARGS.repository_path,
+            name=build_parsed.group('repo_name'),
+            version=build_parsed.group('version'), date=now)
+
+        newrev = 1
+        while True:
+            new_name = '{base}.{rev}'.format(base=new_base, rev=newrev)
+            try:
+                client.inspect_image(new_name)
+            except docker.errors.NotFound:
+                break
+
+            newrev += 1
+
+        build_images.append((image_name, image_path, image_info, new_name))
+
+    LOG.info('starting to build images')
+
+    for image_name, image_path, image_info, new_name in build_images:
+        build_one_image(image_name, image_path, image_info, new_name)
+        for k in image_info['replace']:
+            overcloud_images['parameter_defaults'][k] = new_name
+
+    LOG.info('writing modified overcloud images to %s', ARGS.output)
+    with open(ARGS.output, 'w') as fd:
+        yaml.dump(overcloud_images, stream=fd)
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except FatalError as err:
+        LOG.error(err)
+        sys.exit(1)
