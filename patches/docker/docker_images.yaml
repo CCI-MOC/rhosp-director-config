@@ -1,0 +1,12 @@
+images:
+  horizon:
+    from: DockerHorizonImage
+    replace:
+      - DockerHorizonImage
+      - DockerHorizonConfigImage
+
+  keystone:
+    from: DockerKeystoneImage
+    replace:
+      - DockerKeystoneImage
+      - DockerKeystoneConfigImage
