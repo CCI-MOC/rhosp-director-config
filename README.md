@@ -112,3 +112,28 @@ The file `templates/credentials.yaml` is required by the
 `overcloud-deploy.sh` script, but it does not exist in this
 repository.  This file contains all passwords, keys, and other secrets
 required for the deployment.
+
+## Patches
+
+We are carrying several patches as part of our deployment.
+
+### Keystone Docker Image
+
+We are using a patched version of the Keystone docker image that
+includes the `mod_auth_openidc` package to support Keystone
+federation.
+
+### Horizon Docker Image
+
+We are using a patched version of the Horizon docker image in order to
+support our custom theme.
+
+### Puppet modules
+
+While not included in this repository, we are also making use of
+patches versions of `puppet-keystone` and `puppet-tripleo` in order to
+support Keystone federation.
+
+The changes can all be found at
+https://review.openstack.org/#/q/status:open+topic:feature/keystone/openidc.
+
