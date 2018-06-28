@@ -40,6 +40,8 @@ def parse_args():
                    default='local')
     p.add_argument('--no-cache', '-n',
                    action='store_true')
+    p.add_argument('--push', '-P',
+                   action='store_true')
 
     p.add_argument('names', nargs='*')
 
@@ -54,6 +56,11 @@ def build_one_image(image_name, image_path, image_info, new_name):
         fd.write(dockerfile.render(image_name=image_name,
                                    image_info=image_info))
 
+    pre_build_hook = os.path.join(image_path, 'pre-build')
+    if os.path.isfile(pre_build_hook) and os.access(pre_build_hook, os.X_OK):
+        LOG.info('running pre-build hook for %s', image_name)
+        subprocess.check_call('./pre-build', cwd=image_path)
+
     LOG.info('building %s from %s', new_name, image_info['build_from_image'])
     cmd = ['docker', 'build', '-t', new_name]
     if ARGS.no_cache:
@@ -61,8 +68,9 @@ def build_one_image(image_name, image_path, image_info, new_name):
     cmd.append(image_path)
     subprocess.check_call(cmd)
 
-    LOG.info('pushing %s', new_name)
-    subprocess.check_call(['docker', 'push', new_name])
+    if ARGS.push:
+        LOG.info('pushing %s', new_name)
+        subprocess.check_call(['docker', 'push', new_name])
 
 
 def main():
@@ -107,6 +115,9 @@ def main():
             name=build_parsed.group('repo_name'),
             version=build_parsed.group('version'), date=now)
 
+        # Find the next available revision for this image.  We start with
+        # <image>:<tag>.1, and then incremene the revision until we are
+        # unable to find an existing image that matches the name.
         newrev = 1
         while True:
             new_name = '{base}.{rev}'.format(base=new_base, rev=newrev)

@@ -1,0 +1,10 @@
+#!/usr/bin/ansible-playbook
+
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: clone or update moc horizon theme
+      git:
+        repo: 'https://github.com/larsks/moc_theme'
+        dest: ./moc_theme
+        force: true
