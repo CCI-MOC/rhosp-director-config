@@ -1,0 +1,2 @@
+# prevent erroneous rebuild when only the git metadata has changed
+moc_theme/.git

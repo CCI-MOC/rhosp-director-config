@@ -1,10 +1,6 @@
 FROM {{ image_info.build_from_image }}
 
-COPY rhel7local.repo /etc/yum.repos.d/rhel7local.repo
-RUN yum -y install git
-RUN git clone https://github.com/larsks/moc_theme \
-	/usr/share/openstack-dashboard/openstack_dashboard/themes/moc_theme
-
+COPY moc_theme /usr/share/openstack-dashboard/openstack_dashboard/themes/moc_theme
 COPY _12_moc_theme.py /etc/openstack-dashboard/local_settings.d/_12_moc_theme.py
 
 RUN /usr/bin/python /usr/share/openstack-dashboard/manage.py collectstatic --noinput --clear -v0
