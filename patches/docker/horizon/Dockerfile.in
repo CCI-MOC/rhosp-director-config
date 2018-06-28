@@ -1,7 +1,8 @@
 FROM {{ image_info.build_from_image }}
 
 COPY moc_theme /usr/share/openstack-dashboard/openstack_dashboard/themes/moc_theme
-COPY _12_moc_theme.py /etc/openstack-dashboard/local_settings.d/_12_moc_theme.py
+COPY _12_moc_theme.py /etc/openstack-dashboard/local_settings.d/
+COPY _90_allow_image_from_url.py /etc/openstack-dashboard/local_settings.d/
 
 RUN /usr/bin/python /usr/share/openstack-dashboard/manage.py collectstatic --noinput --clear -v0
 RUN /usr/bin/python /usr/share/openstack-dashboard/manage.py compress --force -v0
