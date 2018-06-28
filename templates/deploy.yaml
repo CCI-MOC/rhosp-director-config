@@ -126,6 +126,8 @@ parameter_defaults:
       - ["moc_openid", "Institution Account"]
     horizon::websso_idp_mapping:
       moc_openid: ["moc", "openid"]
+    horizon::help_url:
+      https://osticket.massopen.cloud/index.php
 
     tripleo::haproxy::haproxy_globals_override:
       tune.ssl.default-dh-param: 2048
