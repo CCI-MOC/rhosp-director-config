@@ -1,0 +1,85 @@
+#!/usr/bin/ansible-playbook
+
+- hosts: localhost
+  gather_facts: false
+  vars:
+    undercloud_ip: 192.168.24.1
+    push_images: true
+  tasks:
+    - name: get last version tag
+      shell: >-
+        cat .last_tag || echo unknown
+      changed_when: false
+      register: last_tag
+
+    - name: get version tag
+      command: >-
+        openstack overcloud container image tag discover
+        --image registry.access.redhat.com/rhosp12/openstack-base:latest
+        --tag-from-label version-release
+      changed_when: false
+      register: tag
+
+    - debug:
+        msg: "{{ message }}"
+      vars:
+        message:
+          - "last tag: {{ last_tag.stdout }}"
+          - "new tag: {{ tag.stdout }}"
+
+    - name: clean up from previous run
+      when: last_tag.stdout != tag.stdout
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - ./local_registry_images.yaml
+        - ./patches/docker/overcloud_images.yaml
+        - ./templates/overcloud_images.yaml
+
+    - name: generate list of images
+      command: >-
+        openstack overcloud container image prepare
+        --namespace=registry.access.redhat.com/rhosp12
+        --prefix=openstack-
+        --tag={{ tag.stdout }}
+        --output-images-file ./local_registry_images.yaml
+      register:
+        images
+      args:
+        creates: ./local_registry_images.yaml
+
+    - name: uploading container images
+      tags: [upload]
+      command: >-
+        openstack overcloud container image upload
+        --config-file  ./local_registry_images.yaml
+        --verbose
+      when: images is changed
+
+    - name: generate environment file for local registry
+      command: >-
+        openstack overcloud container image prepare
+        --namespace={{ undercloud_ip }}:8787/rhosp12
+        --prefix=openstack-
+        --tag={{ tag.stdout }}
+        --output-env-file=./patches/docker/overcloud_images.yaml
+      args:
+        creates: ./patches/docker/overcloud_images.yaml
+
+    - name: generate patched images
+      tags: [patch]
+      command: >-
+        scripts/build-images
+        -d patches/docker
+        -O patches/docker/overcloud_images.yaml
+        -D patches/docker/docker_images.yaml
+        -o ./templates/overcloud_images.yaml
+        {% if push_images %}--push{% endif %}
+      args:
+        creates: ./templates/overcloud_images.yaml
+
+    - name: record tag
+      copy:
+        dest: ./.last_tag
+        content: "{{ tag.stdout }}"
