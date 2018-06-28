@@ -9,6 +9,9 @@ parameters:
   KeystoneIdentityProviders:
     type: json
     default: {}
+  NovaFlavors:
+    type: json
+    default: []
 
 resources:
   FinishNetworkConfig:
@@ -117,6 +120,66 @@ resources:
     properties:
       servers: {get_param: servers}
       config: {get_resource: CreateCloudYamlConfig}
+
+  NovaFlavorsConfig:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ansible
+      inputs:
+        - name: nova_flavors
+      config: |
+        - hosts: localhost
+          connection: local
+          tasks:
+            # We want this script to run once on one of the
+            # controllers. We first check to see if we're running on
+            # the bootstrap node, but this is only unique per role
+            # (so, e.g., there will be a bootstrap node for the
+            # compute services as well).
+            - name: get bootstrap nodeid
+              command: hiera -c /etc/puppet/hiera.yaml bootstrap_nodeid
+              register: bootstrap_node
+
+            # In order to identify whether or not we're running on a
+            # controller, we look at the list of active service names.
+            - name: get service names
+              command: hiera -c /etc/puppet/hiera.yaml service_names
+              register: service_names
+
+            - set_fact:
+                is_bootstrap_node: >-
+                  {{ bootstrap_node.stdout|lower == ansible_hostname|lower }}
+                has_nova_api: >-
+                  {{ 'nova_api' in service_names.stdout|from_json }}
+
+            # We only run the remainder of this playbook if this is a
+            # bootstrap node *and* it is running nova-api.
+            - when: is_bootstrap_node and has_nova_api
+              block:
+                - name: check if flavors exist
+                  command: >-
+                    openstack --os-cloud overcloud flavor show {{ item.name }}
+                  loop: "{{ nova_flavors }}"
+                  ignore_errors: true
+                  register: flavor_check
+
+                - name: create flavors
+                  command: >-
+                    openstack --os-cloud overcloud
+                    flavor create {{ item.item.name }}
+                    --id {{ item.item.id }} --ram {{ item.item.ram }}
+                    --vcpus {{ item.item.vcpus }} --disk {{ item.item.disk }}
+                  when: item is failed
+                  loop: "{{ flavor_check.results }}"
+
+  NovaFlavorsDeployment:
+    type: OS::Heat::SoftwareDeploymentGroup
+    depends_on: CreateCloudYamlDeployments
+    properties:
+      servers: {get_param: servers}
+      config: {get_resource: NovaFlavorsConfig}
+      input_values:
+        nova_flavors: {get_param: NovaFlavors}
 
   KeystoneFederationConfig:
     type: OS::Heat::SoftwareConfig

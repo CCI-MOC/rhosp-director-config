@@ -242,3 +242,30 @@ parameter_defaults:
           remote:
             - {type: OIDC-preferred_username}
       protocol: openid
+
+  NovaFlavors:
+    - name: m1.tiny
+      id: 1
+      ram: 512
+      disk: 1
+      vcpus: 1
+    - name: m1.small
+      id: 2
+      ram: 2048
+      disk: 10
+      vcpus: 1
+    - name: m1.medium
+      id: 3
+      ram: 4096
+      disk: 10
+      vcpus: 2
+    - name: m1.large
+      id: 4
+      ram: 8192
+      disk: 10
+      vcpus: 4
+    - name: m1.xlarge
+      id: 5
+      ram: 16384
+      disk: 10
+      vcpus: 8
