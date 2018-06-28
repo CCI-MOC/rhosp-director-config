@@ -1,0 +1,93 @@
+From bff396ef6237e7d57c7a07091b7e635605d6e881 Mon Sep 17 00:00:00 2001
+From: wangxiyuan <wangxiyuan@huawei.com>
+Date: Sat, 23 Dec 2017 16:51:25 +0800
+Subject: [PATCH] Fix list users by name
+
+When attempting to filter users by name, it works
+for local users, but doesn't work for federated users.
+
+This patch fixed this error.
+
+Change-Id: I1bee51c2be81dbddd9d849731ab53728c86b2765
+Closes-bug: #1738895
+---
+ keystone/identity/core.py                     | 20 ++++++++++++----
+ keystone/identity/shadow_backends/sql.py      | 13 ++++++++++-
+ keystone/tests/unit/identity/test_backends.py | 23 +++++++++++++++++++
+ .../notes/bug-1738895-342864cd0285bc42.yaml   |  7 ++++++
+ 4 files changed, 58 insertions(+), 5 deletions(-)
+ create mode 100644 releasenotes/notes/bug-1738895-342864cd0285bc42.yaml
+
+diff --git a/keystone/identity/core.py b/keystone/identity/core.py
+index 114c4a21c..0ece22166 100644
+--- a/keystone/identity/core.py
++++ b/keystone/identity/core.py
+@@ -14,6 +14,7 @@
+ 
+ """Main entry point into the Identity service."""
+ 
++import copy
+ import functools
+ import itertools
+ import operator
+@@ -1036,12 +1037,23 @@ class Manager(manager.Manager):
+                     raise exception.InvalidOperatorError(op)
+         return hints
+ 
+-    def _handle_federated_attributes_in_hints(self, driver, hints):
++    def _handle_shadow_and_local_users(self, driver, hints):
+         federated_attributes = ['idp_id', 'protocol_id', 'unique_id']
+         for filter_ in hints.filters:
+             if filter_['name'] in federated_attributes:
+-                return self.shadow_users_api.get_federated_users(hints)
+-        return driver.list_users(hints)
++                return PROVIDERS.shadow_users_api.get_federated_users(hints)
++        fed_hints = copy.deepcopy(hints)
++        res = driver.list_users(hints)
++
++        # Note: If the filters contain 'name', we should get the user from both
++        # local user and shadow user backend.
++        for filter_ in fed_hints.filters:
++            if filter_['name'] == 'name':
++                fed_res = PROVIDERS.shadow_users_api.get_federated_users(
++                    fed_hints)
++                res += fed_res
++                break
++        return res
+ 
+     @domains_configured
+     @exception_translated('user')
+@@ -1058,7 +1070,7 @@ class Manager(manager.Manager):
+             # driver selection, so remove any such filter.
+             self._mark_domain_id_filter_satisfied(hints)
+         hints = self._translate_expired_password_hints(hints)
+-        ref_list = self._handle_federated_attributes_in_hints(driver, hints)
++        ref_list = self._handle_shadow_and_local_users(driver, hints)
+         return self._set_domain_id_and_mapping(
+             ref_list, domain_scope, driver, mapping.EntityType.USER)
+ 
+diff --git a/keystone/identity/shadow_backends/sql.py b/keystone/identity/shadow_backends/sql.py
+index ccf420cbc..fe6251760 100644
+--- a/keystone/identity/shadow_backends/sql.py
++++ b/keystone/identity/shadow_backends/sql.py
+@@ -67,9 +67,20 @@ class ShadowUsers(base.ShadowUsersDriverBase):
+ 
+     def get_federated_users(self, hints):
+         with sql.session_for_read() as session:
+-            query = session.query(model.User).outerjoin(model.LocalUser)
++            query = session.query(model.User).outerjoin(
++                model.LocalUser).outerjoin(model.FederatedUser)
+             query = query.filter(model.User.id == model.FederatedUser.user_id)
+             query = self._update_query_with_federated_statements(hints, query)
++            name_filter = None
++            for filter_ in hints.filters:
++                if filter_['name'] == 'name':
++                    name_filter = filter_
++                    query = query.filter(
++                        model.FederatedUser.display_name == name_filter[
++                            'value'])
++                    break
++            if name_filter:
++                hints.filters.remove(name_filter)
+             user_refs = sql.filter_limit_query(model.User, query, hints)
+             return [identity_base.filter_user(x.to_dict()) for x in user_refs]
