@@ -1,3 +1,13 @@
 templates/credentials.yaml
 templates/overcloud_images.yaml
 local_registry_images.yaml
+
+overcloudrc*
+patches/docker/*/Dockerfile
+patches/docker/horizon/moc_theme/
+patches/docker/overcloud_images.yaml
+patches/tripleo-heat-templates/
+puppet-modules.tar.gz
+seed/credentials/
+tempest-deployer-input.conf
+templates/puppet_modules.yaml
