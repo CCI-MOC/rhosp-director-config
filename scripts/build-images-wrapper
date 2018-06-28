@@ -4,5 +4,4 @@ ${0%/*}/build-images \
 	-d patches/docker \
 	-O patches/docker/overcloud_images.yaml \
 	-D patches/docker/docker_images.yaml \
-	-o $PWD/templates/overcloud_images.yaml \
 	"$@"

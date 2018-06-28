@@ -34,14 +34,16 @@ def parse_args():
                    default='docker_images.yaml')
     p.add_argument('--overcloud-images', '-O',
                    default='overcloud_images.yaml')
-    p.add_argument('--output', '-o',
-                   default='local_images.yaml')
+    p.add_argument('--output', '-o')
     p.add_argument('--repository-path', '-p',
                    default='local')
     p.add_argument('--no-cache', '-n',
                    action='store_true')
     p.add_argument('--push', '-P',
                    action='store_true')
+    p.add_argument('--date')
+    p.add_argument('--force-revision', '-r',
+                   type=int)
 
     p.add_argument('names', nargs='*')
 
@@ -80,13 +82,21 @@ def main():
     ARGS = parse_args()
     logging.basicConfig(level='INFO')
 
+    if ARGS.force_revision is not None and len(ARGS.names) != 1:
+        raise FatalError('--force-revision may only be used when '
+                         'building a single image.')
+
     with open(ARGS.docker_images) as fd:
         docker_images = yaml.load(fd)
 
     with open(ARGS.overcloud_images) as fd:
         overcloud_images = yaml.load(fd)
 
-    now = datetime.datetime.now().strftime('%Y%m%d')
+    if ARGS.date:
+        now = ARGS.date
+    else:
+        now = datetime.datetime.now().strftime('%Y%m%d')
+
     client = docker.Client()
 
     build_images = []
@@ -117,18 +127,23 @@ def main():
             name=build_parsed.group('repo_name'),
             version=build_parsed.group('version'), date=now)
 
-        # Find the next available revision for this image.  We start with
-        # <image>:<tag>.1, and then incremene the revision until we are
-        # unable to find an existing image that matches the name.
-        newrev = 1
-        while True:
-            new_name = '{base}.{rev}'.format(base=new_base, rev=newrev)
-            try:
-                client.inspect_image(new_name)
-            except docker.errors.NotFound:
-                break
+        if ARGS.force_revision:
+            new_name = '{base}.{rev}'.format(base=new_base,
+                                             rev=ARGS.force_revision)
+        else:
+            # Find the next available revision for this image.  We start with
+            # <image>:<tag>.1, and then increment the revision until we are
+            # unable to find an existing image that matches the name.
+            newrev = 1
+            while True:
+                new_name = '{base}.{rev}'.format(base=new_base,
+                                                 rev=newrev)
+                try:
+                    client.inspect_image(new_name)
+                except docker.errors.NotFound:
+                    break
 
-            newrev += 1
+                newrev += 1
 
         build_images.append((image_name, image_path, image_info, new_name))
 
@@ -139,9 +154,10 @@ def main():
         for k in image_info['replace']:
             overcloud_images['parameter_defaults'][k] = new_name
 
-    LOG.info('writing modified overcloud images to %s', ARGS.output)
-    with open(ARGS.output, 'w') as fd:
-        yaml.dump(overcloud_images, stream=fd)
+    if ARGS.output:
+        LOG.info('writing modified overcloud images to %s', ARGS.output)
+        with open(ARGS.output, 'w') as fd:
+            yaml.dump(overcloud_images, stream=fd)
 
 
 if __name__ == '__main__':

@@ -23,4 +23,4 @@ openstack overcloud container image prepare \
   --output-env-file=$PWD/patches/docker/overcloud_images.yaml
 
 # Patch the stock images with our local changes
-./scripts/build-all-images --push
+./scripts/build-images-wrapper -o $PWD/templates/overcloud_images.yaml --push
