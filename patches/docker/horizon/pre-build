@@ -5,6 +5,6 @@
   tasks:
     - name: clone or update moc horizon theme
       git:
-        repo: 'https://github.com/larsks/moc_theme'
+        repo: 'https://github.com/CCI-MOC/moc_theme'
         dest: ./moc_theme
         force: true
