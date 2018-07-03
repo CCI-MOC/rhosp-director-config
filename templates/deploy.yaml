@@ -269,3 +269,26 @@ parameter_defaults:
       ram: 16384
       disk: 10
       vcpus: 8
+
+  EnableFencing: true
+  FencingConfig:
+    devices:
+      - agent: fence_xvm
+        host_mac: "52:54:00:91:4e:ba"
+        params: &fence_params
+          multicast_address: "225.0.0.12"
+          port: kumo-control-01
+          manage_fw: true
+          manage_key_file: true
+          key_file: /etc/fence_xvm.key
+          key_file_password: {get_file: fence_xvm.key}
+      - agent: fence_xvm
+        host_mac: "52:54:00:eb:00:48"
+        params:
+          <<: *fence_params
+          port: kumo-control-02
+      - agent: fence_xvm
+        host_mac: "52:54:00:b7:e1:09"
+        params:
+          <<: *fence_params
+          port: kumo-control-02
