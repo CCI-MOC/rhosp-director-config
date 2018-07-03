@@ -1,9 +1,13 @@
 #!/bin/bash
 
+set -e
+
 if [ "$OS_CLOUDNAME" != "undercloud" ]; then
 	echo "ERROR: missing undercloud credentials" >&2
 	exit 1
 fi
+
+ansible-playbook -e @templates/credentials.yaml generate-deploy-files.yaml
 
 if [ -d patches/tripleo-heat-templates ]; then
 	TEMPLATES=$PWD/patches/tripleo-heat-templates

@@ -1,0 +1,10 @@
+---
+- hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ./templates/credentials.yaml
+  tasks:
+    - name: generate deploy.yaml
+      template:
+        src: ./templates/deploy.yaml.in
+        dest: ./templates/deploy.yaml

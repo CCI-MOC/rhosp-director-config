@@ -1,3 +1,7 @@
+{#
+This file is processed with the generate-deploy-files.yaml playbook in
+order to generate deploy.yaml.
+#}
 ---
 resource_registry:
 
@@ -117,6 +121,7 @@ parameter_defaults:
       key: 'os_compute_api:os-admin-actions:reset_state'
       value: 'rule:admin_or_owner'
 
+  # Additional Hiera configuration to be placed on the controllers.
   ControllerDeployedServerExtraConfig:
     swift::keystone::auth::auth_name: ceph
     tripleo::haproxy::ssl_cipher_suite:
@@ -134,15 +139,11 @@ parameter_defaults:
       ssl-default-bind-options: no-sslv3 no-tlsv10
       ssl-default-server-options: no-sslv3 no-tlsv10
 
-# The following should not be necessary if we're setting the
-# corresponding ssl-default-(bind|server)-options:
-#   tripleo::haproxy::ssl_options: no-sslv3 no-tlsv10
+  CephClientUserName: kumostack
 
-# The following needs to be set per-listen-block, but it's not clear
-# if the haproxy support in tripleo allows for this.
-#      http-reponse: >-
-#        set-header Strict-Transport-Security max-age=16000000;\
-#        includeSubDomains;\ preload;"
+  # List of externally managed Ceph Mon Host IPs. Only used for
+  # external Ceph deployments.
+  CephExternalMonHost: "192.168.16.1,192.168.16.2,192.168.16.3"
 
   SSLCertificate: |
     -----BEGIN CERTIFICATE-----
@@ -243,6 +244,7 @@ parameter_defaults:
             - {type: OIDC-preferred_username}
       protocol: openid
 
+  # Create these Nova flavors during the deploy process.
   NovaFlavors:
     - name: m1.tiny
       id: 1
@@ -270,6 +272,8 @@ parameter_defaults:
       disk: 10
       vcpus: 8
 
+  # Fencing configuration. See
+  # https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/12/html/advanced_overcloud_customization/sect-fencing_the_controller_nodes
   EnableFencing: true
   FencingConfig:
     devices:
@@ -281,7 +285,8 @@ parameter_defaults:
           manage_fw: true
           manage_key_file: true
           key_file: /etc/fence_xvm.key
-          key_file_password: {get_file: fence_xvm.key}
+          key_file_password: |
+            {{ parameter_defaults.FencingPassword|indent(12) }}
       - agent: fence_xvm
         host_mac: "52:54:00:eb:00:48"
         params:
