@@ -159,7 +159,7 @@ resources:
                 - name: check if flavors exist
                   command: >-
                     openstack --os-cloud overcloud flavor show {{ item.name }}
-                  loop: "{{ nova_flavors }}"
+                  with_items: "{{ nova_flavors }}"
                   ignore_errors: true
                   register: flavor_check
 
@@ -170,7 +170,7 @@ resources:
                     --id {{ item.item.id }} --ram {{ item.item.ram }}
                     --vcpus {{ item.item.vcpus }} --disk {{ item.item.disk }}
                   when: item is failed
-                  loop: "{{ flavor_check.results }}"
+                  with_items: "{{ flavor_check.results }}"
 
   NovaFlavorsDeployment:
     type: OS::Heat::SoftwareDeploymentGroup
