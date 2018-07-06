@@ -44,8 +44,8 @@ deploy_args=(
 	-e $TEMPLATES/environments/ssl/enable-tls.yaml
 	-e $TEMPLATES/environments/tls-endpoints-public-dns.yaml
 
-	# Enable Neutron LBaaS service.
-	-e $TEMPLATES/environments/services/neutron-lbaasv2.yaml
+	# Enable Neutron Octavia load-balancer service.
+	-e $TEMPLATES/environments/services/octavia.yaml
 
 	# Enable Sahara
 	-e $TEMPLATES/environments/services/sahara.yaml
