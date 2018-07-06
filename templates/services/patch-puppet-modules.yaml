@@ -58,7 +58,7 @@ outputs:
               file:
                 path: "{{ tempdir }}/{{ item }}"
                 state: directory
-              loop:
+              with_items:
                 - incoming
                 - unpacked
 
@@ -85,7 +85,7 @@ outputs:
               file:
                 path: "/usr/share/openstack-puppet/modules/{{item}}"
                 state: absent
-              loop: "{{ puppet_modules.stdout_lines|default([]) }}"
+              with_items: "{{ puppet_modules.stdout_lines|default([]) }}"
 
             - name: install replacement modules
               command: >-
@@ -93,7 +93,7 @@ outputs:
                 /usr/share/openstack-puppet/modules/
               args:
                 chdir: "{{ tempdir }}/unpacked"
-              loop: "{{ puppet_modules.stdout_lines|default([]) }}"
+              with_items: "{{ puppet_modules.stdout_lines|default([]) }}"
           always:
             - name: 'clean up temporary directory'
               file:
