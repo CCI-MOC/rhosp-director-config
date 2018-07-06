@@ -3,7 +3,6 @@
 from __future__ import print_function
 
 import argparse
-import datetime
 import docker
 import jinja2
 import logging
@@ -18,7 +17,7 @@ ARGS = None
 
 re_image_name = re.compile(
     '(?P<server>[^/]+)/(?P<repo_path>[^/]+)/(?P<repo_name>[^:]+):'
-    '(?P<version>[^-]+)-(?P<date>[^.]+).(?P<rev>\d+)'
+    '(?P<version>[^-]+)-(?P<rev>\d+)'
 )
 
 
@@ -41,7 +40,6 @@ def parse_args():
                    action='store_true')
     p.add_argument('--push', '-P',
                    action='store_true')
-    p.add_argument('--date')
     p.add_argument('--force-revision', '-r',
                    type=int)
 
@@ -92,12 +90,7 @@ def main():
     with open(ARGS.overcloud_images) as fd:
         overcloud_images = yaml.load(fd)
 
-    if ARGS.date:
-        now = ARGS.date
-    else:
-        now = datetime.datetime.now().strftime('%Y%m%d')
-
-    client = docker.Client()
+    client = docker.DockerClient()
 
     build_images = []
     for image_name, image_info in docker_images['images'].items():
@@ -122,28 +115,11 @@ def main():
             LOG.error('unable to parse image name %s', build_from_image)
             continue
 
-        new_base = '{server}/{path}/{name}:{version}-{date}'.format(
+        new_name = '{server}/{path}/{name}:{version}-{rev}'.format(
             server=build_parsed.group('server'), path=ARGS.repository_path,
             name=build_parsed.group('repo_name'),
-            version=build_parsed.group('version'), date=now)
-
-        if ARGS.force_revision:
-            new_name = '{base}.{rev}'.format(base=new_base,
-                                             rev=ARGS.force_revision)
-        else:
-            # Find the next available revision for this image.  We start with
-            # <image>:<tag>.1, and then increment the revision until we are
-            # unable to find an existing image that matches the name.
-            newrev = 1
-            while True:
-                new_name = '{base}.{rev}'.format(base=new_base,
-                                                 rev=newrev)
-                try:
-                    client.inspect_image(new_name)
-                except docker.errors.NotFound:
-                    break
-
-                newrev += 1
+            version=build_parsed.group('version'),
+            rev=build_parsed.group('rev'))
 
         build_images.append((image_name, image_path, image_info, new_name))
 
