@@ -1,0 +1,8 @@
+---
+parameter_defaults:
+  HostnameMap:
+    overcloud-controller-0: kumo-control-01
+    overcloud-controller-1: kumo-control-02
+    overcloud-controller-2: kumo-control-03
+    overcloud-novacompute-0: kumo-compute-01
+    overcloud-novacompute-1: kumo-compute-02

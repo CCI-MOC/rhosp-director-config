@@ -40,6 +40,10 @@ deploy_args=(
 	-e $TEMPLATES/environments/deployed-server-pacemaker-environment.yaml
 	-r $TEMPLATES/deployed-server/deployed-server-roles-data.yaml
 
+	# Enable config-download
+	-e $TEMPLATES/environments/config-download-environment.yaml
+	-e $PWD/templates/hostmap.yaml
+
 	# Enable TLS for public endpoints.
 	-e $TEMPLATES/environments/ssl/enable-tls.yaml
 	-e $TEMPLATES/environments/tls-endpoints-public-dns.yaml
@@ -101,4 +105,5 @@ openstack overcloud deploy \
 	--libvirt-type kvm \
 	--ntp-server pool.ntp.org \
 	"${deploy_args[@]}" \
+	--config-download \
 	"$@"
