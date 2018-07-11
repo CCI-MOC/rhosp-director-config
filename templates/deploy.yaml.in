@@ -234,16 +234,6 @@ parameter_defaults:
     rw==
     -----END CERTIFICATE-----
 
-  KeystoneIdentityProviders:
-    moc:
-      remote_id: https://sso.massopen.cloud/auth/realms/moc
-      rules:
-        - local:
-            - user: {name: '{0}'}
-          remote:
-            - {type: OIDC-preferred_username}
-      protocol: openid
-
   # Create these Nova flavors during the deploy process.
   NovaFlavors:
     - name: m1.tiny
