@@ -38,11 +38,21 @@ process of deploying RHOSP.
   It generates the `templates/overcloud_images.yaml` environment file
   that points the overcloud deploy at the local registry server.
 
+  This script is responsible for generating any patched Docker images
+  necessary for the deployment and pushing them into the local
+  registry.
+
 - `overcloud-deploy.sh`
 
-  Runs the actual overcloud deploy. Ensures that the environment files
-  necessary to realize our overcloud configuration are provide on the
-  deploy command line.
+  Runs the actual overcloud deploy. Generate `templates/deploy.yaml`
+  from `templates/deploy.yaml.in` (mostly just injecting some
+  credentials).  Ensures that the environment files necessary to
+  realize our overcloud configuration are provide on the deploy
+  command line.
+
+  Prior to running the `openstack overcloud deploy` command, this
+  script packages up any patched puppet modules and ensures that they
+  will be installed as part of the deploy process.
 
 - `overcloud-continue.sh`
 
@@ -74,7 +84,7 @@ process of deploying RHOSP.
   This configures the overcloud to use an existing Ceph cluster rather
   than deploying a Ceph service as part of the overcloud.
 
-- `templates/deploy.yaml`
+- `templates/deploy.yaml.in`
 
   This contains the bulk of our custom configuration (including
   information about network address ranges and vlan ids).
@@ -84,8 +94,9 @@ process of deploying RHOSP.
   Contains post-deploy actions that take care of:
 
   - Finalizing the network configuration for br-ex
-  - Creating the necessary keystone resources to support federation
-    authentication
+  - Creating the necessary keystone resources to support openid
+    federation
+  - Creating some Nova flavors
 
 - `templates/swift-external.yaml`
 
@@ -104,7 +115,7 @@ process of deploying RHOSP.
 
 - `templates/single-signon.yaml`
 
-  Configuring for enabling Keystone federated authentication.
+  Configuration for enabling Keystone federated authentication.
 
 ### Credentials
 
