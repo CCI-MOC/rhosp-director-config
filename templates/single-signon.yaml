@@ -8,3 +8,14 @@ parameter_defaults:
   KeystoneOpenIdcProviderMetadataUrl:
       https://sso.massopen.cloud/auth/realms/moc/.well-known/openid-configuration
   KeystoneOpenIdcClientId: kumo-openstack
+
+  KeystoneIdentityProviders:
+    moc:
+      remote_id: https://sso.massopen.cloud/auth/realms/moc
+      rules:
+        - local:
+            - user: {name: '{0}'}
+          remote:
+            - {type: OIDC-preferred_username}
+      protocol: openid
+
