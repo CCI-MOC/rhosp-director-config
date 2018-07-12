@@ -287,3 +287,10 @@ parameter_defaults:
         params:
           <<: *fence_params
           port: kumo-control-02
+
+  DefaultFirewallRules:
+    tripleo.tripleo_firewall.firewall_rules:
+      '003 accept ssh':
+        dport: 22
+        proto: 'tcp'
+        source: 172.16.0.0/22
