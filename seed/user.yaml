@@ -26,7 +26,7 @@
       os_security_group_rule:
         security_group: default
         protocol: "{{ item.protocol }}"
-      loop:
+      with_items:
         - protocol: tcp
         - protocol: udp
         - protocol: icmp
