@@ -7,7 +7,8 @@ if [ "$OS_CLOUDNAME" != "undercloud" ]; then
 	exit 1
 fi
 
-ansible-playbook -e @templates/credentials.yaml generate-deploy-files.yaml
+# Generate files
+make
 
 if [ -d patches/tripleo-heat-templates ]; then
 	TEMPLATES=$PWD/patches/tripleo-heat-templates
@@ -38,7 +39,7 @@ deploy_args=(
 	-e $TEMPLATES/environments/deployed-server-environment.yaml
 	-e $TEMPLATES/environments/deployed-server-bootstrap-environment-rhel.yaml
 	-e $TEMPLATES/environments/deployed-server-pacemaker-environment.yaml
-	-r $TEMPLATES/deployed-server/deployed-server-roles-data.yaml
+	-r $PWD/roles_data.yaml
 
 	# Enable TLS for public endpoints.
 	-e $TEMPLATES/environments/ssl/enable-tls.yaml
@@ -68,7 +69,6 @@ deploy_args=(
 	-e $PWD/templates/swift-external.yaml
 
 	# Most of our custom configuration.
-	-e $PWD/templates/services.yaml
 	-e $PWD/templates/deploy.yaml
 
 	# Passwords and other credentials (this file is not included in

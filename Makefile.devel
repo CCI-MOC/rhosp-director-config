@@ -1,0 +1,57 @@
+PANDOC = pandoc
+
+MDDOCS = README.md
+HTMLDOCS = $(MDDOCS:.md=.html)
+CUSTOM_ROLES = \
+	       roles/ControllerDeployedServer.yaml \
+	       roles/ComputeDeployedServer.yaml \
+	       roles/NetworkerDeployedServer.yaml
+
+CONTROLLER_SRC_ROLES = \
+	    roles/ControllerOpenstack.yaml \
+	    roles/Database.yaml \
+	    roles/Messaging.yaml
+
+COMPUTE_SRC_ROLES = \
+		    roles/Compute.yaml
+
+NETWORKER_SRC_ROLES = \
+		    roles/Networker.yaml
+
+%.html: %.md
+	$(PANDOC) -s $< -o $@ --toc --css docs/github-pandoc.css
+
+all: $(CUSTOM_ROLES) $(ENVIRONMENTS)
+
+doc: $(HTMLDOCS)
+
+roles/ControllerDeployedServer.yaml: $(CONTROLLER_SRC_ROLES)
+	./scripts/merge-roles.py -o $@ \
+		-s OS::Local::Services::PatchPuppetModules \
+		-s OS::TripleO::Services::Securetty \
+		-s OS::TripleO::Services::ExternalSwiftProxy \
+		-x disable_contraints=true \
+		-x HostnameFormatDefault='%stackname%-controller-%index%' \
+		ControllerDeployedServer \
+		$(CONTROLLER_SRC_ROLES)
+
+roles/ComputeDeployedServer.yaml: $(COMPUTE_SRC_ROLES)
+	./scripts/merge-roles.py -o $@ \
+		-s OS::Local::Services::PatchPuppetModules \
+		-s OS::TripleO::Services::Securetty \
+		-x disable_contraints=true \
+		-x HostnameFormatDefault='%stackname%-compute-%index%' \
+		ComputeDeployedServer \
+		$(COMPUTE_SRC_ROLES)
+
+roles/NetworkerDeployedServer.yaml: $(NETWORKER_SRC_ROLES)
+	./scripts/merge-roles.py -o $@ \
+		-s OS::Local::Services::PatchPuppetModules \
+		-s OS::TripleO::Services::Securetty \
+		-x disable_contraints=true \
+		-x HostnameFormatDefault='%stackname%-networker-%index%' \
+		NetworkerDeployedServer \
+		$(NETWORKER_SRC_ROLES)
+
+clean:
+	rm -f $(HTMLDOCS) $(CUSTOM_ROLES)
