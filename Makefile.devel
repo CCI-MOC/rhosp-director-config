@@ -30,7 +30,7 @@ roles/ControllerDeployedServer.yaml: $(CONTROLLER_SRC_ROLES)
 		-s OS::Local::Services::PatchPuppetModules \
 		-s OS::TripleO::Services::Securetty \
 		-s OS::TripleO::Services::ExternalSwiftProxy \
-		-x disable_contraints=true \
+		-x disable_constraints=true \
 		-x HostnameFormatDefault='%stackname%-controller-%index%' \
 		ControllerDeployedServer \
 		$(CONTROLLER_SRC_ROLES)
@@ -39,7 +39,7 @@ roles/ComputeDeployedServer.yaml: $(COMPUTE_SRC_ROLES)
 	./scripts/merge-roles.py -o $@ \
 		-s OS::Local::Services::PatchPuppetModules \
 		-s OS::TripleO::Services::Securetty \
-		-x disable_contraints=true \
+		-x disable_constraints=true \
 		-x HostnameFormatDefault='%stackname%-compute-%index%' \
 		ComputeDeployedServer \
 		$(COMPUTE_SRC_ROLES)
@@ -48,7 +48,7 @@ roles/NetworkerDeployedServer.yaml: $(NETWORKER_SRC_ROLES)
 	./scripts/merge-roles.py -o $@ \
 		-s OS::Local::Services::PatchPuppetModules \
 		-s OS::TripleO::Services::Securetty \
-		-x disable_contraints=true \
+		-x disable_constraints=true \
 		-x HostnameFormatDefault='%stackname%-networker-%index%' \
 		NetworkerDeployedServer \
 		$(NETWORKER_SRC_ROLES)
