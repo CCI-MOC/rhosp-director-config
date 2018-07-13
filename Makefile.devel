@@ -32,6 +32,7 @@ roles/ControllerDeployedServer.yaml: $(CONTROLLER_SRC_ROLES)
 		-s OS::TripleO::Services::ExternalSwiftProxy \
 		-x disable_constraints=true \
 		-x HostnameFormatDefault='%stackname%-controller-%index%' \
+		--remove-network Tenant \
 		ControllerDeployedServer \
 		$(CONTROLLER_SRC_ROLES)
 

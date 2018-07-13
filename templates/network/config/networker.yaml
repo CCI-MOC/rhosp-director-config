@@ -1,6 +1,6 @@
 ---
 # This file defines the network interface configuration to be used on
-# Controller nodes.
+# Networker nodes.
 
 heat_template_version: pike
 description: >
@@ -116,16 +116,6 @@ resources:
                   - ip_netmask: 10.13.0.0/16
                     next_hop: 172.16.0.253
 
-              # Put storage on eth3
-              - type: vlan
-                device: eth3
-                vlan_id:
-                  get_param: StorageNetworkVlanID
-                use_dhcp: false
-                addresses:
-                - ip_netmask:
-                    get_param: StorageIpSubnet
-
 #              # Attach ControlPlane, InternalApi, Storage, and
 #              # External networks to eth2
 #              - type: interface
@@ -164,15 +154,23 @@ resources:
               - type: vlan
                 device: eth2
                 vlan_id:
-                  get_param: ExternalNetworkVlanID
+                  get_param: TenantNetworkVlanID
                 use_dhcp: false
                 addresses:
                 - ip_netmask:
-                    get_param: ExternalIpSubnet
-                routes:
-                  - ip_netmask: 0.0.0.0/0
-                    next_hop:
-                      get_param: ExternalInterfaceDefaultRoute
+                    get_param: TenantIpSubnet
+
+              # Set up an OpenvSwitch bridge to be used for instance
+              # external network connectivity
+              - type: vlan
+                device: eth2
+                vlan_id:
+                  get_param: FloatingNetworkVlanID
+
+              - type: ovs_bridge
+                name: br-ex
+                use_dhcp: false
+                members: []
 
 outputs:
   OS::stack_id:
