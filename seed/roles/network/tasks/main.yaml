@@ -1,0 +1,22 @@
+- debug:
+    msg: "creating network {{ index }}"
+
+- name: create network
+  os_network:
+    name: "net{{ index }}"
+
+- name: create subnet
+  os_subnet:
+    name: "net{{ index }}-subnet"
+    network_name: "net{{ index }}"
+    cidr: "172.16.{{ 254 - index|int }}.0/24"
+    dns_nameservers:
+      - 8.8.8.8
+      - 8.8.4.4
+
+- name: create router
+  os_router:
+    name: "router{{ index }}"
+    network: external
+    interfaces:
+      - "net{{ index }}-subnet"
