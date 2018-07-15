@@ -10,6 +10,11 @@ kumo-control-03.kumo.int
 kumo-compute-01.kumo.int
 kumo-compute-02.kumo.int
 
+[networker]
+kumo-networker-01.kumo.int
+kumo-networker-02.kumo.int
+
 [overcloud:children]
 controller
 compute
+networker

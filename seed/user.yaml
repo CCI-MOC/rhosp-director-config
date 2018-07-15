@@ -1,26 +1,14 @@
 ---
 - hosts: localhost
   tags: [network]
+  vars:
+    number_of_networks: 2
   tasks:
-    - name: create network
-      os_network:
-        name: net0
-
-    - name: create subnet
-      os_subnet:
-        name: net0-subnet0
-        network_name: net0
-        cidr: 172.16.254.0/24
-        dns_nameservers:
-          - 8.8.8.8
-          - 8.8.4.4
-
-    - name: create router
-      os_router:
-        name: extrouter
-        network: external
-        interfaces:
-          - net0-subnet0
+    - include_role:
+        name: network
+      vars:
+        index: "{{ item }}"
+      with_sequence: start=0 end={{ number_of_networks - 1 }}
 
     - name: open up default security group
       os_security_group_rule:
