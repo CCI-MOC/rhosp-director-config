@@ -13,7 +13,11 @@ resource_registry:
     network/config/compute.yaml
   OS::TripleO::ControllerDeployedServer::Net::SoftwareConfig:
     network/config/controller.yaml
+  OS::TripleO::NetworkerDeployedServer::Net::SoftwareConfig:
+    network/config/networker.yaml
   OS::TripleO::NodeExtraConfigPost: postconfig.yaml
+  OS::Local::Services::PatchPuppetModules:
+    ./services/patch-puppet-modules.yaml
 
 parameter_defaults:
 
@@ -27,6 +31,7 @@ parameter_defaults:
   # ComputeCount, but since we're using pre-provisioned servers the
   # roles have different names.
   ControllerDeployedServerCount: 3
+  NetworkerDeployedServerCount: 2
   ComputeDeployedServerCount: 2
 
   KeystoneRegion: moc-kumo

@@ -1,14 +1,29 @@
----
-resource_registry:
-
-  OS::Tripleo::Services::PatchPuppetModules:
-    ./services/patch-puppet-modules.yaml
-  OS::Tripleo::Services::ConfigureKeystoneFederation: OS::Heat::None
-
-parameter_defaults:
-  ControllerDeployedServerServices:
-    - OS::Tripleo::Services::PatchPuppetModules
-
+###############################################################################
+# Role: ControllerNoCeph                                                      #
+###############################################################################
+- name: ControllerNoCeph
+  description: |
+    Controller role that has all the controller services loaded and handles
+    Database, Messaging and Network functions but not any Ceph server functions.
+  CountDefault: 0
+  tags:
+    - primary
+    - controller
+  networks:
+    - External
+    - InternalApi
+    - Storage
+    - StorageMgmt
+    - Tenant
+  default_route_networks: ['External']
+  HostnameFormatDefault: '%stackname%-controller-no-ceph-%index%'
+  # Deprecated & backward-compatible values (FIXME: Make parameters consistent)
+  # Set uses_deprecated_params to True if any deprecated params are used.
+  uses_deprecated_params: True
+  deprecated_param_extraconfig: 'controllerExtraConfig'
+  deprecated_param_flavor: 'OvercloudControlFlavor'
+  deprecated_param_image: 'controllerImage'
+  ServicesDefault:
     - OS::TripleO::Services::Aide
     - OS::TripleO::Services::AodhApi
     - OS::TripleO::Services::AodhEvaluator
@@ -26,12 +41,8 @@ parameter_defaults:
     - OS::TripleO::Services::CeilometerExpirer
     - OS::TripleO::Services::CeilometerAgentCentral
     - OS::TripleO::Services::CeilometerAgentNotification
+    - OS::TripleO::Services::CephClient
     - OS::TripleO::Services::CephExternal
-    - OS::TripleO::Services::CephMds
-    - OS::TripleO::Services::CephMgr
-    - OS::TripleO::Services::CephMon
-    - OS::TripleO::Services::CephRbdMirror
-    - OS::TripleO::Services::CephRgw
     - OS::TripleO::Services::CertmongerUser
     - OS::TripleO::Services::CinderApi
     - OS::TripleO::Services::CinderBackendDellPs
