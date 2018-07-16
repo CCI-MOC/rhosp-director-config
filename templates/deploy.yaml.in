@@ -66,6 +66,19 @@ parameter_defaults:
     - start: 192.168.17.10
       end: 192.168.17.254
   StorageNetworkVlanID: 3700
+  
+  # Allow Neutron to map provider networks to the storage bridge  
+  # May not need this since ceph traffic is already configured to go over storage network
+  # In an Overcloud which uses isolated networks the tenant network and storage network are isolated 
+  # from one another so user instances cannot reach the Ceph public network unless there's a 
+  # provider network in neutron that maps to the storage network and exposes access to it
+  # https://docs.openstack.org/tripleo-docs/latest/install/advanced_deployment/deploy_manila.html
+  # datacentre:br-ex is a default bridge mapping, this configuration also adds the storage bridge
+  #NeutronBridgeMappings: datacentre:br-ex,storage:br-storage
+  #NeutronFlatNetworks: datacentre,storage
+  #NeutronNetworkVLANRanges: 'datacentre:3701:3804,storage:3700:3700' 
+  # Not sure about the VLAN mappings for 'datacentre', is it a range inclusive [] or exclusive () 
+  # and also vlanid for external not included
 
   # The Tenant network is used for tenant-created networks.
   TenantNetworkVlanID: 3704

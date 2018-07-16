@@ -113,6 +113,21 @@ resources:
                 use_dhcp: true
 
               # Put storage on eth3
+              # Manila deployment documentations suggests there should be a bridge for storage network interface
+              # https://docs.openstack.org/tripleo-docs/latest/install/advanced_deployment/deploy_manila.html
+              # If a dedicated interface (eth3) is used for storage network, update storage interface for each node type ti use bridge
+              # May not need this since Ceph traffic aready goes over storage network?
+              #- type: ovs_bridge
+              #  name: br-storage
+              #  use_dhcp: false
+              #  addresses:
+              #  - ip_netmask:
+              #      get_param: StorageIpSubnet
+              #    members:
+              #    - type: interface
+              #    name: eth3
+              #    use_dhcp: false
+              #    primary: true
               - type: vlan
                 device: eth3
                 vlan_id:
