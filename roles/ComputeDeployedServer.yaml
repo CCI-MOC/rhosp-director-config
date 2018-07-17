@@ -2,6 +2,7 @@
   HostnameFormatDefault: '%stackname%-compute-%index%'
   CountDefault: 1
   disable_constraints: true
+  disable_upgrade_deployment: true
   tags: []
   networks:
   - InternalApi
