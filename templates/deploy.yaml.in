@@ -86,7 +86,7 @@ parameter_defaults:
 
   FloatingNetworkVlanID: 3803
 
-  ControlPlaneDefaultRoute: 192.168.24.1
+  ControlPlaneDefaultRoute: 172.16.1.1
   ControlPlaneNetworkVlanID: 3703
 
   # The overcloud nodes access the OpenStack metadata service at the

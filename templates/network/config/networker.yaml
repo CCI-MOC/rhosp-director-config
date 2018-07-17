@@ -111,33 +111,21 @@ resources:
               - type: interface
                 name: eth2
                 use_dhcp: true
-
-#              # Attach ControlPlane, InternalApi, Storage, and
-#              # External networks to eth2
-#              - type: interface
-#                name: eth2
-#
-              - type: vlan
-                device: eth2
-                vlan_id:
-                  get_param: ControlPlaneNetworkVlanID
-                use_dhcp: false
-                addresses:
-                - ip_netmask:
-                    list_join:
-                    - /
-                    - - get_param: ControlPlaneIp
-                      - get_param: ControlPlaneSubnetCidr
-
                 routes:
                 # This sets up a static route to the OpenStack
                 # metadata service.  This will be placed into
                 # /etc/sysconfig/network-scripts/routes-eth1 by
                 # os-net-config.
+                - ip_netmask: {get_param: EC2MetadataIp}
+                  next_hop: {get_param: ControlPlaneDefaultRoute}
                 - ip_netmask: 169.254.169.254/32
-                  next_hop:
-                    get_param: EC2MetadataIp
+                  next_hop: {get_param: EC2MetadataIp}
+                # Access to local repo server
+                - ip_netmask: 10.13.96.252
+                  next_hop: {get_param: ControlPlaneDefaultRoute}
 
+               # Attach InternalApi, Storage, and
+               # External networks to eth2
               - type: vlan
                 device: eth2
                 vlan_id:
