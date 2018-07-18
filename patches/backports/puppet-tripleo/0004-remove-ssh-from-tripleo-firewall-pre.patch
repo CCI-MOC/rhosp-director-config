@@ -1,0 +1,61 @@
+From 302464d5549538168e99b9f699e108b7447614b6 Mon Sep 17 00:00:00 2001
+From: Lars Kellogg-Stedman <lars@redhat.com>
+Date: Thu, 12 Jul 2018 15:22:10 -0400
+Subject: [PATCH 4/4] remove ssh from tripleo::firewall::pre
+
+including global ssh access in tripleo::firewall::pre makes it
+difficult for the operator to control ssh access to overcloud hosts.
+This removes the hardcoded rule and the accompanying change in t-h-t
+configures the default firewall rules via hiera config_settings.
+
+See-also: I89cff59947dda3f51482486c41a3d67c4aa36a3e
+Change-Id: I14b540e6564c5b7c5d54b4f1fd5368b000744135
+(cherry picked from commit 943f32dc52cbf6689a6a72279330c1841cafe3c4)
+---
+ manifests/firewall/pre.pp             |  5 -----
+ spec/classes/tripleo_firewall_spec.rb | 13 -------------
+ 2 files changed, 18 deletions(-)
+
+diff --git a/manifests/firewall/pre.pp b/manifests/firewall/pre.pp
+index 39120d92..0feb564e 100644
+--- a/manifests/firewall/pre.pp
++++ b/manifests/firewall/pre.pp
+@@ -49,11 +49,6 @@ class tripleo::firewall::pre(
+     extras  => $firewall_settings,
+   }
+ 
+-  tripleo::firewall::rule{ '003 accept ssh':
+-    dport  => '22',
+-    extras => $firewall_settings,
+-  }
+-
+   tripleo::firewall::rule{ '004 accept ipv6 dhcpv6':
+     dport       => '546',
+     proto       => 'udp',
+diff --git a/spec/classes/tripleo_firewall_spec.rb b/spec/classes/tripleo_firewall_spec.rb
+index 203c2847..2d655056 100644
+--- a/spec/classes/tripleo_firewall_spec.rb
++++ b/spec/classes/tripleo_firewall_spec.rb
+@@ -69,19 +69,6 @@ describe 'tripleo::firewall' do
+           :state    => ['NEW'],
+           :provider => 'ip6tables',
+         )
+-        is_expected.to contain_firewall('003 accept ssh ipv4').with(
+-          :dport   => '22',
+-          :proto  => 'tcp',
+-          :action => 'accept',
+-          :state  => ['NEW'],
+-        )
+-        is_expected.to contain_firewall('003 accept ssh ipv6').with(
+-          :dport    => '22',
+-          :proto    => 'tcp',
+-          :action   => 'accept',
+-          :state    => ['NEW'],
+-          :provider => 'ip6tables',
+-        )
+       end
+ 
+       it 'configure basic post firewall rules' do
+-- 
+2.18.0.rc2
+

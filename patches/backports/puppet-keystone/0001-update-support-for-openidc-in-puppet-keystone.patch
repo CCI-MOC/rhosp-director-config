@@ -1,0 +1,644 @@
+From 9872246039991ef90d0f2f1bdd4046210aeea48b Mon Sep 17 00:00:00 2001
+From: Lars Kellogg-Stedman <lars@redhat.com>
+Date: Wed, 13 Jun 2018 11:26:01 -0400
+Subject: [PATCH 1/2] update support for openidc in puppet-keystone
+
+The existing openidc support in puppet-keystone was incomplete and
+would result in invalid Apache configurations. This commit updates
+the openidc federation to work with modern Keystone and abstracts out
+some common parameters for use in other federated identity modules.
+
+Change-Id: I200011e2e0ffd01a2aa26df8a03f03151eb64150
+(cherry picked from commit ce1b5302dc6b5dc5d4ad83a67bb5d1618a836995)
+---
+ .../{ini_setting.rb => openstackconfig.rb}    |  4 +-
+ .../provider/keystone_domain/openstack.rb     |  2 +-
+ .../keystone_domain_config/openstack.rb       |  6 +-
+ lib/puppet/type/keystone_config.rb            |  4 ++
+ lib/puppet_x/keystone_config/ini_setting.rb   | 16 +++--
+ manifests/federation.pp                       | 36 +++++++++++
+ manifests/federation/openidc.pp               | 62 ++++++++-----------
+ .../federation/openidc_httpd_configuration.pp |  7 +--
+ spec/acceptance/keystone_wsgi_apache_spec.rb  |  6 --
+ .../keystone_federation_openidc_spec.rb       | 44 ++++---------
+ spec/classes/keystone_federation_spec.rb      | 41 ++++++++++++
+ .../keystone_config/ini_setting_spec.rb       |  2 +-
+ .../keystone_domain_config/openstack_spec.rb  | 11 ++--
+ spec/unit/type/keystone_config_spec.rb        |  4 +-
+ templates/openidc.conf.erb                    | 18 ++++--
+ 15 files changed, 157 insertions(+), 106 deletions(-)
+ rename lib/puppet/provider/keystone_config/{ini_setting.rb => openstackconfig.rb} (56%)
+ create mode 100644 manifests/federation.pp
+ create mode 100644 spec/classes/keystone_federation_spec.rb
+
+diff --git a/lib/puppet/provider/keystone_config/ini_setting.rb b/lib/puppet/provider/keystone_config/openstackconfig.rb
+similarity index 56%
+rename from lib/puppet/provider/keystone_config/ini_setting.rb
+rename to lib/puppet/provider/keystone_config/openstackconfig.rb
+index 3c2b1d2..00fe910 100644
+--- a/lib/puppet/provider/keystone_config/ini_setting.rb
++++ b/lib/puppet/provider/keystone_config/openstackconfig.rb
+@@ -1,6 +1,6 @@
+ Puppet::Type.type(:keystone_config).provide(
+-  :ini_setting,
+-  :parent => Puppet::Type.type(:openstack_config).provider(:ini_setting)
++  :openstackconfig,
++  :parent => Puppet::Type.type(:openstack_config).provider(:ruby)
+ ) do
+ 
+   def self.file_path
+diff --git a/lib/puppet/provider/keystone_domain/openstack.rb b/lib/puppet/provider/keystone_domain/openstack.rb
+index 3190e23..e5dbfa6 100644
+--- a/lib/puppet/provider/keystone_domain/openstack.rb
++++ b/lib/puppet/provider/keystone_domain/openstack.rb
+@@ -155,7 +155,7 @@ Puppet::Type.type(:keystone_domain).provide(
+   def keystone_conf_default_domain_id_entry(newid)
+     conf = Puppet::Type::Keystone_config
+       .new(:title => 'identity/default_domain_id', :value => newid)
+-    entry = Puppet::Type.type(:keystone_config).provider(:ini_setting)
++    entry = Puppet::Type.type(:keystone_config).provider(:openstackconfig)
+       .new(conf)
+     entry
+   end
+diff --git a/lib/puppet/provider/keystone_domain_config/openstack.rb b/lib/puppet/provider/keystone_domain_config/openstack.rb
+index 7f6ec1a..4ecd672 100644
+--- a/lib/puppet/provider/keystone_domain_config/openstack.rb
++++ b/lib/puppet/provider/keystone_domain_config/openstack.rb
+@@ -1,6 +1,6 @@
+ Puppet::Type.type(:keystone_domain_config).provide(
+   :openstack,
+-  :parent => Puppet::Type.type(:openstack_config).provider(:ini_setting)
++  :parent => Puppet::Type.type(:openstack_config).provider(:ruby)
+ ) do
+ 
+   class Puppet::Error::OpenstackMissingDomainName < Puppet::Error; end
+@@ -17,7 +17,7 @@ Puppet::Type.type(:keystone_domain_config).provide(
+     if base_dir == :absent
+       '/etc/keystone/domains'
+     else
+-      base_dir
++      base_dir[0]
+     end
+   end
+ 
+@@ -38,7 +38,7 @@ Puppet::Type.type(:keystone_domain_config).provide(
+   def self.prefetch(resources)
+     catalog = resources.values.first.catalog
+     resource_dir = find_domain_conf(catalog)
+-    @base_dir = resource_dir.nil? ? nil : resource_dir[:value]
++    @base_dir = resource_dir.nil? ? nil : resource_dir[:value][0]
+   end
+ 
+   def self.base_dir_exists?
+diff --git a/lib/puppet/type/keystone_config.rb b/lib/puppet/type/keystone_config.rb
+index 9dc4f3c..2b1be72 100644
+--- a/lib/puppet/type/keystone_config.rb
++++ b/lib/puppet/type/keystone_config.rb
+@@ -9,4 +9,8 @@ Puppet::Type.newtype(:keystone_config) do
+ 
+   create_parameters
+ 
++  autorequire(:package) do
++    'keystone'
++  end
++
+ end
+diff --git a/lib/puppet_x/keystone_config/ini_setting.rb b/lib/puppet_x/keystone_config/ini_setting.rb
+index 3535735..385a68d 100644
+--- a/lib/puppet_x/keystone_config/ini_setting.rb
++++ b/lib/puppet_x/keystone_config/ini_setting.rb
+@@ -13,14 +13,22 @@ module PuppetX
+           newvalues(/\S+\/\S+/)
+         end
+ 
+-        newproperty(:value) do
++        newproperty(:value, :array_matching => :all) do
+           desc 'The value of the setting to be defined.'
++          def insync?(is)
++            return true if @should.empty?
++            return false unless is.is_a? Array
++            return false unless is.length == @should.length
++            return (
++              is & @should == is or
++              is & @should.map(&:to_s) == is
++            )
++          end
+           munge do |value|
+             value = value.to_s.strip
+             value.capitalize! if value =~ /^(true|false)$/i
+             value
+           end
+-          newvalues(/^[\S ]*$/)
+ 
+           def is_to_s( currentvalue )
+             if resource.secret?
+@@ -51,10 +59,6 @@ module PuppetX
+           desc 'A value that is specified as the value property will behave as if ensure => absent was specified'
+           defaultto('<SERVICE DEFAULT>')
+         end
+-
+-        autorequire(:package) do
+-          'keystone'
+-        end
+       end
+     end
+   end
+diff --git a/manifests/federation.pp b/manifests/federation.pp
+new file mode 100644
+index 0000000..7a528ee
+--- /dev/null
++++ b/manifests/federation.pp
+@@ -0,0 +1,36 @@
++# == class: keystone::federation
++#
++# == Parameters
++#
++# [*trusted_dashboards*]
++#   (optional) URL list of trusted horizon servers.
++#   This setting ensures that keystone only sends token data back to trusted
++#   servers. This is performed as a precaution, specifically to prevent man-in-
++#   the-middle (MITM) attacks.
++#   Defaults to undef
++#
++# [*remote_id_attribute*]
++#   (optional) Value to be used to obtain the entity ID of the Identity
++#   Provider from the environment.
++#
++# [*auth_methods*]
++#   (optional) Allowed authentication methods.
++#
++class keystone::federation (
++  $trusted_dashboards  = undef,
++  $remote_id_attribute = undef,
++  $auth_methods        = undef,
++) {
++  include ::keystone::deps
++
++  keystone_config {
++    'federation/trusted_dashboard': value  => any2array($trusted_dashboards);
++    'auth/methods': value => join(any2array($auth_methods), ',');
++  }
++
++  if $remote_id_attribute {
++    keystone_config {
++      'federation/remote_id_attribute': value => $remote_id_attribute;
++    }
++  }
++}
+diff --git a/manifests/federation/openidc.pp b/manifests/federation/openidc.pp
+index 9d85193..cd2100f 100644
+--- a/manifests/federation/openidc.pp
++++ b/manifests/federation/openidc.pp
+@@ -2,12 +2,6 @@
+ #
+ # == Parameters
+ #
+-# [*methods*]
+-#  A list of methods used for authentication separated by comma or an array.
+-#  The allowed values are: 'external', 'password', 'token', 'oauth1', 'saml2'
+-#  (Required) (string or array value).
+-#  Note: The external value should be dropped to avoid problems.
+-#
+ # [*idp_name*]
+ #  The name name associated with the IdP in Keystone.
+ #  (Required) String value.
+@@ -44,11 +38,6 @@
+ #  using Keystone VirtualHost on port 5000.
+ #  (Optional) Defaults to true.
+ #
+-# [*module_plugin*]
+-#  The plugin for authentication acording to the choice made with protocol and
+-#  module.
+-#  (Optional) Defaults to 'keystone.auth.plugins.mapped.Mapped' (string value)
+-#
+ # [*template_order*]
+ #  This number indicates the order for the concat::fragment that will apply
+ #  the shibboleth configuration to Keystone VirtualHost. The value should
+@@ -64,8 +53,18 @@
+ #   accepts latest or specific versions.
+ #   Defaults to present.
+ #
++# [*keystone_public_url*]
++#   (optional) URL to keystone public endpoint.
++#
++# [*keystone_admin_url*]
++#    (optional) URL to keystone admin endpoint.
++#
++# === DEPRECATED
++#
++# [*module_plugin*]
++#  This value is no longer used.
++#
+ class keystone::federation::openidc (
+-  $methods,
+   $idp_name,
+   $openidc_provider_metadata_url,
+   $openidc_client_id,
+@@ -74,42 +73,36 @@ class keystone::federation::openidc (
+   $openidc_response_type       = 'id_token',
+   $admin_port                  = false,
+   $main_port                   = true,
+-  $module_plugin               = 'keystone.auth.plugins.mapped.Mapped',
+   $template_order              = 331,
+   $package_ensure              = present,
++  $keystone_public_url         = undef,
++  $keystone_admin_url          = undef,
++
++  # DEPRECATED
++  $module_plugin               = undef,
+ ) {
+ 
+   include ::apache
+   include ::keystone::deps
+   include ::keystone::params
+ 
++  $_keystone_public_url = pick($keystone_public_url, $::keystone::public_endpoint)
++  $_keystone_admin_url = pick($keystone_admin_url, $::keystone::admin_endpoint)
++
+   # Note: if puppet-apache modify these values, this needs to be updated
+   if $template_order <= 330 or $template_order >= 999 {
+     fail('The template order should be greater than 330 and less than 999.')
+   }
+ 
+-  if ('external' in $methods ) {
+-    fail('The external method should be dropped to avoid any interference with openidc')
+-  }
+-
+-  if !('openidc' in $methods ) {
+-    fail('Methods should contain openidc as one of the auth methods.')
+-  } else {
+-    if ($module_plugin != 'keystone.auth.plugins.mapped.Mapped') {
+-      fail('Other plugins are not currently supported for openidc')
+-    }
+-  }
+-
+-  validate_bool($admin_port)
+-  validate_bool($main_port)
++  validate_legacy(Boolean, 'validate_bool', $admin_port)
++  validate_legacy(Boolean, 'validate_bool', $main_port)
+ 
+   if( !$admin_port and !$main_port){
+     fail('No VirtualHost port to configure, please choose at least one.')
+   }
+ 
+   keystone_config {
+-    'auth/methods': value => join(any2array($methods),',');
+-    'auth/openidc': value => $module_plugin;
++    'openid/remote_id_attribute': value => 'HTTP_OIDC_ISS';
+   }
+ 
+   ensure_packages([$::keystone::params::openidc_package_name], {
+@@ -117,18 +110,15 @@ class keystone::federation::openidc (
+     tag    => 'keystone-support-package',
+   })
+ 
+-  if $admin_port {
++  if $admin_port and $_keystone_admin_url {
+     keystone::federation::openidc_httpd_configuration{ 'admin':
+-      port              => $::keystone::admin_port,
+-      keystone_endpoint => $::keystone::admin_endpoint,
++      keystone_endpoint => $_keystone_admin_url,
+     }
+   }
+ 
+-  if $main_port {
++  if $main_port and $_keystone_public_url {
+     keystone::federation::openidc_httpd_configuration{ 'main':
+-      port              => $::keystone::public_port,
+-      keystone_endpoint => $::keystone::public_endpoint,
++      keystone_endpoint => $_keystone_public_url,
+     }
+   }
+-
+ }
+diff --git a/manifests/federation/openidc_httpd_configuration.pp b/manifests/federation/openidc_httpd_configuration.pp
+index de415db..eaea7c6 100644
+--- a/manifests/federation/openidc_httpd_configuration.pp
++++ b/manifests/federation/openidc_httpd_configuration.pp
+@@ -2,20 +2,15 @@
+ #
+ # == Parameters
+ #
+-# [*port*]
+-#  The port number to configure OpenIDC federated authentication on
+-#  (Required) String value.
+-#
+ # [*keystone_endpoint*]
+ #  The keystone endpoint to use when configuring the OpenIDC redirect back
+ #  to keystone
+ #  (Required) String value.
+ #
+ define keystone::federation::openidc_httpd_configuration (
+-  $port              = undef,
+   $keystone_endpoint = undef
+ ) {
+-  concat::fragment { "configure_openidc_on_port_${port}":
++  concat::fragment { "configure_openidc_on_${title}":
+     target  => "${keystone::wsgi::apache::priority}-keystone_wsgi_${title}.conf",
+     content => template('keystone/openidc.conf.erb'),
+     order   => $keystone::federation::openidc::template_order,
+diff --git a/spec/acceptance/keystone_wsgi_apache_spec.rb b/spec/acceptance/keystone_wsgi_apache_spec.rb
+index 007f9af..493d757 100644
+--- a/spec/acceptance/keystone_wsgi_apache_spec.rb
++++ b/spec/acceptance/keystone_wsgi_apache_spec.rb
+@@ -249,7 +249,6 @@ describe 'keystone server running with Apache/WSGI with resources' do
+           # note: cannot use neither instance variable nor let on
+           # parameter for shared_example
+           it_behaves_like 'a_valid_configuration', <<-EOC
+-
+ [ldap]
+ url=http://auth.com/1
+ EOC
+@@ -266,7 +265,6 @@ EOC
+ 
+         context '/tmp/keystone.services.conf' do
+           it_behaves_like 'a_valid_configuration', <<-EOC
+-
+ [ldap]
+ url=http://auth.com/1
+ EOC
+@@ -295,7 +293,6 @@ EOC
+ 
+       describe '/etc/keystone/domains/keystone.external.conf' do
+         it_behaves_like 'a_valid_configuration', <<EOC
+-
+ [ldap]
+ url=http://ext-auth.com/1
+ EOC
+@@ -312,7 +309,6 @@ EOC
+ 
+       context '/etc/keystone/domains/keystone.services.conf' do
+         it_behaves_like 'a_valid_configuration', <<-EOC
+-
+ [ldap]
+ url=http://auth.com/1
+ EOC
+@@ -351,7 +347,6 @@ EOC
+         end
+         context '/etc/keystone/domains/keystone.domain_1_ldap_backend.conf' do
+           it_behaves_like 'a_valid_configuration', <<-EOC
+-
+ [ldap]
+ use_pool=False
+ pool_retry_delay=0.1
+@@ -369,7 +364,6 @@ EOC
+ 
+         context '/etc/keystone/domains/keystone.domain_2_ldap_backend.conf' do
+           it_behaves_like 'a_valid_configuration', <<-EOC
+-
+ [ldap]
+ pool_retry_delay=0.1
+ url=ldap://bar
+diff --git a/spec/classes/keystone_federation_openidc_spec.rb b/spec/classes/keystone_federation_openidc_spec.rb
+index 668bfeb..531e5d6 100644
+--- a/spec/classes/keystone_federation_openidc_spec.rb
++++ b/spec/classes/keystone_federation_openidc_spec.rb
+@@ -6,18 +6,16 @@ describe 'keystone::federation::openidc' do
+     <<-EOS
+     class { 'keystone':
+       admin_token => 'service_token',
+-      admin_password => 'special_password',
++      public_endpoint => 'http://os.example.com:5000',
++      admin_endpoint => 'http://os.example.com:35357',
+     }
+ 
+-    include apache
+-
+-    class { 'keystone::wsgi::apache': }
++    include keystone::wsgi::apache
+     EOS
+   end
+ 
+   let :params do
+-    { :methods => 'password, token, openidc',
+-      :idp_name => 'myidp',
++    { :idp_name => 'myidp',
+       :openidc_provider_metadata_url => 'https://accounts.google.com/.well-known/openid-configuration',
+       :openidc_client_id => 'openid_client_id',
+       :openidc_client_secret => 'openid_client_secret',
+@@ -26,22 +24,6 @@ describe 'keystone::federation::openidc' do
+   end
+ 
+   context 'with invalid params' do
+-    before do
+-      params.merge!(:methods => 'external, password, token, oauth1')
+-      it_raises 'a Puppet::Error', /The external method should be dropped to avoid any interference with openidc/
+-    end
+-
+-    before do
+-      params.merge!(:methods => 'password, token, oauth1')
+-      it_raises 'a Puppet::Error', /Methods should contain openidc as one of the auth methods./
+-    end
+-
+-    before do
+-      params.merge!(:methods       => 'password, token, oauth1, openidc',
+-                    :module_plugin => 'keystone.auth.plugins')
+-      it_raises 'a Puppet:Error', /The plugin for openidc should be keystone.auth.plugins.mapped.Mapped/
+-    end
+-
+     before do
+       params.merge!(:admin_port => false,
+                     :main_port  => false)
+@@ -79,15 +61,15 @@ describe 'keystone::federation::openidc' do
+     end
+ 
+     context 'with only required parameters' do
+-      it 'should have basic params for mellon in Keystone configuration' do
+-        is_expected.to contain_keystone_config('auth/methods').with_value('password, token, openidc')
+-        is_expected.to contain_keystone_config('auth/openidc').with_value('keystone.auth.plugins.mapped.Mapped')
++      it 'should set remote_id_attribute in keystone' do
++        is_expected.to contain_keystone_config('openid/remote_id_attribute').with_value('HTTP_OIDC_ISS')
+       end
+ 
+-      it { is_expected.to contain_concat__fragment('configure_openidc_on_port_5000').with({
++      it { is_expected.to contain_concat__fragment('configure_openidc_on_main').with({
+         :target => "10-keystone_wsgi_main.conf",
+         :order  => params[:template_order],
+       })}
++
+     end
+ 
+     context 'with override default parameters' do
+@@ -97,23 +79,21 @@ describe 'keystone::federation::openidc' do
+         })
+       end
+ 
+-      it 'should have basic params for mellon in Keystone configuration' do
+-        is_expected.to contain_keystone_config('auth/methods').with_value('password, token, openidc')
+-        is_expected.to contain_keystone_config('auth/openidc').with_value('keystone.auth.plugins.mapped.Mapped')
++      it 'should set remote_id_attribute in keystone' do
++        is_expected.to contain_keystone_config('openid/remote_id_attribute').with_value('HTTP_OIDC_ISS')
+       end
+ 
+-      it { is_expected.to contain_concat__fragment('configure_openidc_on_port_5000').with({
++      it { is_expected.to contain_concat__fragment('configure_openidc_on_main').with({
+         :target => "10-keystone_wsgi_main.conf",
+         :order  => params[:template_order],
+       })}
+ 
+-      it { is_expected.to contain_concat__fragment('configure_openidc_on_port_35357').with({
++      it { is_expected.to contain_concat__fragment('configure_openidc_on_admin').with({
+         :target => "10-keystone_wsgi_admin.conf",
+         :order  => params[:template_order],
+       })}
+     end
+ 
+     it { is_expected.to contain_package(platform_parameters[:openidc_package_name]) }
+-
+   end
+ end
+diff --git a/spec/classes/keystone_federation_spec.rb b/spec/classes/keystone_federation_spec.rb
+new file mode 100644
+index 0000000..c4582e9
+--- /dev/null
++++ b/spec/classes/keystone_federation_spec.rb
+@@ -0,0 +1,41 @@
++require 'spec_helper'
++
++describe 'keystone::federation' do
++
++  let(:pre_condition) do
++    <<-EOS
++    class { 'keystone':
++      admin_token => 'service_token',
++      admin_password => 'special_password',
++    }
++    EOS
++  end
++
++  let :params do
++    { :trusted_dashboards => ['http://dashboard.example.com'],
++      :auth_methods => ['password', 'token', 'openid'],
++      :remote_id_attribute => 'test_attribute',
++     }
++  end
++
++  on_supported_os({
++  }).each do |os,facts|
++    let (:facts) do
++      facts.merge!(OSDefaults.get_facts({}))
++    end
++
++    context 'with optional parameters' do
++      it 'should set auth/methods in keystone' do
++        is_expected.to contain_keystone_config('auth/methods').with_value('password,token,openid')
++      end
++
++      it 'should set federation/trusted_dashboard' do
++        is_expected.to contain_keystone_config('federation/trusted_dashboard').with_value(['http://dashboard.example.com'])
++      end
++
++      it 'should set federation/remote_id_attribute' do
++        is_expected.to contain_keystone_config('federation/remote_id_attribute').with_value('test_attribute')
++      end
++    end
++  end
++end
+diff --git a/spec/unit/provider/keystone_config/ini_setting_spec.rb b/spec/unit/provider/keystone_config/ini_setting_spec.rb
+index 8a9e32e..f5a9bd8 100644
+--- a/spec/unit/provider/keystone_config/ini_setting_spec.rb
++++ b/spec/unit/provider/keystone_config/ini_setting_spec.rb
+@@ -15,7 +15,7 @@ $LOAD_PATH.push(
+     'lib')
+ )
+ require 'spec_helper'
+-provider_class = Puppet::Type.type(:keystone_config).provider(:ini_setting)
++provider_class = Puppet::Type.type(:keystone_config).provider(:openstackconfig)
+ describe provider_class do
+ 
+   it 'should default to the default setting when no other one is specified' do
+diff --git a/spec/unit/provider/keystone_domain_config/openstack_spec.rb b/spec/unit/provider/keystone_domain_config/openstack_spec.rb
+index d500367..971a061 100644
+--- a/spec/unit/provider/keystone_domain_config/openstack_spec.rb
++++ b/spec/unit/provider/keystone_domain_config/openstack_spec.rb
+@@ -50,7 +50,7 @@ describe provider_class do
+         :value => '/tmp'
+       })
+       config_provider = Puppet::Type.type(:keystone_config)
+-        .provider(:ini_setting)
++        .provider(:openstackconfig)
+       keystone_config = config_provider.new(config)
+       keystone_config.class.expects(:file_path).at_least_once.returns(tmpfile)
+       keystone_config.create
+@@ -77,8 +77,7 @@ describe provider_class do
+         expect { @domain_provider.create }.not_to raise_error
+         expect(File).to exist('/tmp/keystone.bar.conf')
+         expect(File.read('/tmp/keystone.bar.conf'))
+-          .to eq('
+-[dude]
++          .to eq('[dude]
+ foo=blahh
+ ')
+       end
+@@ -96,14 +95,12 @@ foo=blahh
+         expect(File).to exist('/tmp/keystone.baz.conf')
+ 
+         expect(File.read('/tmp/keystone.bar.conf'))
+-          .to eq('
+-[dude]
++          .to eq('[dude]
+ foo=blahh
+ ')
+ 
+         expect(File.read('/tmp/keystone.baz.conf'))
+-          .to eq('
+-[duck]
++          .to eq('[duck]
+ go=where
+ ')
+       end
+diff --git a/spec/unit/type/keystone_config_spec.rb b/spec/unit/type/keystone_config_spec.rb
+index b8e19ec..3f3a824 100644
+--- a/spec/unit/type/keystone_config_spec.rb
++++ b/spec/unit/type/keystone_config_spec.rb
+@@ -43,12 +43,12 @@ describe 'Puppet::Type.type(:keystone_config)' do
+ 
+   it 'should accept a valid value' do
+     @keystone_config[:value] = 'bar'
+-    expect(@keystone_config[:value]).to eq('bar')
++    expect(@keystone_config[:value]).to eq(['bar'])
+   end
+ 
+   it 'should not accept a value with whitespace' do
+     @keystone_config[:value] = 'b ar'
+-    expect(@keystone_config[:value]).to eq('b ar')
++    expect(@keystone_config[:value]).to eq(['b ar'])
+   end
+ 
+   it 'should accept valid ensure values' do
+diff --git a/templates/openidc.conf.erb b/templates/openidc.conf.erb
+index e5fe33a..d50600c 100644
+--- a/templates/openidc.conf.erb
++++ b/templates/openidc.conf.erb
+@@ -7,14 +7,24 @@
+   OIDCClientSecret "<%= scope['keystone::federation::openidc::openidc_client_secret']-%>"
+   OIDCCryptoPassphrase "<%= scope['keystone::federation::openidc::openidc_crypto_passphrase']-%>"
+ 
+-  OIDCRedirectURI "<%= @keystone_endpoint-%>/v3/OS-FEDERATION/identity_providers/<%= scope['keystone::federation::openidc::idp_name']-%>/protocols/openidc/auth/redirect"
+-  <LocationMatch /v3/OS-FEDERATION/identity_providers/.*?/protocols/openidc/auth>
++  # The following directives are required to support openid from the command
++  # line
++  <Location ~ "/v3/OS-FEDERATION/identity_providers/<%= scope['keystone::federation::openid::idp_name']-%>/protocols/openid/auth">
++      AuthType oauth20
++      Require valid-user
++  </Location>
++
++  # The following directives are necessary to support websso from Horizon
++  # (Per https://docs.openstack.org/keystone/pike/advanced-topics/federation/websso.html)
++  OIDCRedirectURI "<%= @keystone_endpoint-%>/v3/auth/OS-FEDERATION/identity_providers/<%= scope['keystone::federation::openidc::idp_name']-%>/protocols/openid/websso"
++  OIDCRedirectURI "<%= @keystone_endpoint-%>/v3/auth/OS-FEDERATION/websso"
++
++  <LocationMatch "/v3/auth/OS-FEDERATION/websso/openid">
+       AuthType "openid-connect"
+       Require valid-user
+   </LocationMatch>
+ 
+-  OIDCRedirectURI "<%= @keystone_endpoint-%>/v3/auth/OS-FEDERATION/identity_providers/<%= scope['keystone::federation::openidc::idp_name']-%>/protocols/openidc/websso/redirect"
+-  <LocationMatch /v3/auth/OS-FEDERATION/identity_providers/.*?/protocols/openidc/websso>
++  <LocationMatch "/v3/auth/OS-FEDERATION/identity_providers/<%= scope['keystone::federation::openidc::idp_name']-%>/protocols/openid/websso">
+       AuthType "openid-connect"
+       Require valid-user
+   </LocationMatch>
+-- 
+2.18.0.rc2
+

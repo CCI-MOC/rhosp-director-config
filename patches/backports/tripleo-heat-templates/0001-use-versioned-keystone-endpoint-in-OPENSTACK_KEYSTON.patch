@@ -1,0 +1,31 @@
+From 9aa39d8a7c0623b69582a60afb169d7218c26f84 Mon Sep 17 00:00:00 2001
+From: Lars Kellogg-Stedman <lars@redhat.com>
+Date: Mon, 18 Jun 2018 16:07:14 -0400
+Subject: [PATCH 1/4] use versioned keystone endpoint in OPENSTACK_KEYSTONE_URL
+
+Horizon uses OPENSTACK_KEYSTONE_URL to generate browser redirects for
+web sso (in openstack_auth/utils.py). In order to generate valid URLs,
+this value must use a versioned keystone endpoint.
+
+Change-Id: Ifd8b7dea83a4566b69f76898952f908395c590a4
+(cherry picked from commit 3aa91b8462fe05a3a56ec5983adfeb1e1922a495)
+---
+ puppet/services/horizon.yaml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/puppet/services/horizon.yaml b/puppet/services/horizon.yaml
+index ef81ebd50..45208b1bc 100644
+--- a/puppet/services/horizon.yaml
++++ b/puppet/services/horizon.yaml
+@@ -116,7 +116,7 @@ outputs:
+           horizon::django_session_engine: 'django.contrib.sessions.backends.cache'
+           horizon::vhost_extra_params: {get_param: HorizonVhostExtraParams}
+           horizon::bind_address: {get_param: [ServiceNetMap, HorizonNetwork]}
+-          horizon::keystone_url: {get_param: [EndpointMap, KeystoneInternal, uri_no_suffix]}
++          horizon::keystone_url: {get_param: [EndpointMap, KeystoneV3Public, uri]}
+           horizon::password_validator: {get_param: [HorizonPasswordValidator]}
+           horizon::password_validator_help: {get_param: [HorizonPasswordValidatorHelp]}
+           horizon::secret_key:
+-- 
+2.18.0.rc2
+

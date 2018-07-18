@@ -1,0 +1,32 @@
+From 8c9d976132db9701ff525f6995a558d452357a81 Mon Sep 17 00:00:00 2001
+From: Lars Kellogg-Stedman <lars@redhat.com>
+Date: Thu, 21 Jun 2018 15:27:51 -0400
+Subject: [PATCH 3/4] [WIP] set mod_auth_openidc cache type to memcache
+
+When its behind a load balancer, mod_auth_openidc requires shared
+state (or sticky sessions). Since we already have memcache available,
+configure mod_auth_openidc to use memcache.
+
+Depends-on: I9ff976854b93cdf9ca3175d1fd39c2b268b9f7fa
+Change-Id: Iff0abdfd7605d839e8ab145078de523864db4660
+(cherry picked from commit b3725637b4750569c40d80e61ac5f20c98a9f010)
+---
+ puppet/services/keystone.yaml | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/puppet/services/keystone.yaml b/puppet/services/keystone.yaml
+index a07c9a179..64c838a4b 100644
+--- a/puppet/services/keystone.yaml
++++ b/puppet/services/keystone.yaml
+@@ -518,6 +518,8 @@ outputs:
+                 get_param: KeystoneOpenIdcCryptoPassphrase
+               keystone::federation::openidc::openidc_response_type:
+                 get_param: KeystoneOpenIdcResponseType
++              keystone::federation::openidc::openidc_cache_type:
++                memcache
+             - {}
+           -
+             if:
+-- 
+2.18.0.rc2
+
