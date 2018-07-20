@@ -10,9 +10,6 @@ CONTROLLER_SRC_ROLES = \
 
 ENVIRONMENTS = templates/deploy.yaml
 
-%.html: %.md
-	$(PANDOC) -s $< -o $@ --toc --css github-pandoc.css
-
 all: $(ENVIRONMENTS) roles_data.yaml
 
 templates/deploy.yaml: templates/deploy.yaml.in
