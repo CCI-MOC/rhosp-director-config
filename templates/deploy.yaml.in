@@ -34,7 +34,7 @@ parameter_defaults:
   NetworkerDeployedServerCount: 2
   ComputeDeployedServerCount: 2
 
-  KeystoneRegion: moc-kumo
+  KeystoneRegion: moc-kzn
 
   NtpServer:
     - 128.30.2.167
@@ -54,40 +54,40 @@ parameter_defaults:
   # between the controllers and compute nodes, as well as for AMQ
   # traffic, database access, and most other traffic internal to the
   # overcloud.
-  InternalApiNetCidr: 192.168.32.0/22
+  InternalApiNetCidr: 172.16.32.0/19
   InternalApiAllocationPools:
-    - start: 192.168.32.10
-      end: 192.168.32.254
-  InternalApiNetworkVlanID: 3702
+    - start: 172.16.32.10
+      end: 172.16.63.200
+  InternalApiNetworkVlanID: 202
 
   # The Storage network is used for Cinder, Ceph, and Swift.
-  StorageNetCidr: 192.168.16.0/22
+  StorageNetCidr: 192.168.0.0/19
   StorageAllocationPools:
-    - start: 192.168.17.10
-      end: 192.168.17.254
-  StorageNetworkVlanID: 3700
+    - start: 192.168.0.10
+      end: 192.168.31.200
+  StorageNetworkVlanID: 250
 
   # The Tenant network is used for tenant-created networks.
-  TenantNetworkVlanID: 3704
-  TenantNetCidr: 192.168.12.0/22
+  TenantNetCidr: 172.16.64.0/19
   TenantAllocationPools:
-    - start: 192.168.12.10
-      end: 192.168.12.254
+    - start: 172.16.64.10
+      end: 172.16.95.200
+  TenantNetworkVlanID: 203
 
-  ExternalNetCidr: 192.12.185.0/24
-  ExternalInterfaceDefaultRoute: 192.12.185.1
+  ExternalNetCidr: 129.10.5.0/24
+  ExternalInterfaceDefaultRoute: 129.10.5.1
   ExternalAllocationPools:
-    - start: 192.12.185.20
-      end: 192.12.185.100
-  ExternalNetworkVlanID: 105
+    - start: 129.10.5.10
+      end: 129.10.5.200
+  ExternalNetworkVlanID: 127
   PublicVirtualFixedIPs:
-    - ip_address: 192.12.185.13
+    - ip_address: 129.10.5.100
 
 
-  FloatingNetworkVlanID: 3803
+  FloatingNetworkVlanID: 3802
 
-  ControlPlaneDefaultRoute: 172.16.1.1
-  ControlPlaneNetworkVlanID: 3703
+  ControlPlaneDefaultRoute: 172.16.0.1
+  ControlPlaneNetworkVlanID: 201
 
   # The overcloud nodes access the OpenStack metadata service at the
   # EC2MetadataIp address.
@@ -151,11 +151,11 @@ parameter_defaults:
         proto: 'tcp'
         source: 172.16.0.0/22
 
-  CephClientUserName: kumostack
+  CephClientUserName: ostack2
 
   # List of externally managed Ceph Mon Host IPs. Only used for
   # external Ceph deployments.
-  CephExternalMonHost: "192.168.16.1,192.168.16.2,192.168.16.3"
+  CephExternalMonHost: "192.168.28.201,192.168.28.202,192.168.28.203"
 
   SSLCertificate: |
     -----BEGIN CERTIFICATE-----
@@ -276,26 +276,5 @@ parameter_defaults:
 
   # Fencing configuration. See
   # https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/12/html/advanced_overcloud_customization/sect-fencing_the_controller_nodes
-  EnableFencing: true
-  FencingConfig:
-    devices:
-      - agent: fence_xvm
-        host_mac: "52:54:00:91:4e:ba"
-        params: &fence_params
-          multicast_address: "225.0.0.12"
-          port: kumo-control-01
-          manage_fw: true
-          manage_key_file: true
-          key_file: /etc/fence_xvm.key
-          key_file_password: |
-            {{ parameter_defaults.FencingPassword|indent(12) }}
-      - agent: fence_xvm
-        host_mac: "52:54:00:eb:00:48"
-        params:
-          <<: *fence_params
-          port: kumo-control-02
-      - agent: fence_xvm
-        host_mac: "52:54:00:b7:e1:09"
-        params:
-          <<: *fence_params
-          port: kumo-control-02
+  EnableFencing: false
+  FencingConfig: {}
