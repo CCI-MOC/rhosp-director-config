@@ -74,6 +74,10 @@ deploy_args=(
 	# Passwords and other credentials (this file is not included in
 	# the repository).
 	-e $PWD/templates/credentials.yaml
+
+	# Enable Manila
+	-e $TEMPLATES/environments/ceph-ansible/ceph-mds.yaml
+	-e $TEMPLATES/environments/manila-cephfsnative-config.yaml
 )
 
 if [ -d patches/puppet-modules ]; then
