@@ -107,15 +107,15 @@ resources:
             # script mentioned in the preceding get_file directive.
             $network_config:
               network_config:
-              # eth2 is the foreman provisioning network.
+              # p3p1 is the foreman provisioning network.
               - type: interface
-                name: eth2
+                name: p3p1
                 use_dhcp: true
                 defroute: false
                 routes:
                 # This sets up a static route to the OpenStack
                 # metadata service.  This will be placed into
-                # /etc/sysconfig/network-scripts/routes-eth1 by
+                # /etc/sysconfig/network-scripts/routes-p3p1 by
                 # os-net-config.
                 - ip_netmask: {get_param: EC2MetadataIp}
                   next_hop: {get_param: ControlPlaneDefaultRoute}
@@ -125,9 +125,9 @@ resources:
                 - ip_netmask: 10.13.96.252
                   next_hop: {get_param: ControlPlaneDefaultRoute}
 
-              # Put storage on eth3
+              # Put storage on p3p2
               - type: vlan
-                device: eth3
+                device: p3p2
                 vlan_id:
                   get_param: StorageNetworkVlanID
                 use_dhcp: false
@@ -136,9 +136,9 @@ resources:
                     get_param: StorageIpSubnet
 
 #              # Attach InternalApi, Storage, and
-#              # External networks to eth2
+#              # External networks to p3p1
               - type: vlan
-                device: eth2
+                device: p3p1
                 vlan_id:
                   get_param: InternalApiNetworkVlanID
                 use_dhcp: false
@@ -147,7 +147,7 @@ resources:
                     get_param: InternalApiIpSubnet
 
               - type: vlan
-                device: eth2
+                device: p3p1
                 vlan_id:
                   get_param: ExternalNetworkVlanID
                 use_dhcp: false
