@@ -124,6 +124,9 @@ resources:
                 # Access to local repo server
                 - ip_netmask: 10.13.96.252
                   next_hop: {get_param: ControlPlaneDefaultRoute}
+                # Access to ipmi network
+                - ip_netmask: 10.0.0.0/19
+                  next_hop: 172.16.0.6
 
               # Put storage on p3p2
               - type: vlan
