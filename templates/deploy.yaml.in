@@ -64,7 +64,7 @@ parameter_defaults:
   StorageNetCidr: 192.168.0.0/19
   StorageAllocationPools:
     - start: 192.168.0.10
-      end: 192.168.31.200
+      end: 192.168.3.200
   StorageNetworkVlanID: 250
 
   # The Tenant network is used for tenant-created networks.
