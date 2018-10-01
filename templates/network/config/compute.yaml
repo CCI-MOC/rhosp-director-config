@@ -119,7 +119,7 @@ resources:
                 - ip_netmask: {get_param: EC2MetadataIp}
                   next_hop: {get_param: ControlPlaneDefaultRoute}
                 - ip_netmask: 169.254.169.254/32
-                  next_hop: {get_param: EC2MetadataIp}
+                  next_hop: 172.16.0.5
 
               # Put storage on p3p2
               - type: vlan
