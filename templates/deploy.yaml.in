@@ -91,7 +91,7 @@ parameter_defaults:
 
   # The overcloud nodes access the OpenStack metadata service at the
   # EC2MetadataIp address.
-  EC2MetadataIp: 192.168.24.1
+  EC2MetadataIp: 192.168.255.1
 
   # Setting NeutronExternalNetworkBridge to '' means that floating ips
   # can use any bridge. This maps to the `external_network_bridge`
