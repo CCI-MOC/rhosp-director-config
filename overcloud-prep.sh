@@ -2,7 +2,7 @@
 
 openstack overcloud container image prepare \
   --namespace registry.access.redhat.com/rhosp13 \
-  --push-destination 192.168.255.1:8787 \
+  --push-destination 172.16.0.5:8787 \
   --prefix openstack- \
   --tag-from-label {version}-{release} \
   --output-env-file $PWD/patches/docker/overcloud_images.yaml \

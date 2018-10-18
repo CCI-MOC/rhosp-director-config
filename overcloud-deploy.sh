@@ -7,14 +7,14 @@ if [ "$OS_CLOUDNAME" != "undercloud" ]; then
 	exit 1
 fi
 
-# Generate files
-make
-
 if [ -d patches/tripleo-heat-templates ]; then
 	TEMPLATES=$PWD/patches/tripleo-heat-templates
 else
 	TEMPLATES=/usr/share/openstack-tripleo-heat-templates
 fi
+
+# Generate files
+make TEMPLATES=$TEMPLATES
 
 # When passing environment files (`-e ...`) to the `overcloud deploy`
 # command, order is important! Your custom configuration
@@ -77,6 +77,10 @@ deploy_args=(
 	# Passwords and other credentials (this file is not included in
 	# the repository).
 	-e $PWD/templates/credentials.yaml
+
+	# Static ip assignment
+	-e $PWD/templates/hostnamemap.yaml
+	-e $PWD/templates/deployedserverportmap.yaml
 )
 
 if [ -d patches/puppet-modules ]; then
