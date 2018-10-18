@@ -113,17 +113,8 @@ resources:
                 use_dhcp: true
                 defroute: false
                 routes:
-                # This sets up a static route to the OpenStack
-                # metadata service.  This will be placed into
-                # /etc/sysconfig/network-scripts/routes-p3p1 by
-                # os-net-config.
-                - ip_netmask: {get_param: EC2MetadataIp}
-                  next_hop: {get_param: ControlPlaneDefaultRoute}
                 - ip_netmask: 169.254.169.254/32
-                  next_hop: 172.16.0.5
-                # Access to local repo server
-                - ip_netmask: 10.13.96.252
-                  next_hop: {get_param: ControlPlaneDefaultRoute}
+                  next_hop: {get_param: EC2MetadataIp}
                 # Access to ipmi network
                 - ip_netmask: 10.0.0.0/19
                   next_hop: 172.16.0.6
