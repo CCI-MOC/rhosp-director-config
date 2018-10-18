@@ -22,7 +22,7 @@ parameter_defaults:
   CephClientKey: <None>
 
   # Type: string
-  CephClientUserName: kumostack
+  CephClientUserName: ostack2
 
   # The Ceph cluster FSID. Must be a UUID.
   # Mandatory. This parameter must be set by the user.
@@ -32,7 +32,7 @@ parameter_defaults:
   # List of externally managed Ceph Mon Host IPs. Only used for
   # external Ceph deployments.
   # Type: string
-  CephExternalMonHost: ''
+  CephExternalMonHost: "192.168.28.201,192.168.28.202,192.168.28.203"
 
   # Whether to enable or not the Iscsi backend for Cinder
   # Type: boolean
@@ -45,8 +45,8 @@ parameter_defaults:
   CinderBackupBackend: ceph
 
   # Type: string
-  CinderRbdPoolName: kumostack
-  CinderBackupRbdPoolName: kumostack
+  CinderRbdPoolName: ostack2
+  CinderBackupRbdPoolName: ostack2
 
   # The short name of the Glance backend to use. Should be one of
   # swift, rbd, cinder, or file
@@ -54,7 +54,7 @@ parameter_defaults:
   GlanceBackend: rbd
 
   # Type: string
-  GlanceRbdPoolName: kumostack
+  GlanceRbdPoolName: ostack2
 
   # The short name of the Gnocchi backend to use. Should be one of
   # swift, rbd, or file
@@ -62,14 +62,14 @@ parameter_defaults:
   GnocchiBackend: rbd
 
   # Type: string
-  GnocchiRbdPoolName: kumostack
+  GnocchiRbdPoolName: ostack2
 
   # Whether to enable or not the Rbd backend for Nova
   # Type: boolean
   NovaEnableRbdBackend: true
 
   # Type: string
-  NovaRbdPoolName: kumostack
+  NovaRbdPoolName: ostack2
 
   # The default features enabled when creating a block device image.
   # Only applies to format 2 images. Set to '1' for Jewel clients

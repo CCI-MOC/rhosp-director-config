@@ -152,12 +152,6 @@ parameter_defaults:
         proto: 'tcp'
         source: 172.16.0.0/22
 
-  CephClientUserName: ostack2
-
-  # List of externally managed Ceph Mon Host IPs. Only used for
-  # external Ceph deployments.
-  CephExternalMonHost: "192.168.28.201,192.168.28.202,192.168.28.203"
-
   SSLCertificate: |
     -----BEGIN CERTIFICATE-----
     MIIFNjCCBB6gAwIBAgIJALkccmIyr9G0MA0GCSqGSIb3DQEBCwUAMIG0MQswCQYD
