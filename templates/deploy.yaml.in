@@ -38,10 +38,10 @@ parameter_defaults:
   KeystoneRegion: moc-kzn
 
   NtpServer:
-    - 128.30.2.167
-    - 128.30.2.89
-    - 128.30.3.19
-    - 18.26.0.36
+    - 0.rhel.pool.ntp.org
+    - 1.rhel.pool.ntp.org
+    - 2.rhel.pool.ntp.org
+    - 3.rhel.pool.ntp.org
 
   ##
   ## Network configuration
