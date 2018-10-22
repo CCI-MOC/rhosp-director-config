@@ -73,9 +73,6 @@ deploy_args=(
 
 	# Most of our custom configuration.
 	-e $PWD/templates/deploy.yaml
-
-	# Passwords and other credentials (this file is not included in
-	# the repository).
 	-e $PWD/templates/credentials.yaml
 
 	# Static ip assignment
