@@ -17,6 +17,11 @@ neu-5-35-stackcomp.kzn.moc
 neu-5-36-stackcomp.kzn.moc
 neu-5-37-stackcomp.kzn.moc
 neu-5-38-stackcomp.kzn.moc
+neu-15-34-stackcomp.kzn.moc
+neu-15-35-stackcomp.kzn.moc
+neu-15-36-stackcomp.kzn.moc
+neu-15-37-stackcomp.kzn.moc
+neu-15-38-stackcomp.kzn.moc
 "
 export NetworkerDeployedServer_hosts="
 neu-19-11-nc1.kzn.moc
