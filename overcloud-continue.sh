@@ -24,8 +24,8 @@ neu-15-37-stackcomp.kzn.moc
 neu-15-38-stackcomp.kzn.moc
 "
 export NetworkerDeployedServer_hosts="
-neu-19-11-nc1.kzn.moc
 neu-17-11-nc2.kzn.moc
+neu-19-11-nc1.kzn.moc
 "
 
 /usr/share/openstack-tripleo-heat-templates/deployed-server/scripts/get-occ-config.sh

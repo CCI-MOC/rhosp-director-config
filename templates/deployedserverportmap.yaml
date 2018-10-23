@@ -1,103 +1,103 @@
 ---
 parameter_defaults:
   DeployedServerPortMap:
-    compute1:
-      fixed_ips:
-        - 172.16.3.35
-      subnets:
-        - cidr: 192.168.1.0/24
-    compute2:
-      fixed_ips:
-        - 172.16.3.36
-      subnets:
-        - cidr: 192.168.1.0/24
-    compute0:
-      fixed_ips:
-        - 172.16.3.34
-      subnets:
-        - cidr: 192.168.1.0/24
-    compute5:
-      fixed_ips:
-        - 172.16.5.34
-      subnets:
-        - cidr: 192.168.1.0/24
-    compute6:
-      fixed_ips:
-        - 172.16.5.35
-      subnets:
-        - cidr: 192.168.1.0/24
-    compute3:
-      fixed_ips:
-        - 172.16.3.37
-      subnets:
-        - cidr: 192.168.1.0/24
-    compute10:
-      fixed_ips:
-        - 172.16.15.34
-      subnets:
-        - cidr: 192.168.1.0/24
-    compute4:
-      fixed_ips:
-        - 172.16.3.38
-      subnets:
-        - cidr: 192.168.1.0/24
-    compute13:
-      fixed_ips:
-        - 172.16.15.37
-      subnets:
-        - cidr: 192.168.1.0/24
-    compute8:
-      fixed_ips:
-        - 172.16.5.37
-      subnets:
-        - cidr: 192.168.1.0/24
-    compute7:
-      fixed_ips:
-        - 172.16.5.36
-      subnets:
-        - cidr: 192.168.1.0/24
-    compute9:
-      fixed_ips:
-        - 172.16.5.38
-      subnets:
-        - cidr: 192.168.1.0/24
-    compute14:
-      fixed_ips:
-        - 172.16.15.38
-      subnets:
-        - cidr: 192.168.1.0/24
-    compute12:
-      fixed_ips:
-        - 172.16.15.36
-      subnets:
-        - cidr: 192.168.1.0/24
-    compute11:
-      fixed_ips:
-        - 172.16.15.35
-      subnets:
-        - cidr: 192.168.1.0/24
     controller2:
       fixed_ips:
         - 172.16.3.39
       subnets:
-        - cidr: 192.168.1.0/24
+        - cidr: 172.16.0.0/19
     controller1:
       fixed_ips:
         - 172.16.5.39
       subnets:
-        - cidr: 192.168.1.0/24
+        - cidr: 172.16.0.0/19
     controller0:
       fixed_ips:
         - 172.16.15.39
       subnets:
-        - cidr: 192.168.1.0/24
+        - cidr: 172.16.0.0/19
     network1:
       fixed_ips:
         - 172.16.17.11
       subnets:
-        - cidr: 192.168.1.0/24
+        - cidr: 172.16.0.0/19
     network0:
       fixed_ips:
         - 172.16.19.11
       subnets:
-        - cidr: 192.168.1.0/24
+        - cidr: 172.16.0.0/19
+    compute0:
+      fixed_ips:
+        - 172.16.3.34
+      subnets:
+        - cidr: 172.16.0.0/19
+    compute1:
+      fixed_ips:
+        - 172.16.3.35
+      subnets:
+        - cidr: 172.16.0.0/19
+    compute2:
+      fixed_ips:
+        - 172.16.3.36
+      subnets:
+        - cidr: 172.16.0.0/19
+    compute3:
+      fixed_ips:
+        - 172.16.3.37
+      subnets:
+        - cidr: 172.16.0.0/19
+    compute4:
+      fixed_ips:
+        - 172.16.3.38
+      subnets:
+        - cidr: 172.16.0.0/19
+    compute5:
+      fixed_ips:
+        - 172.16.5.34
+      subnets:
+        - cidr: 172.16.0.0/19
+    compute6:
+      fixed_ips:
+        - 172.16.5.35
+      subnets:
+        - cidr: 172.16.0.0/19
+    compute7:
+      fixed_ips:
+        - 172.16.5.36
+      subnets:
+        - cidr: 172.16.0.0/19
+    compute8:
+      fixed_ips:
+        - 172.16.5.37
+      subnets:
+        - cidr: 172.16.0.0/19
+    compute9:
+      fixed_ips:
+        - 172.16.5.38
+      subnets:
+        - cidr: 172.16.0.0/19
+    compute10:
+      fixed_ips:
+        - 172.16.15.34
+      subnets:
+        - cidr: 172.16.0.0/19
+    compute11:
+      fixed_ips:
+        - 172.16.15.35
+      subnets:
+        - cidr: 172.16.0.0/19
+    compute12:
+      fixed_ips:
+        - 172.16.15.36
+      subnets:
+        - cidr: 172.16.0.0/19
+    compute13:
+      fixed_ips:
+        - 172.16.15.37
+      subnets:
+        - cidr: 172.16.0.0/19
+    compute14:
+      fixed_ips:
+        - 172.16.15.38
+      subnets:
+        - cidr: 172.16.0.0/19
