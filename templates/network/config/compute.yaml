@@ -110,6 +110,7 @@ resources:
               # p3p1 is the foreman provisioning network
               - type: interface
                 name: p3p1
+                mtu: 9000
                 use_dhcp: true
                 routes:
                 # This sets up a static route to the OpenStack
@@ -119,9 +120,14 @@ resources:
                 - ip_netmask: 169.254.169.254/32
                   next_hop: {get_param: EC2MetadataIp}
 
+              - type: interface
+                name: p3p2
+                mtu: 9000
+
               # Put storage on p3p2
               - type: vlan
                 device: p3p2
+                mtu: 9000
                 vlan_id:
                   get_param: StorageNetworkVlanID
                 use_dhcp: false
@@ -133,6 +139,7 @@ resources:
               # External networks to p3p1
               - type: vlan
                 device: p3p1
+                mtu: 9000
                 vlan_id:
                   get_param: InternalApiNetworkVlanID
                 use_dhcp: false
@@ -142,6 +149,7 @@ resources:
 
               - type: vlan
                 device: p3p1
+                mtu: 9000
                 vlan_id:
                   get_param: TenantNetworkVlanID
                 use_dhcp: false

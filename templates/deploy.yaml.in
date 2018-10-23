@@ -50,6 +50,7 @@ parameter_defaults:
   # Use the openvswitch firewall driver for implementing security
   # groups.
   NeutronOVSFirewallDriver: openvswitch
+  NeutronGlobalPhysnetMtu: 9000
 
   # The InternalApi network is used for OpenStack REST API traffic
   # between the controllers and compute nodes, as well as for AMQ
