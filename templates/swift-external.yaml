@@ -1,7 +1,7 @@
 ---
 parameter_defaults:
   # Do not add a trailing '/' to these URLs.
-  ExternalPublicUrl: 'https://kumo-rgw.massopen.cloud/swift/v1'
-  ExternalInternalUrl: 'https://kumo-rgw.massopen.cloud/swift/v1'
-  ExternalAdminUrl: 'https://kumo-rgw.massopen.cloud/swift/v1'
+  ExternalPublicUrl: 'https://swift-kaizen.massopen.cloud/swift/v1'
+  ExternalInternalUrl: 'https://swift-kaizen.massopen.cloud/swift/v1'
+  ExternalAdminUrl: 'https://swift-kaizen.massopen.cloud/swift/v1'
   ExternalSwiftUserTenant: 'admin'
