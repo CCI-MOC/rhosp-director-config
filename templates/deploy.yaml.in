@@ -23,7 +23,7 @@ resource_registry:
 parameter_defaults:
 
   # The CloudName is used in public API endpoints.
-  CloudName: kumo.massopen.cloud
+  CloudName: kaizen.massopen.cloud
   DnsServers:
     - 10.13.96.1
     - 10.13.96.252
