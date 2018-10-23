@@ -110,6 +110,7 @@ resources:
               # p3p1 is the foreman provisioning network.
               - type: interface
                 name: p3p1
+                mtu: 9000
                 use_dhcp: true
                 defroute: false
                 routes:
@@ -119,8 +120,13 @@ resources:
                 - ip_netmask: 10.0.0.0/19
                   next_hop: 172.16.0.6
 
+              - type: interface
+                name: p3p2
+                mtu: 9000
+
               # Put storage on p3p2
               - type: vlan
+                mtu: 9000
                 device: p3p2
                 vlan_id:
                   get_param: StorageNetworkVlanID
@@ -133,6 +139,7 @@ resources:
 #              # External networks to p3p1
               - type: vlan
                 device: p3p1
+                mtu: 9000
                 vlan_id:
                   get_param: InternalApiNetworkVlanID
                 use_dhcp: false
