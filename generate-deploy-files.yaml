@@ -15,3 +15,9 @@
       template:
         src: ./templates/credentials.yaml.in
         dest: ./templates/credentials.yaml
+
+    - name: generate fencing.yaml
+      tags: [fencing.yaml]
+      template:
+        src: ./templates/fencing.yaml.in
+        dest: ./templates/fencing.yaml

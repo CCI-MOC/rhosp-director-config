@@ -269,8 +269,3 @@ parameter_defaults:
       ram: 16384
       disk: 10
       vcpus: 8
-
-  # Fencing configuration. See
-  # https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/12/html/advanced_overcloud_customization/sect-fencing_the_controller_nodes
-  EnableFencing: false
-  FencingConfig: {}
