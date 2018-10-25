@@ -1,7 +1,7 @@
 ---
 parameter_defaults:
   KeystoneTrustedDashboards:
-    - https://kaizen.massopen.cloud/dashboard/auth/websso/
+    - https://k.massopen.cloud/dashboard/auth/websso/
 
   KeystoneOpenIdcIdpName: moc
   KeystoneOpenIdcProviderMetadataUrl:
