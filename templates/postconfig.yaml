@@ -4,7 +4,7 @@ heat_template_version: pike
 parameters:
   servers:
     type: json
-  FloatingNetworkVlanID:
+  FloatingNetworkVlanId:
     type: string
   KeystoneIdentityProviders:
     type: json
@@ -17,41 +17,56 @@ resources:
   FinishNetworkConfig:
     type: OS::Heat::SoftwareConfig
     properties:
-      group: script
-      config:
-        str_replace:
-          template: |
-            #!/bin/sh
-            iface=vlan@VLANID@
+      group: ansible
+      inputs:
+        - name: floating_network_vlan_id
+      config: |
+        - hosts: localhost
+          tasks:
+            - set_fact:
+                floating_network_vlan_interface: "vlan{{floating_network_vlan_id}}"
 
-            # if the target interface does not exist, exit
-            # with no changes
-            if ! ip addr show $iface; then
-              exit 0
-            fi
+            - copy:
+                mode: "0755"
+                dest: "/sbin/ifup-local"
+                content: |
+                  #!/bin/sh
+                  DEVICE=$1
 
-            # if br-ex does not exist, exit with no changes
-            if ! ovs-vsctl list-ports br-ex; then
-              exit 0
-            fi
+                  if [ "$DEVICE" = "{{ floating_network_vlan_interface }}" ]; then
 
-            # if the interface has already been added to the bridge,
-            # exit with no changes
-            if ovs-vsctl list-ports br-ex | grep -q $iface; then
-              exit 0
-            fi
+                    # if the target interface does not exist, exit
+                    # with no changes
+                    if ! ip addr show $DEVICE; then
+                      exit 0
+                    fi
 
-            # add the target interface to the bridge
-            ovs-vsctl add-port br-ex $iface
-          params:
-            "@VLANID@": {get_param: FloatingNetworkVlanID}
+                    # if br-ex does not exist, exit with no changes
+                    if ! ovs-vsctl list-ports br-ex; then
+                      exit 0
+                    fi
+
+                    # if the interface has already been added to the bridge,
+                    # exit with no changes
+                    if ovs-vsctl list-ports br-ex | grep -q $DEVICE; then
+                      exit 0
+                    fi
+
+                    # add the target interface to the bridge
+                    ovs-vsctl add-port br-ex $DEVICE
+
+                  fi
+
+            - command: "/sbin/ifup-local {{ floating_network_vlan_interface }}"
 
   FinishNetworkDeployments:
     type: OS::Heat::SoftwareDeploymentGroup
     properties:
       servers: {get_param: servers}
       config: {get_resource: FinishNetworkConfig}
-      actions: ['CREATE']
+      actions: ['CREATE', 'UPDATE']
+      input_values:
+        floating_network_vlan_id: {get_param: FloatingNetworkVlanId}
 
   # Create /etc/openstack/clouds.yaml on all controllers.  You can
   # use this to provide authentication information to the 'openstack'
@@ -239,7 +254,7 @@ resources:
                     --remote-id {{ item.item.value.remote_id }} {{ item.item.key }}
                   when: item is failed
                   with_items: "{{ providers.results }}"
-                  
+
                 - name: check if mapping exists
                   command: >-
                     openstack --os-cloud overcloud mapping show {{ item.key }}-mapping

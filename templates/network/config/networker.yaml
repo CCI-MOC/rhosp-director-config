@@ -39,7 +39,7 @@ parameters:
   ControlPlaneNetworkVlanID:
     description: Vlan ID for the control plane network
     type: number
-  FloatingNetworkVlanID:
+  FloatingNetworkVlanId:
     description: Vlan ID for the control plane network
     type: number
   ExternalNetworkVlanID:
@@ -150,7 +150,7 @@ resources:
               - type: vlan
                 device: p3p1
                 vlan_id:
-                  get_param: FloatingNetworkVlanID
+                  get_param: FloatingNetworkVlanId
 
               - type: ovs_bridge
                 name: br-ex

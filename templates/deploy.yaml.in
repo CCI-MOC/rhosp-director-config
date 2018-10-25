@@ -86,7 +86,7 @@ parameter_defaults:
     - ip_address: 129.10.5.100
 
 
-  FloatingNetworkVlanID: 3802
+  FloatingNetworkVlanId: 3802
 
   ControlPlaneDefaultRoute: 172.16.0.5
   ControlPlaneNetworkVlanID: 201
