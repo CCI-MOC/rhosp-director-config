@@ -119,6 +119,9 @@ resources:
                 # os-net-config.
                 - ip_netmask: 169.254.169.254/32
                   next_hop: {get_param: EC2MetadataIp}
+                # VPN access
+                - ip_netmask: 172.31.224.0/19
+                  next_hop: 172.16.0.1
 
               - type: interface
                 name: p3p2

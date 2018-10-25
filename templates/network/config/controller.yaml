@@ -119,6 +119,9 @@ resources:
                 # Access to ipmi network
                 - ip_netmask: 10.0.0.0/19
                   next_hop: 172.16.0.6
+                # VPN access
+                - ip_netmask: 172.31.224.0/19
+                  next_hop: 172.16.0.1
 
               - type: interface
                 name: p3p2
