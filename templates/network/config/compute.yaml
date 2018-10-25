@@ -39,7 +39,7 @@ parameters:
   ControlPlaneNetworkVlanID:
     description: Vlan ID for the control plane network
     type: number
-  FloatingNetworkVlanID:
+  FloatingNetworkVlanId:
     description: Vlan ID for the control plane network
     type: number
   ExternalNetworkVlanID:
