@@ -22,6 +22,7 @@ resources:
         - name: floating_network_vlan_id
       config: |
         - hosts: localhost
+          connection: local
           tasks:
             - set_fact:
                 floating_network_vlan_interface: "vlan{{floating_network_vlan_id}}"
