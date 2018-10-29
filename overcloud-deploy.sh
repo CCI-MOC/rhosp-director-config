@@ -79,6 +79,10 @@ deploy_args=(
 	# Static ip assignment
 	-e $PWD/templates/hostnamemap.yaml
 	-e $PWD/templates/deployedserverportmap.yaml
+
+	# Config download
+	-e $TEMPLATES/environments/config-download-environment.yaml
+	--config-download
 )
 
 if [ -d patches/puppet-modules ]; then
