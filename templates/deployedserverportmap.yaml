@@ -16,12 +16,12 @@ parameter_defaults:
         - 172.16.15.39
       subnets:
         - cidr: 172.16.0.0/19
-    network1:
+    networker1:
       fixed_ips:
         - 172.16.17.11
       subnets:
         - cidr: 172.16.0.0/19
-    network0:
+    networker0:
       fixed_ips:
         - 172.16.19.11
       subnets:
