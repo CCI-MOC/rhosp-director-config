@@ -1,23 +1,23 @@
 ---
 parameter_defaults:
   HostnameMap:
-    overcloud-controller-2: neu-3-39-control3.kzn.moc
-    overcloud-controller-1: neu-5-39-control2.kzn.moc
-    overcloud-controller-0: neu-15-39-control1.kzn.moc
-    overcloud-networker-1: neu-17-11-nc2.kzn.moc
-    overcloud-networker-0: neu-19-11-nc1.kzn.moc
-    overcloud-compute-0: neu-3-34-stackcomp.kzn.moc
-    overcloud-compute-1: neu-3-35-stackcomp.kzn.moc
-    overcloud-compute-2: neu-3-36-stackcomp.kzn.moc
-    overcloud-compute-3: neu-3-37-stackcomp.kzn.moc
-    overcloud-compute-4: neu-3-38-stackcomp.kzn.moc
-    overcloud-compute-5: neu-5-34-stackcomp.kzn.moc
-    overcloud-compute-6: neu-5-35-stackcomp.kzn.moc
-    overcloud-compute-7: neu-5-36-stackcomp.kzn.moc
-    overcloud-compute-8: neu-5-37-stackcomp.kzn.moc
-    overcloud-compute-9: neu-5-38-stackcomp.kzn.moc
-    overcloud-compute-10: neu-15-34-stackcomp.kzn.moc
-    overcloud-compute-11: neu-15-35-stackcomp.kzn.moc
-    overcloud-compute-12: neu-15-36-stackcomp.kzn.moc
-    overcloud-compute-13: neu-15-37-stackcomp.kzn.moc
-    overcloud-compute-14: neu-15-38-stackcomp.kzn.moc
+    overcloud-controller-2: neu-3-39-control3
+    overcloud-controller-1: neu-5-39-control2
+    overcloud-controller-0: neu-15-39-control1
+    overcloud-networker-1: neu-17-11-nc2
+    overcloud-networker-0: neu-19-11-nc1
+    overcloud-compute-0: neu-3-34-stackcomp
+    overcloud-compute-1: neu-3-35-stackcomp
+    overcloud-compute-2: neu-3-36-stackcomp
+    overcloud-compute-3: neu-3-37-stackcomp
+    overcloud-compute-4: neu-3-38-stackcomp
+    overcloud-compute-5: neu-5-34-stackcomp
+    overcloud-compute-6: neu-5-35-stackcomp
+    overcloud-compute-7: neu-5-36-stackcomp
+    overcloud-compute-8: neu-5-37-stackcomp
+    overcloud-compute-9: neu-5-38-stackcomp
+    overcloud-compute-10: neu-15-34-stackcomp
+    overcloud-compute-11: neu-15-35-stackcomp
+    overcloud-compute-12: neu-15-36-stackcomp
+    overcloud-compute-13: neu-15-37-stackcomp
+    overcloud-compute-14: neu-15-38-stackcomp

@@ -1,103 +1,103 @@
 ---
 parameter_defaults:
   DeployedServerPortMap:
-    controller2:
+    neu-3-39-control3-ctlplane:
       fixed_ips:
-        - 172.16.3.39
+        - ip_address: 172.16.3.39
       subnets:
         - cidr: 172.16.0.0/19
-    controller1:
+    neu-5-39-control2-ctlplane:
       fixed_ips:
-        - 172.16.5.39
+        - ip_address: 172.16.5.39
       subnets:
         - cidr: 172.16.0.0/19
-    controller0:
+    neu-15-39-control1-ctlplane:
       fixed_ips:
-        - 172.16.15.39
+        - ip_address: 172.16.15.39
       subnets:
         - cidr: 172.16.0.0/19
-    networker1:
+    neu-17-11-nc2-ctlplane:
       fixed_ips:
-        - 172.16.17.11
+        - ip_address: 172.16.17.11
       subnets:
         - cidr: 172.16.0.0/19
-    networker0:
+    neu-19-11-nc1-ctlplane:
       fixed_ips:
-        - 172.16.19.11
+        - ip_address: 172.16.19.11
       subnets:
         - cidr: 172.16.0.0/19
-    compute0:
+    neu-3-34-stackcomp-ctlplane:
       fixed_ips:
-        - 172.16.3.34
+        - ip_address: 172.16.3.34
       subnets:
         - cidr: 172.16.0.0/19
-    compute1:
+    neu-3-35-stackcomp-ctlplane:
       fixed_ips:
-        - 172.16.3.35
+        - ip_address: 172.16.3.35
       subnets:
         - cidr: 172.16.0.0/19
-    compute2:
+    neu-3-36-stackcomp-ctlplane:
       fixed_ips:
-        - 172.16.3.36
+        - ip_address: 172.16.3.36
       subnets:
         - cidr: 172.16.0.0/19
-    compute3:
+    neu-3-37-stackcomp-ctlplane:
       fixed_ips:
-        - 172.16.3.37
+        - ip_address: 172.16.3.37
       subnets:
         - cidr: 172.16.0.0/19
-    compute4:
+    neu-3-38-stackcomp-ctlplane:
       fixed_ips:
-        - 172.16.3.38
+        - ip_address: 172.16.3.38
       subnets:
         - cidr: 172.16.0.0/19
-    compute5:
+    neu-5-34-stackcomp-ctlplane:
       fixed_ips:
-        - 172.16.5.34
+        - ip_address: 172.16.5.34
       subnets:
         - cidr: 172.16.0.0/19
-    compute6:
+    neu-5-35-stackcomp-ctlplane:
       fixed_ips:
-        - 172.16.5.35
+        - ip_address: 172.16.5.35
       subnets:
         - cidr: 172.16.0.0/19
-    compute7:
+    neu-5-36-stackcomp-ctlplane:
       fixed_ips:
-        - 172.16.5.36
+        - ip_address: 172.16.5.36
       subnets:
         - cidr: 172.16.0.0/19
-    compute8:
+    neu-5-37-stackcomp-ctlplane:
       fixed_ips:
-        - 172.16.5.37
+        - ip_address: 172.16.5.37
       subnets:
         - cidr: 172.16.0.0/19
-    compute9:
+    neu-5-38-stackcomp-ctlplane:
       fixed_ips:
-        - 172.16.5.38
+        - ip_address: 172.16.5.38
       subnets:
         - cidr: 172.16.0.0/19
-    compute10:
+    neu-15-34-stackcomp-ctlplane:
       fixed_ips:
-        - 172.16.15.34
+        - ip_address: 172.16.15.34
       subnets:
         - cidr: 172.16.0.0/19
-    compute11:
+    neu-15-35-stackcomp-ctlplane:
       fixed_ips:
-        - 172.16.15.35
+        - ip_address: 172.16.15.35
       subnets:
         - cidr: 172.16.0.0/19
-    compute12:
+    neu-15-36-stackcomp-ctlplane:
       fixed_ips:
-        - 172.16.15.36
+        - ip_address: 172.16.15.36
       subnets:
         - cidr: 172.16.0.0/19
-    compute13:
+    neu-15-37-stackcomp-ctlplane:
       fixed_ips:
-        - 172.16.15.37
+        - ip_address: 172.16.15.37
       subnets:
         - cidr: 172.16.0.0/19
-    compute14:
+    neu-15-38-stackcomp-ctlplane:
       fixed_ips:
-        - 172.16.15.38
+        - ip_address: 172.16.15.38
       subnets:
         - cidr: 172.16.0.0/19
