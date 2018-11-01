@@ -118,7 +118,12 @@ resources:
                         - "/"
                         - - get_param: ControlPlaneIp
                           - get_param: ControlPlaneSubnetCidr
+                dns_servers:
+                  get_param: DnsServers
                 routes:
+                - default: true
+                  next_hop:
+                    get_param: ControlPlaneDefaultRoute
                 # This sets up a static route to the OpenStack
                 # metadata service.  This will be placed into
                 # /etc/sysconfig/network-scripts/routes-p3p1 by
