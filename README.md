@@ -118,10 +118,9 @@ process of deploying RHOSP.
 
 ### Credentials
 
-The file `templates/credentials.yaml` is required by the
-`overcloud-deploy.sh` script, but it does not exist in this
-repository.  This file contains all passwords, keys, and other secrets
-required for the deployment.
+The file `credentials.yaml` is generated at deploy time from
+`credentials.yaml.in`.  This pulls passwords and other secrets from
+Bitwarden.
 
 ## Patches
 
