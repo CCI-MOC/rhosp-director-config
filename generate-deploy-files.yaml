@@ -4,12 +4,6 @@
   roles:
     - ansible-modules-bitwarden
   tasks:
-    - name: generate deploy.yaml
-      tags: [deploy.yaml]
-      template:
-        src: ./templates/deploy.yaml.in
-        dest: ./templates/deploy.yaml
-
     - name: generate credentials.yaml
       tags: [credentials.yaml]
       template:

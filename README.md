@@ -43,11 +43,10 @@ process of deploying RHOSP.
 
 - `overcloud-deploy.sh`
 
-  Runs the actual overcloud deploy. Generate `templates/deploy.yaml`
-  from `templates/deploy.yaml.in` (mostly just injecting some
-  credentials).  Ensures that the environment files necessary to
-  realize our overcloud configuration are provide on the deploy
-  command line.
+  Runs the actual overcloud deploy. This takes care of generating some
+  files (mostly credentials) from templates. Ensures that the
+  environment files necessary to realize our overcloud configuration
+  are provide on the deploy command line.
 
   Prior to running the `openstack overcloud deploy` command, this
   script packages up any patched puppet modules and ensures that they
@@ -83,7 +82,7 @@ process of deploying RHOSP.
   This configures the overcloud to use an existing Ceph cluster rather
   than deploying a Ceph service as part of the overcloud.
 
-- `templates/deploy.yaml.in`
+- `templates/deploy.yaml`
 
   This contains the bulk of our custom configuration (including
   information about network address ranges and vlan ids).
