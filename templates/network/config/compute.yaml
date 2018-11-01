@@ -111,7 +111,13 @@ resources:
               - type: interface
                 name: p3p1
                 mtu: 9000
-                use_dhcp: true
+                use_dhcp: false
+                addresses:
+                  - ip_netmask:
+                      list_join:
+                        - "/"
+                        - - get_param: ControlPlaneIp
+                          - get_param: ControlPlaneSubnetCidr
                 routes:
                 # This sets up a static route to the OpenStack
                 # metadata service.  This will be placed into
