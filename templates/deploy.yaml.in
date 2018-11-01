@@ -90,6 +90,7 @@ parameter_defaults:
 
   ControlPlaneDefaultRoute: 172.16.0.5
   ControlPlaneNetworkVlanID: 201
+  ControlPlaneSubnetCidr: 19
 
   # The overcloud nodes access the OpenStack metadata service at the
   # EC2MetadataIp address.
