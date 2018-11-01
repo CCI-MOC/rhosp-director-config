@@ -9,7 +9,6 @@ CONTROLLER_SRC_ROLES = \
 	    roles/Messaging.yaml
 
 ENVIRONMENTS = \
-	       templates/deploy.yaml \
 	       templates/credentials.yaml \
 	       templates/fencing.yaml
 
