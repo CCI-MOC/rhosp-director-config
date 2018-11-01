@@ -22,8 +22,8 @@ parameter_defaults:
   # The CloudName is used in public API endpoints.
   CloudName: k.massopen.cloud
   DnsServers:
-    - 10.13.96.1
-    - 10.13.96.252
+    - 172.16.0.3
+    - 172.16.0.8
 
   # For a normal install these would be ControllerCount and
   # ComputeCount, but since we're using pre-provisioned servers the
@@ -85,7 +85,7 @@ parameter_defaults:
 
   FloatingNetworkVlanId: 3802
 
-  ControlPlaneDefaultRoute: 172.16.0.5
+  ControlPlaneDefaultRoute: 172.16.0.1
   ControlPlaneNetworkVlanID: 201
   ControlPlaneSubnetCidr: 19
 
