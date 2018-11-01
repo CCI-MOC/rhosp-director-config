@@ -18,7 +18,8 @@ resource_registry:
   OS::TripleO::NodeExtraConfigPost: postconfig.yaml
   OS::Local::Services::PatchPuppetModules:
     ./services/patch-puppet-modules.yaml
-  OS::TripleO::DeployedServer::ControlPlanePort: {{templates}}/deployed-server/deployed-neutron-port.yaml
+  OS::TripleO::DeployedServer::ControlPlanePort:
+    /usr/share/openstack-tripleo-heat-templates/deployed-server/deployed-neutron-port.yaml
 
 parameter_defaults:
 
@@ -242,6 +243,14 @@ parameter_defaults:
     qm5vjLyb4lddJIGvl5echK1srDdMZvNhkREg5L4wn3qkKQmw4TRfZHcYQFHfjDCm
     rw==
     -----END CERTIFICATE-----
+
+  # Create these Cinder volume types during the deploy process.
+  CinderVolumeTypes:
+    - name: default
+      volume_backend_name: tripleo_ceph
+
+    - name: performance
+      volume_backend_name: tripleo_ceph_performance2
 
   # Create these Nova flavors during the deploy process.
   NovaFlavors:

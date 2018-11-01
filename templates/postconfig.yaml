@@ -12,6 +12,9 @@ parameters:
   NovaFlavors:
     type: json
     default: []
+  CinderVolumeTypes:
+    type: json
+    default: []
 
 resources:
   FinishNetworkConfig:
@@ -301,3 +304,62 @@ resources:
       config: {get_resource: KeystoneFederationConfig}
       input_values:
         keystone_identity_providers: {get_param: KeystoneIdentityProviders}
+
+  CinderVolumeTypesConfig:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ansible
+      inputs:
+        - name: cinder_volume_types
+      config: |
+        - hosts: localhost
+          connection: local
+          tasks:
+            # We want this script to run once on one of the
+            # controllers. We first check to see if we're running on
+            # the bootstrap node, but this is only unique per role
+            # (so, e.g., there will be a bootstrap node for the
+            # compute services as well).
+            - name: get bootstrap nodeid
+              command: hiera -c /etc/puppet/hiera.yaml bootstrap_nodeid
+              register: bootstrap_node
+
+            # In order to identify whether or not we're running on a
+            # controller, we look at the list of active service names.
+            - name: get service names
+              command: hiera -c /etc/puppet/hiera.yaml service_names
+              register: service_names
+
+            - set_fact:
+                is_bootstrap_node: >-
+                  {{ bootstrap_node.stdout|lower == ansible_hostname|lower }}
+                has_cinder_volumes: >-
+                  {{ 'cinder_volumes' in service_names.stdout|from_json }}
+
+            # We only run the remainder of this playbook if this is a
+            # bootstrap node *and* it is running nova-api.
+            - when: is_bootstrap_node and has_cinder_volumes
+              block:
+                - name: check if volume types exist
+                  command: >-
+                    openstack --os-cloud overcloud volume type show {{ item.name }}
+                  with_items: "{{ cinder_volume_types }}"
+                  ignore_errors: true
+                  register: volume_type_check
+
+                - name: create volume_types
+                  command: >-
+                    openstack --os-cloud overcloud
+                    volume type create {{ item.item.name }}
+                    --property volume_backend_name={{ item.item.volume_backend_name }}
+                  when: item is failed
+                  with_items: "{{ volume_type_check.results }}"
+
+  CinderVolumeTypesDeployment:
+    type: OS::Heat::SoftwareDeploymentGroup
+    depends_on: CreateCloudYamlDeployments
+    properties:
+      servers: {get_param: servers}
+      config: {get_resource: CinderVolumeTypesConfig}
+      input_values:
+        cinder_volume_types: {get_param: CinderVolumeTypes}
