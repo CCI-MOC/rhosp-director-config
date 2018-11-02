@@ -150,6 +150,7 @@ parameter_defaults:
         dport: 22
         proto: 'tcp'
         source: 172.16.0.0/22
+    nova::compute::libvirt::libvirt_cpu_mode: host-passthrough
 
   SSLCertificate: |
     -----BEGIN CERTIFICATE-----
