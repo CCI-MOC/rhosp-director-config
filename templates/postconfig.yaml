@@ -188,7 +188,7 @@ resources:
                   command: >-
                     openstack --os-cloud overcloud
                     flavor create {{ item.item.name }}
-                    --id {{ item.item.id }} --ram {{ item.item.ram }}
+                    --ram {{ item.item.ram }}
                     --vcpus {{ item.item.vcpus }} --disk {{ item.item.disk }}
                   when: item is failed
                   with_items: "{{ flavor_check.results }}"
@@ -198,7 +198,7 @@ resources:
                     openstack --os-cloud overcloud flavor set
                     {%for prop in item.properties.items()%}--property
                     {{prop.0}}={{prop.1}} {%endfor %} {{ item.name }}
-                  loop: "{{ nova_flavors }}"
+                  with_items: "{{ nova_flavors }}"
 
   NovaFlavorsDeployment:
     type: OS::Heat::SoftwareDeploymentGroup
