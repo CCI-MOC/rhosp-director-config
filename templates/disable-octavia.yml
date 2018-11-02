@@ -1,6 +1,0 @@
-resource_registry:
-  OS::TripleO::Services::OctaviaApi: OS::Heat::None
-  OS::TripleO::Services::OctaviaDeploymentConfig: OS::Heat::None
-  OS::TripleO::Services::OctaviaHealthManager: OS::Heat::None
-  OS::TripleO::Services::OctaviaHousekeeping: OS::Heat::None
-  OS::TripleO::Services::OctaviaWorker: OS::Heat::None

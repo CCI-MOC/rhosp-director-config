@@ -46,10 +46,7 @@ deploy_args=(
 	-e $TEMPLATES/environments/tls-endpoints-public-dns.yaml
 
 	# Enable Neutron Octavia load-balancer service.
-	#-e $TEMPLATES/environments/services/octavia.yaml
-
-	# Disable octavia
-	-e $PWD/templates/disable-octavia.yml
+	-e $TEMPLATES/environments/services/octavia.yaml
 
 	# Enable Sahara
 	-e $TEMPLATES/environments/services/sahara.yaml
