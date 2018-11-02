@@ -16,6 +16,10 @@ fi
 # Generate files
 make TEMPLATES=$TEMPLATES
 
+# This is necessary to work around bugs #1645503 and #1645134
+. ./overcloud-env.sh
+bash $TEMPLATES/deployed-server/scripts/enable-ssh-admin.sh
+
 # When passing environment files (`-e ...`) to the `overcloud deploy`
 # command, order is important! Your custom configuration
 # (`$PWD/templates/deploy.yaml` in this script) should come *last*,
