@@ -146,10 +146,18 @@ parameter_defaults:
 
   ExtraConfig:
     tripleo::firewall::firewall_rules:
-      '003 accept ssh from provisioning network':
+      '002 accept ssh from provisioning network ipv4':
         dport: 22
         proto: 'tcp'
-        source: 172.16.0.0/22
+        source: 172.16.0.0/19
+      '002 accept ssh from vpn network ipv4':
+        dport: 22
+        proto: 'tcp'
+        source: 172.31.224.0/19
+      '002 reject all other ssh traffic ipv4':
+        dport: 22
+        proto: 'tcp'
+        action: drop
     nova::compute::libvirt::libvirt_cpu_mode: host-passthrough
 
   SSLCertificate: |
