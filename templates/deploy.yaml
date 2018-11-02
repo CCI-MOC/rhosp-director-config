@@ -158,6 +158,10 @@ parameter_defaults:
         dport: 22
         proto: 'tcp'
         action: drop
+      '100 accept snmp ipv4':
+        dport: 161
+        proto: udp
+        source: 172.16.0.0/19
     nova::compute::libvirt::libvirt_cpu_mode: host-passthrough
 
   SSLCertificate: |
