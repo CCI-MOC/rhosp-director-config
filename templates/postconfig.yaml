@@ -333,12 +333,12 @@ resources:
             - set_fact:
                 is_bootstrap_node: >-
                   {{ bootstrap_node.stdout|lower == ansible_hostname|lower }}
-                has_cinder_volumes: >-
-                  {{ 'cinder_volumes' in service_names.stdout|from_json }}
+                has_cinder_volume: >-
+                  {{ 'cinder_volume' in service_names.stdout|from_json }}
 
             # We only run the remainder of this playbook if this is a
             # bootstrap node *and* it is running nova-api.
-            - when: is_bootstrap_node and has_cinder_volumes
+            - when: is_bootstrap_node and has_cinder_volume
               block:
                 - name: check if volume types exist
                   command: >-
