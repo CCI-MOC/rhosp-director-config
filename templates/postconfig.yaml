@@ -66,6 +66,7 @@ resources:
   FinishNetworkDeployments:
     type: OS::Heat::SoftwareDeploymentGroup
     properties:
+      name: FinishNetworkDeployments
       servers: {get_param: servers}
       config: {get_resource: FinishNetworkConfig}
       actions: ['CREATE', 'UPDATE']
@@ -137,6 +138,7 @@ resources:
   CreateCloudYamlDeployments:
     type: OS::Heat::SoftwareDeploymentGroup
     properties:
+      name: CreateCloudYamlDeployments
       servers: {get_param: servers}
       config: {get_resource: CreateCloudYamlConfig}
 
@@ -195,6 +197,7 @@ resources:
     type: OS::Heat::SoftwareDeploymentGroup
     depends_on: CreateCloudYamlDeployments
     properties:
+      name: NovaFlavorsDeployment
       servers: {get_param: servers}
       config: {get_resource: NovaFlavorsConfig}
       input_values:
@@ -300,6 +303,7 @@ resources:
     type: OS::Heat::SoftwareDeploymentGroup
     depends_on: CreateCloudYamlDeployments
     properties:
+      name: KeystoneFederationDeployments
       servers: {get_param: servers}
       config: {get_resource: KeystoneFederationConfig}
       input_values:
@@ -359,6 +363,7 @@ resources:
     type: OS::Heat::SoftwareDeploymentGroup
     depends_on: CreateCloudYamlDeployments
     properties:
+      name: CinderVolumeTypesDeployment
       servers: {get_param: servers}
       config: {get_resource: CinderVolumeTypesConfig}
       input_values:
