@@ -193,6 +193,13 @@ resources:
                   when: item is failed
                   with_items: "{{ flavor_check.results }}"
 
+                - name: set flavor properties
+                  command: >-
+                    openstack --os-cloud overcloud flavor set
+                    {%for prop in item.properties.items()%}--property
+                    {{prop.0}}={{prop.1}} {%endfor %} {{ item.name }}
+                  loop: "{{ nova_flavors }}"
+
   NovaFlavorsDeployment:
     type: OS::Heat::SoftwareDeploymentGroup
     depends_on: CreateCloudYamlDeployments
