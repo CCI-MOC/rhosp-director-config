@@ -1,0 +1,36 @@
+---
+- name: ensure necessary packages are installed
+  package:
+    name: "{{ selinux_packages }}"
+    state: installed
+
+- name: create selinux working directory
+  file:
+    path: "/root/selinux"
+    state: directory
+
+- name: copy selinux patches to remote host
+  copy:
+    src: "{{ item }}.te"
+    dest: "/root/selinux/{{ item }}.te"
+  with_items: "{{ selinux_patches }}"
+
+- name: run checkmodule on selinux modules
+  command: "checkmodule -M -m -o {{ item }}.mod  {{ item }}.te"
+  args:
+    chdir: /root/selinux
+    creates: "/root/selinux/{{ item }}.mod"
+  with_items: "{{ selinux_patches }}"
+
+- name: run semodule-package on selinux modules
+  command: "semodule_package -o {{ item}}.pp -m {{ item }}.mod"
+  args:
+    chdir: /root/selinux
+    creates: "/root/selinux/{{ item }}.pp"
+  with_items: "{{ selinux_patches }}"
+
+- name: install selinux modules
+  command: "semodule -i {{ item }}.pp"
+  args:
+    chdir: /root/selinux
+  with_items: "{{ selinux_patches }}"

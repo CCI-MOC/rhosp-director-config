@@ -1,3 +1,5 @@
+#!/bin/sh
+
 export ControllerDeployedServer_hosts="
 neu-3-39-control3.kzn.moc
 neu-5-39-control2.kzn.moc

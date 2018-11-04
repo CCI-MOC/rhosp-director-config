@@ -1,0 +1,2 @@
+# This file is managed by ansible
+stack  ALL=(ALL) NOPASSWD: ALL

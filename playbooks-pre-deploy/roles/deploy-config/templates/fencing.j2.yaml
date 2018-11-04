@@ -1,0 +1,20 @@
+---
+parameter_defaults:
+  EnableFencing: true
+  FencingConfig:
+    devices:
+{% for host in groups.controller %}
+    - agent: fence_ipmilan
+      host_mac: {{ hostvars[host]["ansible_" + internalapi_interface].macaddress }}
+      params:
+        ipaddr: {{ hostvars[host].ipmi_host }}
+        lanplus: true
+        login: >-
+          {% raw %}{{ lookup('bitwarden', 'idrac@kaizen', field='username') }}
+{% endraw %}
+        passwd: >-
+          {% raw %}{{ lookup('bitwarden', 'idrac@kaizen') }}
+{% endraw %}
+        pcmk_host_list: {{ hostvars[host].ooo_name }}
+        privlvl: administrator
+{% endfor %}

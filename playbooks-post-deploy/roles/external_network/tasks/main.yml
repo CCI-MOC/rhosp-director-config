@@ -1,0 +1,46 @@
+---
+- name: check if external networks exist
+  tags: [network]
+  command: >-
+    openstack --os-cloud {{ cloud_name }}
+    network show {{ item.name }}
+  failed_when: false
+  changed_when: ext_net_check.rc != 0
+  register: ext_net_check
+  with_items: "{{ external_networks }}"
+
+- name: create external networks
+  tags: [network]
+  command: >-
+    openstack --os-cloud {{ cloud_name }}
+    network create {{ item.item.name }}
+    --external
+    --provider-network-type flat \
+    --provider-physical-network {{ item.item.physical_network }}
+  when: item.rc != 0
+  with_items: "{{ ext_net_check.results }}"
+
+- name: check if subnets exist
+  tags: [network]
+  command: >-
+    openstack --os-cloud {{ cloud_name }}
+    subnet show "{{ item.1.name }}"
+  failed_when: false
+  changed_when: ext_subnet_check.rc != 0
+  register: ext_subnet_check
+  with_subelements:
+    - "{{ external_networks }}"
+    - subnets
+
+- name: create subnets
+  tags: [network]
+  command: >-
+    openstack --os-cloud {{ cloud_name }}
+    subnet create {{ item.item.1.name }}
+    --network {{ item.item.0.name }}
+    --subnet-range {{ item.item.1.cidr }}
+    --no-dhcp
+    --gateway {{ item.item.1.gateway }}
+    --allocation-pool start={{ item.item.1.allocation_pool_start }},end={{ item.item.1.allocation_pool_end }}
+  when: item.rc != 0
+  with_items: "{{ ext_subnet_check.results }}"

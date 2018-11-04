@@ -1,0 +1,7 @@
+---
+- name: configure authorized_keys for stack user
+  authorized_key:
+    user: stack
+    state: present
+    comment: stack@undercloud
+    key: "{{ hostvars[groups.undercloud.0].ssh_pub_key.stdout }}"
