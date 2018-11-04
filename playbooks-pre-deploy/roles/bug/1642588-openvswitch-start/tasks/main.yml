@@ -1,0 +1,11 @@
+---
+- name: ensure openvswitch package is installed
+  package:
+    name: openvswitch
+    state: installed
+
+- name: ensure openvswitch is enabled
+  service:
+    name: openvswitch
+    state: started
+    enabled: true

@@ -1,0 +1,8 @@
+---
+parameter_defaults:
+  HostnameMap:
+{% for group in ['controller', 'network', 'compute'] %}
+{% for host in groups[group]|hostname_sort %}
+    {{ hostvars[host].ooo_name }}: {{ host.split('.').0 }}
+{% endfor %}
+{% endfor %}

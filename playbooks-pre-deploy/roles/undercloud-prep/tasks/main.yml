@@ -1,0 +1,32 @@
+---
+- name: get stack user home directory
+  changed_when: false
+  command: >-
+    getent passwd stack
+  register: stackpwent
+
+- set_fact:
+    stack_home: "{{ stackpwent.stdout.split(':').5 }}"
+
+- name: read stack user public key
+  changed_when: false
+  become_user: stack
+  become: true
+  command: >-
+    cat .ssh/id_rsa.pub
+  args:
+    chdir: "{{ stack_home }}"
+  register: ssh_pub_key
+
+- name: add stack pub key to authorized_keys
+  authorized_key:
+    user: stack
+    comment: stack@undercloud
+    key: "{{ ssh_pub_key.stdout }}"
+
+- name: add other pub key to authorized_keys
+  authorized_key:
+    user: stack
+    key: "{{ item.key }}"
+    comment: "{{ item.comment }}"
+  with_items: "{{ undercloud_authorized_keys }}"
