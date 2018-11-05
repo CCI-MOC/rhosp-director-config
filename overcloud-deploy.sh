@@ -14,7 +14,7 @@ else
 fi
 
 # Generate files
-make TEMPLATES=$TEMPLATES
+ansible-playbook playbooks-deploy/playbook.yml
 
 # This is necessary to work around bugs #1645503 and #1645134
 . ./overcloud-env.sh

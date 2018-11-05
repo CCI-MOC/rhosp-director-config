@@ -23,4 +23,5 @@
     openstack --os-cloud {{ cloud_name }}  flavor set
     {%for prop in item.properties.items()%}--property
     {{prop.0}}={{prop.1}} {%endfor %} {{ item.name }}
+  when: item.properties is defined
   with_items: "{{ nova_flavors }}"
