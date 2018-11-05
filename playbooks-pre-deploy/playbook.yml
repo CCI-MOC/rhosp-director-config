@@ -1,19 +1,4 @@
 ---
-- name: gather facts from overcloud hosts
-  hosts: overcloud
-  gather_facts: false
-  tasks:
-    - name: gather facts from overcloud hosts
-      tags: [always]
-      setup:
-
-- name: generate files
-  hosts: localhost
-  tags: [templates]
-  roles:
-    - ansible-modules-bitwarden
-    - deploy-config
-
 - name: prepare all hosts
   hosts: undercloud:overcloud
   tags: [prep, undercloud, overcloud]
