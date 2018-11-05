@@ -1,0 +1,40 @@
+---
+- name: create testdata directory
+  file:
+    path: ./testdata
+    state: directory
+
+- name: create test flavors
+  tags: [setup, nova]
+  include_role:
+    name: nova_flavors
+  vars:
+    nova_flavors: "{{ test_flavors }}"
+
+- name: create test projects and users
+  tags: [setup, keystone]
+  include_role:
+    name: keystone_principals
+  vars:
+    keystone_projects: "{{ test_projects }}"
+    keystone_users: "{{ test_users }}"
+
+- name: create keystonerc files
+  tags: [setup, keystone]
+  template:
+    src: keystonerc.j2.sh
+    dest: "testdata/keystonerc-{{ item.name }}.sh"
+  with_items: "{{ test_users }}"
+
+- name: create clouds.yaml
+  tags: [setup, keystone]
+  template:
+    src: clouds.j2.yaml
+    dest: "testdata/clouds.yaml"
+
+- name: create images
+  tags: [setup, images]
+  include_role:
+    name: glance_images
+  vars:
+    glance_images: "{{ test_images }}"

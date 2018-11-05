@@ -1,0 +1,14 @@
+---
+- name: create networks
+  tags: [network]
+  include_role:
+    name: neutron_networks
+  vars:
+    neutron_networks: "{{ test_networks }}"
+
+- name: create routers
+  tags: [routers]
+  include_role:
+    name: neutron_routers
+  vars:
+    neutron_routers: "{{ test_routers }}"

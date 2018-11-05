@@ -1,0 +1,27 @@
+---
+test_images:
+  - name: cirros
+    url: http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img
+    format: qcow2
+    public: true
+
+test_flavors:
+  - name: test.tiny
+    ram: 256
+    vcpus: 1
+    disk: 1
+
+test_projects:
+  - name: project1
+  - name: project2
+
+test_users:
+  - name: user1
+    email: user1@example.com
+    project: project1
+    password: "{{ lookup('password', 'testdata/credentials/user1-password length=20') }}"
+
+  - name: user2
+    email: user2@example.com
+    project: project2
+    password: "{{ lookup('password', 'testdata/credentials/user2-password length=20') }}"
