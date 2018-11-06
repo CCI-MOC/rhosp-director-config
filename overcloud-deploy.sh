@@ -52,6 +52,10 @@ deploy_args=(
 	# Enable Neutron Octavia load-balancer service.
 	-e $TEMPLATES/environments/services/octavia.yaml
 
+	# Enable barbican
+	-e $TEMPLATES/environments/services/barbican.yaml
+	-e $TEMPLATES/environments/barbican-backend-simple-crypto.yaml
+
 	# Enable Sahara
 	-e $TEMPLATES/environments/services/sahara.yaml
 
