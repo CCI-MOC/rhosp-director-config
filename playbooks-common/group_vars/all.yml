@@ -46,7 +46,7 @@ nova_flavors:
       vif_outbound_average: 2500
       vif_outbound_burst: 3750000
       vif_outbound_peak: 12500
-    ram: 1
+    ram: 1024
     vcpus: 1
   - disk: 10
     name: m1.small
@@ -61,7 +61,7 @@ nova_flavors:
       vif_outbound_average: 5000
       vif_outbound_burst: 7500000
       vif_outbound_peak: 25000
-    ram: 2
+    ram: 2048
     vcpus: 1
   - disk: 10
     name: m1.medium
@@ -76,7 +76,7 @@ nova_flavors:
       vif_outbound_average: 10000
       vif_outbound_burst: 15000000
       vif_outbound_peak: 50000
-    ram: 4
+    ram: 4096
     vcpus: 2
   - disk: 10
     name: m1.large
@@ -91,7 +91,7 @@ nova_flavors:
       vif_outbound_average: 20000
       vif_outbound_burst: 30000000
       vif_outbound_peak: 100000
-    ram: 8
+    ram: 8192
     vcpus: 4
   - disk: 10
     name: m1.xlarge
@@ -106,7 +106,7 @@ nova_flavors:
       vif_outbound_average: 40000
       vif_outbound_burst: 60000000
       vif_outbound_peak: 200000
-    ram: 16
+    ram: 16384
     vcpus: 8
   - disk: 10
     name: c1.xlarge
@@ -121,7 +121,7 @@ nova_flavors:
       vif_outbound_average: 128000
       vif_outbound_burst: 46080000
       vif_outbound_peak: 255000
-    ram: 45
+    ram: 46080
     vcpus: 10
   - disk: 10
     name: c1.2xlarge
@@ -136,7 +136,7 @@ nova_flavors:
       vif_outbound_average: 256000
       vif_outbound_burst: 92160000
       vif_outbound_peak: 512000
-    ram: 90
+    ram: 92160
     vcpus: 20
   - disk: 10
     name: c1.4xlarge
@@ -151,7 +151,7 @@ nova_flavors:
       vif_outbound_average: 512000
       vif_outbound_burst: 184320000
       vif_outbound_peak: 1020000
-    ram: 180
+    ram: 184320
     vcpus: 40
 
 keystone_identity_providers:
