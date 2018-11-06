@@ -170,6 +170,6 @@ external_networks:
     subnets:
       - name: external-subnet-0
         cidr: 128.31.24.0/22
-        allocation_pool_start: 128.31.24.129
+        allocation_pool_start: 128.31.27.0
         allocation_pool_end: 128.31.27.254
         gateway: 128.31.24.1
