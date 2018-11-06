@@ -29,7 +29,7 @@
     openstack
     subnet create {{ item.item.name }}-subnet
     --network {{ item.item.name }}
-    --dns-nameserver {{ item.item.nameserver|default('1.1.1.1') }}
+    --dns-nameserver {{ item.item.nameserver|default('8.8.8.8') }}
     --subnet-range {{ item.item.cidr }}
   when: item.rc != 0
   with_items: "{{ subnet_check.results }}"
