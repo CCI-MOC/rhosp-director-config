@@ -3,6 +3,17 @@ common_packages:
   - tcpdump
   - strace
 
+glance_images:
+  - name: fedora-29-x86_64
+    url: https://download.fedoraproject.org/pub/fedora/linux/releases/29/Cloud/x86_64/images/Fedora-Cloud-Base-29-1.2.x86_64.qcow2
+    format: qcow2
+    public: true
+
+  - name: fedora-28-x86_64
+    url: https://download.fedoraproject.org/pub/fedora/linux/releases/28/Cloud/x86_64/images/Fedora-Cloud-Base-28-1.1.x86_64.qcow2
+    format: qcow2
+    public: true
+
 # These need to be here rather than in overcloud-ipmi.yml because
 # we need to access to these values when delegating tasks.
 ipmi_user: root

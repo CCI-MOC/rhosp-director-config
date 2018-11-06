@@ -19,6 +19,7 @@
 - hosts: localhost
   roles:
     - nova_flavors
+    - glance_images
     - cinder_volume_types
     - keystone_federation
     - external_network
