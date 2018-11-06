@@ -140,6 +140,7 @@ parameter_defaults:
       moc_openid: ["moc", "openid"]
     horizon::help_url:
       https://osticket.massopen.cloud/index.php
+    cinder::api::default_volume_type: default
 
     tripleo::haproxy::haproxy_globals_override:
       tune.ssl.default-dh-param: 2048
