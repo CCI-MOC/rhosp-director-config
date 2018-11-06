@@ -1,3 +1,4 @@
+---
 clouds:
 {% for user in test_users %}
   test-{{ user.name }}:
