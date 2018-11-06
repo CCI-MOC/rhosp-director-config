@@ -29,7 +29,7 @@
         --container-format {{ item.item.container_format|default('bare') }}
         --disk-format {{ item.item.format }}
         --file {{ tempdir.path }}/{{ item.item.name }}.img
-        {% if not item.item.private|default('false') %}--public{% endif %}
+        {% if item.item.public|default('false') %}--public{% endif %}
       when: item.rc != 0
       with_items: "{{ image_check.results }}"
   always:
