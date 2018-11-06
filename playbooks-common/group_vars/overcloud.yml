@@ -1,12 +1,6 @@
 ---
 overcloud_packages:
-  - python-heat-agent
-  - python-heat-agent-ansible
-  - python-heat-agent-apply-config
-  - python-heat-agent-docker-cmd
-  - python-heat-agent-hiera
-  - python-heat-agent-json-file
-  - python-heat-agent-puppet
+  - openstack-heat-agents
 
 controller_packages:
   - python-openstackclient
