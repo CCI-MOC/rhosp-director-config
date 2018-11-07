@@ -1,4 +1,7 @@
 #!/bin/sh
+#
+# This file is generated with Ansible. Any changes made here will be
+# lost.
 
 export ControllerDeployedServer_hosts="
 {% for host in groups.controller|hostname_sort %}
