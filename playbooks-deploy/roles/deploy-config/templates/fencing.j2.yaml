@@ -15,6 +15,6 @@ parameter_defaults:
           {{ lookup('bitwarden', 'idrac@kaizen', field='username') }}
         passwd: >-
           {{ lookup('bitwarden', 'idrac@kaizen') }}
-        pcmk_host_list: {{ hostvars[host].ooo_name }}
+        pcmk_host_list: {{ host.split('.').0 }}
         privlvl: administrator
 {% endfor %}
