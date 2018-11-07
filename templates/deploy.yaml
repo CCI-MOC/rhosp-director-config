@@ -128,6 +128,10 @@ parameter_defaults:
       key: 'os_compute_api:os-admin-actions:reset_state'
       value: 'rule:admin_or_owner'
 
+  # Enable simple crypto backend as global default.
+  # (https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/13/html/manage_secrets_with_openstack_key_manager/installing_barbican)
+  BarbicanSimpleCryptoGlobalDefault: true
+
   # Additional Hiera configuration to be placed on the controllers.
   ControllerDeployedServerExtraConfig:
     swift::keystone::auth::auth_name: ceph
@@ -147,9 +151,8 @@ parameter_defaults:
       ssl-default-bind-options: no-sslv3 no-tlsv10
       ssl-default-server-options: no-sslv3 no-tlsv10
 
-  # Enable simple crypto backend as global default.
-  # (https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/13/html/manage_secrets_with_openstack_key_manager/installing_barbican)
-  BarbicanSimpleCryptoGlobalDefault: true
+  ComputeDeployedServerExtraConfig:
+    nova::compute::libvirt::libvirt_cpu_mode: host-passthrough
 
   ExtraConfig:
     tripleo::firewall::firewall_rules:
@@ -169,7 +172,6 @@ parameter_defaults:
         dport: 161
         proto: udp
         source: 172.16.0.0/19
-    nova::compute::libvirt::libvirt_cpu_mode: host-passthrough
 
   SSLCertificate: |
     -----BEGIN CERTIFICATE-----
