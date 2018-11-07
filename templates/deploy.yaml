@@ -153,6 +153,7 @@ parameter_defaults:
 
   ComputeDeployedServerExtraConfig:
     nova::compute::libvirt::libvirt_cpu_mode: host-passthrough
+    nova::compute::resume_guests_state_on_host_boot: true
 
   ExtraConfig:
     tripleo::firewall::firewall_rules:
