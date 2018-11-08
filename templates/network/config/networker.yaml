@@ -138,7 +138,6 @@ resources:
                # External networks to p3p1
               - type: vlan
                 device: p3p1
-                mtu: 9000
                 vlan_id:
                   get_param: InternalApiNetworkVlanID
                 use_dhcp: false
