@@ -110,7 +110,7 @@ resources:
               # p3p1 is the foreman provisioning network.
               - type: interface
                 name: p3p1
-                mtu: 9000
+                mtu: 9050
                 use_dhcp: false
                 addresses:
                   - ip_netmask:
@@ -147,7 +147,7 @@ resources:
 
               - type: vlan
                 device: p3p1
-                mtu: 9000
+                mtu: 9050
                 vlan_id:
                   get_param: TenantNetworkVlanID
                 use_dhcp: false
