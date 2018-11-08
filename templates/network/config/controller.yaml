@@ -137,7 +137,6 @@ resources:
 
               # Put storage on p3p2
               - type: vlan
-                mtu: 9000
                 device: p3p2
                 vlan_id:
                   get_param: StorageNetworkVlanID
