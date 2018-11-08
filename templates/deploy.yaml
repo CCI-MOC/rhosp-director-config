@@ -49,6 +49,11 @@ parameter_defaults:
   NeutronOVSFirewallDriver: openvswitch
   NeutronGlobalPhysnetMtu: 9000
 
+  # Allow network configuration changes via stack update
+  NetworkDeploymentActions:
+    - CREATE
+    - UPDATE
+
   # The InternalApi network is used for OpenStack REST API traffic
   # between the controllers and compute nodes, as well as for AMQ
   # traffic, database access, and most other traffic internal to the
