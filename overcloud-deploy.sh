@@ -76,6 +76,9 @@ deploy_args=(
 	-e $TEMPLATES/environments/swift-external.yaml
 	-e $PWD/templates/swift-external.yaml
 
+	# Disable snmp (to be configured outside of Director)
+	-e $PWD/templates/disable-snmp.yaml
+
 	# Most of our custom configuration.
 	-e $PWD/templates/deploy.yaml
 	-e $PWD/templates/credentials.yaml
