@@ -73,11 +73,11 @@ parameters:
   ControlPlaneDefaultRoute:
     description: The default route of the control plane network.
     type: string
-  ExternalInterfaceDefaultRoute: # Not used by default in this template
+  ExternalInterfaceDefaultRoute:  # Not used by default in this template
     default: 10.0.0.1
     description: The default route of the external network.
     type: string
-  ManagementInterfaceDefaultRoute: # Commented out by default in this template
+  ManagementInterfaceDefaultRoute:  # Commented out by default in this template
     default: unset
     description: The default route of the management network.
     type: string
@@ -107,65 +107,76 @@ resources:
             # script mentioned in the preceding get_file directive.
             $network_config:
               network_config:
-              # p3p1 is the foreman provisioning network.
-              - type: interface
-                name: p3p1
-                mtu: 9050
-                use_dhcp: false
-                addresses:
-                  - ip_netmask:
-                      list_join:
-                        - "/"
-                        - - get_param: ControlPlaneIp
-                          - get_param: ControlPlaneSubnetCidr
-                dns_servers:
-                  get_param: DnsServers
-                routes:
-                - default: true
-                  next_hop:
-                    get_param: ControlPlaneDefaultRoute
-                # This sets up a static route to the OpenStack
-                # metadata service.  This will be placed into
-                # /etc/sysconfig/network-scripts/routes-p3p1 by
-                # os-net-config.
-                - ip_netmask: 169.254.169.254/32
-                  next_hop: {get_param: EC2MetadataIp}
-                # VPN access
-                - ip_netmask: 172.31.224.0/19
-                  next_hop: 172.16.0.1
+                # p3p1 is the foreman provisioning network.
+                - type: interface
+                  name: p3p1
+                  mtu: 9050
+                  use_dhcp: false
+                  addresses:
+                    - ip_netmask:
+                        list_join:
+                          - "/"
+                          - - get_param: ControlPlaneIp
+                            - get_param: ControlPlaneSubnetCidr
+                  dns_servers:
+                    get_param: DnsServers
+                  routes:
+                    - default: true
+                      next_hop:
+                        get_param: ControlPlaneDefaultRoute
+                    # This sets up a static route to the OpenStack
+                    # metadata service.  This will be placed into
+                    # /etc/sysconfig/network-scripts/routes-p3p1 by
+                    # os-net-config.
+                    - ip_netmask: 169.254.169.254/32
+                      next_hop: {get_param: EC2MetadataIp}
+                    # VPN access
+                    - ip_netmask: 172.31.224.0/19
+                      next_hop: 172.16.0.1
 
-               # Attach InternalApi, Storage, and
-               # External networks to p3p1
-              - type: vlan
-                device: p3p1
-                vlan_id:
-                  get_param: InternalApiNetworkVlanID
-                use_dhcp: false
-                addresses:
-                - ip_netmask:
-                    get_param: InternalApiIpSubnet
+                # Attach InternalApi, Storage, and
+                # External networks to p3p1
+                - type: vlan
+                  device: p3p1
+                  mtu: 9050
+                  vlan_id:
+                    get_param: InternalApiNetworkVlanID
+                  use_dhcp: false
+                  addresses:
+                    - ip_netmask:
+                        get_param: InternalApiIpSubnet
 
-              - type: vlan
-                device: p3p1
-                mtu: 9050
-                vlan_id:
-                  get_param: TenantNetworkVlanID
-                use_dhcp: false
-                addresses:
-                - ip_netmask:
-                    get_param: TenantIpSubnet
+                - type: vlan
+                  device: p3p1
+                  mtu: 9050
+                  vlan_id:
+                    get_param: TenantNetworkVlanID
+                  use_dhcp: false
+                  addresses:
+                    - ip_netmask:
+                        get_param: TenantIpSubnet
 
-              # Set up an OpenvSwitch bridge to be used for instance
-              # external network connectivity
-              - type: vlan
-                device: p3p1
-                vlan_id:
-                  get_param: FloatingNetworkVlanId
-
-              - type: ovs_bridge
-                name: br-ex
-                use_dhcp: false
-                members: []
+                # Set up an OpenvSwitch bridge to be used for instance
+                # external network connectivity
+                - type: ovs_bridge
+                  name: br-ex
+                  mtu: 1500
+                  use_dhcp: false
+                  members:
+                    - type: interface
+                      mtu: 1500
+                      name:
+                        str_replace:
+                          template: p3p1.VLANID
+                          params:
+                            VLANID:
+                              get_param: FloatingNetworkVlanId
+                      device:
+                        str_replace:
+                          template: p3p1.VLANID
+                          params:
+                            VLANID:
+                              get_param: FloatingNetworkVlanId
 
 outputs:
   OS::stack_id:

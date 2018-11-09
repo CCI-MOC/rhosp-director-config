@@ -11,7 +11,6 @@ resource_registry:
     network/config/controller.yaml
   OS::TripleO::NetworkerDeployedServer::Net::SoftwareConfig:
     network/config/networker.yaml
-  OS::TripleO::NodeExtraConfigPost: postconfig.yaml
   OS::Local::Services::PatchPuppetModules:
     ./services/patch-puppet-modules.yaml
   OS::TripleO::DeployedServer::ControlPlanePort:
