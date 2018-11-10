@@ -46,7 +46,7 @@ parameter_defaults:
   # Use the openvswitch firewall driver for implementing security
   # groups.
   NeutronOVSFirewallDriver: openvswitch
-  NeutronGlobalPhysnetMtu: 9000
+  NeutronGlobalPhysnetMtu: 9050
 
   # Allow network configuration changes via stack update
   NetworkDeploymentActions:
