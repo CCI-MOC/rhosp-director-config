@@ -1,76 +1,71 @@
 ---
 - block:
     - name: create temporary directory
-      tags: [federation]
       command: "mktemp -td federationXXXXXX"
+      changed_when: false
       register: tempdir
 
     - name: write mapping rules to tempdir
-      tags: [federation]
       copy:
         dest: "{{ tempdir.stdout }}/rules-{{ item.key }}.json"
         content: "{{ item.value.rules|to_nice_json }}"
-      with_dict: "{{ keystone_identity_providers }}"
+      changed_when: false
+      loop: "{{ keystone_identity_providers|dict2items }}"
 
     - name: check if identity providers exist
-      tags: [federation]
       command: >-
-        openstack --os-cloud {{ cloud_name }} identity
+        openstack identity
         provider show {{ item.key }}
       ignore_errors: true
       changed_when: false
-      with_dict: "{{ keystone_identity_providers }}"
+      loop: "{{ keystone_identity_providers|dict2items }}"
       register: providers
 
     - name: create identity providers
-      tags: [federation]
       command: >-
-        openstack --os-cloud {{ cloud_name }} identity provider create
+        openstack identity provider create
         --remote-id {{ item.item.value.remote_id }} {{ item.item.key }}
       when: item is failed
-      with_items: "{{ providers.results }}"
+      loop: "{{ providers.results }}"
 
     - name: check if mapping exists
-      tags: [federation]
       command: >-
-        openstack --os-cloud {{ cloud_name }} mapping
+        openstack mapping
         show {{ item.key }}-mapping
       ignore_errors: true
       changed_when: false
-      with_dict: "{{ keystone_identity_providers }}"
+      loop: "{{ keystone_identity_providers|dict2items }}"
       register: mappings
 
     - name: create mapping
-      tags: [federation]
       command: >-
-        openstack --os-cloud {{ cloud_name }} mapping create
+        openstack mapping create
         --rules "{{ tempdir.stdout }}/rules-{{ item.item.key }}.json"
         {{ item.item.key }}-mapping
       when: item is failed
-      with_items: "{{ mappings.results }}"
+      loop: "{{ mappings.results }}"
 
     - name: check if federation protocol exists
-      tags: [federation]
       command: >-
-        openstack --os-cloud {{ cloud_name }} federation protocol show
+        openstack federation protocol show
         --identity-provider {{ item.key }} {{ item.value.protocol }}
       ignore_errors: true
       changed_when: false
-      with_dict: "{{ keystone_identity_providers }}"
+      loop: "{{ keystone_identity_providers|dict2items }}"
       register: protocols
 
     - name: create federation protocol
-      tags: [federation]
       command: >-
-        openstack --os-cloud {{ cloud_name }} federation protocol
+        openstack federation protocol
         create {{ item.item.value.protocol }}
         --mapping {{ item.item.key }}-mapping
         --identity-provider {{ item.item.key }}
       when: item is failed
-      with_items: "{{ protocols.results }}"
+      loop: "{{ protocols.results }}"
   always:
     - name: removing temporary directory
       file:
         path: "{{ tempdir.stdout }}"
         state: absent
       ignore_errors: true
+      changed_when: false

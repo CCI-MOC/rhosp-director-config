@@ -1,0 +1,36 @@
+---
+- block:
+    - name: create temporary directory for images
+      tempfile:
+        state: directory
+        suffix: images
+      changed_when: false
+      register: tempdir
+
+    - name: check if images exist
+      os_image_facts:
+        image: "{{ item.name }}"
+      register: image_check
+      loop: "{{ glance_images }}"
+
+    - name: download remote images
+      get_url:
+        url: "{{ item.item.url }}"
+        dest: "{{ tempdir.path }}/{{ item.item.name }}.img"
+      when: not item.ansible_facts.openstack_image
+      loop: "{{ image_check.results }}"
+
+    - name: create images
+      os_image:
+        name: "{{ item.item.name }}"
+        container_format: "{{ item.item.container_format|default('bare') }}"
+        disk_format: "{{ item.item.format }}"
+        filename: "{{ tempdir.path }}/{{ item.item.name }}.img"
+      when: not item.ansible_facts.openstack_image
+      loop: "{{ image_check.results }}"
+  always:
+    - name: clean up temporary directory
+      file:
+        path: "{{ tempdir.path }}"
+        state: absent
+      changed_when: false

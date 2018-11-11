@@ -1,0 +1,7 @@
+---
+cinder_volume_types:
+  - name: default
+    volume_backend_name: tripleo_ceph
+
+  - name: performance
+    volume_backend_name: tripleo_ceph_performance2

@@ -1,4 +1,0 @@
----
-ipmi_user: root
-ipmi_pass: >-
-  {{ lookup('bitwarden', 'idrac@kaizen') }}
