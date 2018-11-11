@@ -1,0 +1,11 @@
+---
+keystone_identity_providers:
+  moc:
+    remote_id: https://sso.massopen.cloud/auth/realms/moc
+    rules:
+      - local:
+          - user:
+              name: '{0}'
+        remote:
+          - type: OIDC-preferred_username
+    protocol: openid

@@ -1,0 +1,21 @@
+---
+- name: create external networks
+  os_network:
+    state: present
+    name: "{{ item.name }}"
+    provider_physical_network: "{{ item.physical_network }}"
+    provider_network_type: "{{ item.network_type }}"
+    external: true
+  loop: "{{ external_networks }}"
+
+- name: create external network subnets
+  os_subnet:
+    state: present
+    name: "{{ item.1.name }}"
+    network_name: "{{ item.0.name }}"
+    cidr: "{{ item.1.cidr }}"
+    allocation_pool_start: "{{ item.1.allocation_pool_start }}"
+    allocation_pool_end: "{{ item.1.allocation_pool_end }}"
+    enable_dhcp: false
+    gateway_ip: "{{ item.1.gateway }}"
+  loop: "{{ external_networks|subelements('subnets') }}"

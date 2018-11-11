@@ -1,25 +1,3 @@
 ---
-- hosts: localhost
-  roles:
-    - ansible-modules-bitwarden
-
-- hosts: controller[0]
-  become: true
-  become_user: root
-  run_once: true
-  roles:
-    - credentials/fetch
-
-- hosts: undercloud:controller
-  become: true
-  become_user: root
-  roles:
-    - credentials/create
-
-- hosts: localhost
-  roles:
-    - nova_flavors
-    - glance_images
-    - cinder_volume_types
-    - keystone_federation
-    - external_network
+- import_playbook: credentials.yml
+- import_playbook: resources.yml

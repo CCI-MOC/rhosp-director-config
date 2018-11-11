@@ -29,7 +29,6 @@
   become: true
   roles:
     - overcloud-prep
-    - roles/bug/1642588-openvswitch-start
-    - roles/bug/1642591-openvswitch-selinux
+    - bug/1642588-openvswitch-start
+    - bug/1642591-openvswitch-selinux
     - selinux_relabel
-
