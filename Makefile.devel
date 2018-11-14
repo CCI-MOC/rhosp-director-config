@@ -21,7 +21,7 @@ NETWORKER_SRC_ROLES = \
 %.html: %.md
 	$(PANDOC) -s $< -o $@ --toc --css docs/github-pandoc.css
 
-all: $(CUSTOM_ROLES) $(ENVIRONMENTS)
+all: $(CUSTOM_ROLES)
 
 doc: $(HTMLDOCS)
 
@@ -32,7 +32,6 @@ roles/ControllerDeployedServer.yaml: $(CONTROLLER_SRC_ROLES)
 		-s OS::TripleO::Services::ExternalSwiftProxy \
 		-x disable_constraints=true \
 		-x HostnameFormatDefault='%stackname%-controller-%index%' \
-		--remove-network Tenant \
 		ControllerDeployedServer \
 		$(CONTROLLER_SRC_ROLES)
 
@@ -41,6 +40,7 @@ roles/ComputeDeployedServer.yaml: $(COMPUTE_SRC_ROLES)
 		-s OS::Local::Services::PatchPuppetModules \
 		-s OS::TripleO::Services::Securetty \
 		-x disable_constraints=true \
+		-x disable_upgrade_deployment=true \
 		-x HostnameFormatDefault='%stackname%-compute-%index%' \
 		ComputeDeployedServer \
 		$(COMPUTE_SRC_ROLES)
@@ -49,6 +49,7 @@ roles/NetworkerDeployedServer.yaml: $(NETWORKER_SRC_ROLES)
 	./scripts/merge-roles.py -o $@ \
 		-s OS::Local::Services::PatchPuppetModules \
 		-s OS::TripleO::Services::Securetty \
+		-s OS::TripleO::Services::Sshd \
 		-x disable_constraints=true \
 		-x HostnameFormatDefault='%stackname%-networker-%index%' \
 		NetworkerDeployedServer \

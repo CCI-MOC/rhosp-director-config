@@ -10,6 +10,7 @@
   - InternalApi
   - Storage
   - StorageMgmt
+  - Tenant
   default_route_networks:
   - External
   ServicesDefault:
