@@ -172,6 +172,16 @@ resources:
                       next_hop:
                         get_param: ExternalInterfaceDefaultRoute
 
+                - type: vlan
+                  device: p3p1
+                  mtu: 9050
+                  vlan_id:
+                    get_param: TenantNetworkVlanID
+                  use_dhcp: false
+                  addresses:
+                    - ip_netmask:
+                        get_param: TenantIpSubnet
+
 outputs:
   OS::stack_id:
     description: The OsNetConfigImpl resource.
