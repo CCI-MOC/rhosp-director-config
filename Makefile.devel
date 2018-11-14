@@ -36,6 +36,7 @@ roles/ControllerDeployedServer.yaml: $(CONTROLLER_SRC_ROLES)
 		-s OS::Local::Services::PatchPuppetModules \
 		-s OS::TripleO::Services::Securetty \
 		-s OS::TripleO::Services::ExternalSwiftProxy \
+		-s OS::TripleO::Services::NeutronOvsAgent \
 		-x disable_constraints=true \
 		-x HostnameFormatDefault='%stackname%-controller-%index%' \
 		ControllerDeployedServer \
