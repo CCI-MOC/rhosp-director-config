@@ -21,9 +21,15 @@ NETWORKER_SRC_ROLES = \
 %.html: %.md
 	$(PANDOC) -s $< -o $@ --toc --css docs/github-pandoc.css
 
-all: $(CUSTOM_ROLES)
+all: roles_data.yaml
 
 doc: $(HTMLDOCS)
+
+roles_data.yaml: $(CUSTOM_ROLES)
+	openstack overcloud roles generate --roles-path roles -o $@ \
+		ControllerDeployedServer \
+		ComputeDeployedServer \
+		NetworkerDeployedServer
 
 roles/ControllerDeployedServer.yaml: $(CONTROLLER_SRC_ROLES)
 	./scripts/merge-roles.py -o $@ \
