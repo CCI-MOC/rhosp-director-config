@@ -1,0 +1,6 @@
+---
+foreman_admin_user: admin
+foreman_cli_packages:
+  - rubygem-hammer_cli_foreman
+
+hammer_config_file: .hammer/cli_config.yml

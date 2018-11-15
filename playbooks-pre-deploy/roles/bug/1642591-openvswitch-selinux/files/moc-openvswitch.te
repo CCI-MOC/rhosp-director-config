@@ -1,0 +1,10 @@
+module moc-openvswitch 1.0;
+
+require {
+        type container_var_run_t;
+        type openvswitch_t;
+        class dir write;
+}
+
+#============= openvswitch_t ==============
+allow openvswitch_t container_var_run_t:dir write;

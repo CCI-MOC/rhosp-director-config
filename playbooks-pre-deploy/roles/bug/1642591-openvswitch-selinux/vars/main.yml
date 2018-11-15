@@ -1,0 +1,8 @@
+---
+selinux_patches:
+  - moc-openvswitch
+
+selinux_packages:
+  - checkpolicy
+  - policycoreutils
+  - policycoreutils-python

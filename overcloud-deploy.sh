@@ -7,13 +7,18 @@ if [ "$OS_CLOUDNAME" != "undercloud" ]; then
 	exit 1
 fi
 
-ansible-playbook -e @templates/credentials.yaml generate-deploy-files.yaml
-
 if [ -d patches/tripleo-heat-templates ]; then
 	TEMPLATES=$PWD/patches/tripleo-heat-templates
 else
 	TEMPLATES=/usr/share/openstack-tripleo-heat-templates
 fi
+
+# Generate files
+ansible-playbook playbooks-deploy/playbook.yml
+
+# This is necessary to work around bugs #1645503 and #1645134
+. ./overcloud-env.sh
+bash $TEMPLATES/deployed-server/scripts/enable-ssh-admin.sh
 
 # When passing environment files (`-e ...`) to the `overcloud deploy`
 # command, order is important! Your custom configuration
@@ -38,7 +43,7 @@ deploy_args=(
 	-e $TEMPLATES/environments/deployed-server-environment.yaml
 	-e $TEMPLATES/environments/deployed-server-bootstrap-environment-rhel.yaml
 	-e $TEMPLATES/environments/deployed-server-pacemaker-environment.yaml
-	-r $TEMPLATES/deployed-server/deployed-server-roles-data.yaml
+	-r $PWD/roles_data.yaml
 
 	# Enable TLS for public endpoints.
 	-e $TEMPLATES/environments/ssl/enable-tls.yaml
@@ -46,6 +51,10 @@ deploy_args=(
 
 	# Enable Neutron Octavia load-balancer service.
 	-e $TEMPLATES/environments/services/octavia.yaml
+
+	# Enable barbican
+	-e $TEMPLATES/environments/services/barbican.yaml
+	-e $TEMPLATES/environments/barbican-backend-simple-crypto.yaml
 
 	# Enable Sahara
 	-e $TEMPLATES/environments/services/sahara.yaml
@@ -67,13 +76,17 @@ deploy_args=(
 	-e $TEMPLATES/environments/swift-external.yaml
 	-e $PWD/templates/swift-external.yaml
 
-	# Most of our custom configuration.
-	-e $PWD/templates/services.yaml
-	-e $PWD/templates/deploy.yaml
+	# Disable snmp (to be configured outside of Director)
+	-e $PWD/templates/disable-snmp.yaml
 
-	# Passwords and other credentials (this file is not included in
-	# the repository).
+	# Most of our custom configuration.
+	-e $PWD/templates/deploy.yaml
 	-e $PWD/templates/credentials.yaml
+	-e $PWD/templates/fencing.yaml
+
+	# Static ip assignment
+	-e $PWD/templates/hostnamemap.yaml
+	-e $PWD/templates/deployedserverportmap.yaml
 )
 
 if [ -d patches/puppet-modules ]; then

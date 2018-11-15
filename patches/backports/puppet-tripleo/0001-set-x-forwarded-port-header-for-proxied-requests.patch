@@ -1,0 +1,32 @@
+From 0a46364ccd110f3ca52d61afdff53b4ad474ca93 Mon Sep 17 00:00:00 2001
+From: Lars Kellogg-Stedman <lars@redhat.com>
+Date: Wed, 20 Jun 2018 09:54:10 -0400
+Subject: [PATCH 1/4] set x-forwarded-port header for proxied requests
+
+This is required for keystone federation to work correctly when
+mod_auth_openidc.
+
+Change-Id: Ib79fbd47169388bfb044a8183725a3d1de5bc480
+Closes-bug: 1777884
+(cherry picked from commit bf9a9620c68eb3934a897038ccc36a1a2a10bf66)
+---
+ manifests/haproxy.pp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/manifests/haproxy.pp b/manifests/haproxy.pp
+index d7aaab9a..d56dd03e 100644
+--- a/manifests/haproxy.pp
++++ b/manifests/haproxy.pp
+@@ -834,7 +834,8 @@ class tripleo::haproxy (
+     'option'       => [ 'httpchk', 'httplog', ],
+     'http-request' => [
+       'set-header X-Forwarded-Proto https if { ssl_fc }',
+-      'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
++      'set-header X-Forwarded-Proto http if !{ ssl_fc }',
++      'set-header X-Forwarded-Port %[dst_port]'],
+   }
+   Tripleo::Haproxy::Endpoint {
+     haproxy_listen_bind_param   => $haproxy_listen_bind_param,
+-- 
+2.18.0.rc2
+

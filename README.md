@@ -19,7 +19,6 @@ This configuration will provision:
 | eth2      | 3699    | N      |                   | Y     | foreman provisioning network | |
 | eth2      | 105  | Y      | 192.12.185.0/24   | N     | public API/horizon | External |
 | eth2      | 3702 | Y      | 192.168.32.0/22   | N     | openstack api network | InternalApi |
-| eth2      | 3703 | Y      | 192.168.24.0/24   | N     | director control plane | ControlPlane |
 | eth2      | 3704 | Y      | 192.168.12.0/22   | N     | tenant networks | Tenant |
 | eth2      | 3803 | Y      | 128.31.28.0/24    | N     | floating ip | |
 | eth3      | 3700 | Y      | 192.168.16.0/22   | N     | ceph public network | Storage |
@@ -44,11 +43,10 @@ process of deploying RHOSP.
 
 - `overcloud-deploy.sh`
 
-  Runs the actual overcloud deploy. Generate `templates/deploy.yaml`
-  from `templates/deploy.yaml.in` (mostly just injecting some
-  credentials).  Ensures that the environment files necessary to
-  realize our overcloud configuration are provide on the deploy
-  command line.
+  Runs the actual overcloud deploy. This takes care of generating some
+  files (mostly credentials) from templates. Ensures that the
+  environment files necessary to realize our overcloud configuration
+  are provide on the deploy command line.
 
   Prior to running the `openstack overcloud deploy` command, this
   script packages up any patched puppet modules and ensures that they
@@ -119,10 +117,9 @@ process of deploying RHOSP.
 
 ### Credentials
 
-The file `templates/credentials.yaml` is required by the
-`overcloud-deploy.sh` script, but it does not exist in this
-repository.  This file contains all passwords, keys, and other secrets
-required for the deployment.
+The file `credentials.yaml` is generated at deploy time from
+`credentials.yaml.in`.  This pulls passwords and other secrets from
+Bitwarden.
 
 ## Patches
 

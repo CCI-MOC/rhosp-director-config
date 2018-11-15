@@ -1,0 +1,39 @@
+From 65761b5545eb87dc8f95aa289be621e5ed0b3fc1 Mon Sep 17 00:00:00 2001
+From: Lars Kellogg-Stedman <lars@redhat.com>
+Date: Thu, 12 Jul 2018 15:36:48 -0400
+Subject: [PATCH 4/4] implement default ssh-from-ctlplane rule via hiera
+
+With the accompanying change in puppet-tripleo, this removes the
+hardcoded firewall rule allowing ssh traffic in tripleo::firewall::pre
+and replaces it with a configuration in tripleo-firewall.yaml that
+allows only ssh access from the undercloud's controlplane network
+address. This allows operators to define more granular ssh
+firewall rules via tripleo::firewall::firewall_rules.
+
+Depends-on: I14b540e6564c5b7c5d54b4f1fd5368b000744135
+Change-Id: I89cff59947dda3f51482486c41a3d67c4aa36a3e
+(cherry picked from commit 08098a77b13b5a0ed98fdc0bff834982883b8a1a)
+---
+ puppet/services/tripleo-firewall.yaml | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/puppet/services/tripleo-firewall.yaml b/puppet/services/tripleo-firewall.yaml
+index b92be457a..4aac7c469 100644
+--- a/puppet/services/tripleo-firewall.yaml
++++ b/puppet/services/tripleo-firewall.yaml
+@@ -47,6 +47,12 @@ outputs:
+       config_settings:
+         tripleo::firewall::manage_firewall: {get_param: ManageFirewall}
+         tripleo::firewall::purge_firewall_rules: {get_param: PurgeFirewallRules}
++        tripleo.tripleo_firewall.firewall_rules:
++          '003 accept ssh from controlplane':
++            source: "%{hiera('ctlplane_subnet')}"
++            proto: 'tcp'
++            dport: 22
++
+       step_config: |
+         include ::tripleo::firewall
+       upgrade_tasks:
+-- 
+2.18.0.rc2
+

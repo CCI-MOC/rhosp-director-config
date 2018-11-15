@@ -1,0 +1,4 @@
+---
+- name: apply selinux labels
+  shell: yes n | fixfiles relabel
+  changed_when: false

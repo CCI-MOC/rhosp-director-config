@@ -1,0 +1,132 @@
+From a8c739e3d48d5be84a5fb89f402deec95097b5cc Mon Sep 17 00:00:00 2001
+From: Lars Kellogg-Stedman <lars@redhat.com>
+Date: Tue, 12 Jun 2018 14:35:00 -0400
+Subject: [PATCH 2/4] [WIP] enable support for openidc federation in keystone
+
+This exposes parameters to configure OpenIDC federation in Keystone.
+
+Change-Id: I3e06ca5fde65f3e2c3c084f96209d1b38d5f8b86
+Depends-on: Id2ef3558a359883bf3182f50d6a082b1789a900a
+(cherry picked from commit 2274f78e2f169741d45d019e529df14ab9ca16b6)
+---
+ environments/enable-federation-openidc.yaml |  5 ++
+ puppet/services/keystone.yaml               | 77 +++++++++++++++++++++
+ 2 files changed, 82 insertions(+)
+ create mode 100644 environments/enable-federation-openidc.yaml
+
+diff --git a/environments/enable-federation-openidc.yaml b/environments/enable-federation-openidc.yaml
+new file mode 100644
+index 000000000..0c9a63646
+--- /dev/null
++++ b/environments/enable-federation-openidc.yaml
+@@ -0,0 +1,5 @@
++---
++parameter_defaults:
++  KeystoneFederationEnable: true
++  KeystoneAuthMethods: password,token,openid
++  KeystoneOpenIdcEnable: true
+diff --git a/puppet/services/keystone.yaml b/puppet/services/keystone.yaml
+index 83e54a13f..a07c9a179 100644
+--- a/puppet/services/keystone.yaml
++++ b/puppet/services/keystone.yaml
+@@ -277,6 +277,51 @@ parameters:
+     description: >-
+       This controls the number of previous user password iterations to keep in
+       history, in order to enforce that newly created passwords are unique.
++  KeystoneFederationEnable:
++    type: boolean
++    default: false
++    description: Enable support for federated authentication.
++  KeystoneTrustedDashboards:
++    type: comma_delimited_list
++    default: []
++    description: A list of dashboard URLs trusted for single sign-on.
++  KeystoneAuthMethods:
++    type: comma_delimited_list
++    default: []
++    description: >-
++      A list of methods used for authentication.
++  KeystoneOpenIdcEnable:
++    type: boolean
++    default: false
++    description: Enable support for OpenIDC federation.
++  KeystoneOpenIdcIdpName:
++    type: string
++    default: ''
++    description: The name name associated with the IdP in Keystone.
++  KeystoneOpenIdcProviderMetadataUrl:
++    type: string
++    default: ''
++    description: The url that points to your OpenID Connect metadata provider
++  KeystoneOpenIdcClientId:
++    type: string
++    default: ''
++    description: >-
++      The client ID to use when handshaking with your OpenID Connect provider
++  KeystoneOpenIdcClientSecret:
++    type: string
++    default: ''
++    description: >-
++      The client secret to use when handshaking with your OpenID
++      Connect provider
++  KeystoneOpenIdcCryptoPassphrase:
++    type: string
++    default: 'openstack'
++    description: >-
++      Passphrase to use when encrypting data for OpenID Connect handshake.
++  KeystoneOpenIdcResponseType:
++    type: string
++    default: 'id_token'
++    description: Response type to be expected from the OpenID Connect provider.
+ 
+ parameter_groups:
+ - label: deprecated
+@@ -306,6 +351,8 @@ resources:
+ conditions:
+   keystone_fernet_tokens: {equals: [{get_param: KeystoneTokenProvider}, "fernet"]}
+   keystone_ldap_domain_enabled: {equals: [{get_param: KeystoneLDAPDomainEnable}, True]}
++  keystone_federation_enabled: {equals: [{get_param: KeystoneFederationEnable}, true]}
++  keystone_openidc_enabled: {equals: [{get_param: KeystoneOpenIdcEnable}, true]}
+   service_debug_unset: {equals : [{get_param: KeystoneDebug}, '']}
+ 
+   # Security compliance
+@@ -442,6 +489,36 @@ outputs:
+             keystone::cron::token_flush::maxdelay: {get_param: KeystoneCronTokenFlushMaxDelay}
+             keystone::cron::token_flush::destination: {get_param: KeystoneCronTokenFlushDestination}
+             keystone::cron::token_flush::user: {get_param: KeystoneCronTokenFlushUser}
++          - if:
++            - keystone_federation_enabled
++            -
++              keystone_federation_enabled: true
++              keystone::federation::trusted_dashboards:
++                get_param: KeystoneTrustedDashboards
++              keystone::federation::auth_methods:
++                get_param: KeystoneAuthMethods
++            - {}
++          - if:
++            - keystone_openidc_enabled
++            -
++              keystone_openidc_enabled: true
++              keystone::federation::openidc::keystone_public_url:
++                get_param: [EndpointMap, KeystonePublic, uri_no_suffix]
++              keystone::federation::openidc::keystone_admin_url:
++                get_param: [EndpointMap, KeystoneAdmin, uri_no_suffix]
++              keystone::federation::openidc::idp_name:
++                get_param: KeystoneOpenIdcIdpName
++              keystone::federation::openidc::openidc_provider_metadata_url:
++                get_param: KeystoneOpenIdcProviderMetadataUrl
++              keystone::federation::openidc::openidc_client_id:
++                get_param: KeystoneOpenIdcClientId
++              keystone::federation::openidc::openidc_client_secret:
++                get_param: KeystoneOpenIdcClientSecret
++              keystone::federation::openidc::openidc_crypto_passphrase:
++                get_param: KeystoneOpenIdcCryptoPassphrase
++              keystone::federation::openidc::openidc_response_type:
++                get_param: KeystoneOpenIdcResponseType
++            - {}
+           -
+             if:
+             - keystone_ldap_domain_enabled
+-- 
+2.18.0.rc2
+

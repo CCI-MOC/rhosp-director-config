@@ -1,0 +1,34 @@
+---
+- name: prepare all hosts
+  hosts: undercloud:overcloud
+  tags: [prep, undercloud, overcloud]
+  become: true
+  roles:
+    - all-prep
+
+- name: prepare undercloud
+  hosts: undercloud
+  tags: [prep, undercloud]
+  become: true
+  roles:
+    - undercloud-prep
+    - selinux_relabel
+
+- name: prepare stack user on undercloud
+  hosts: undercloud
+  tags: [prep, undercloud]
+  become: true
+  become_user: stack
+  roles:
+    - stackuser
+    - foremancli
+
+- name: prepare overcloud
+  hosts: overcloud
+  tags: [prep, overcloud]
+  become: true
+  roles:
+    - overcloud-prep
+    - bug/1642588-openvswitch-start
+    - bug/1642591-openvswitch-selinux
+    - selinux_relabel

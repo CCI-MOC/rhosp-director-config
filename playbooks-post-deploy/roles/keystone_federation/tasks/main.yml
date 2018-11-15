@@ -1,0 +1,71 @@
+---
+- block:
+    - name: create temporary directory
+      command: "mktemp -td federationXXXXXX"
+      changed_when: false
+      register: tempdir
+
+    - name: write mapping rules to tempdir
+      copy:
+        dest: "{{ tempdir.stdout }}/rules-{{ item.key }}.json"
+        content: "{{ item.value.rules|to_nice_json }}"
+      changed_when: false
+      loop: "{{ keystone_identity_providers|dict2items }}"
+
+    - name: check if identity providers exist
+      command: >-
+        openstack identity
+        provider show {{ item.key }}
+      ignore_errors: true
+      changed_when: false
+      loop: "{{ keystone_identity_providers|dict2items }}"
+      register: providers
+
+    - name: create identity providers
+      command: >-
+        openstack identity provider create
+        --remote-id {{ item.item.value.remote_id }} {{ item.item.key }}
+      when: item is failed
+      loop: "{{ providers.results }}"
+
+    - name: check if mapping exists
+      command: >-
+        openstack mapping
+        show {{ item.key }}-mapping
+      ignore_errors: true
+      changed_when: false
+      loop: "{{ keystone_identity_providers|dict2items }}"
+      register: mappings
+
+    - name: create mapping
+      command: >-
+        openstack mapping create
+        --rules "{{ tempdir.stdout }}/rules-{{ item.item.key }}.json"
+        {{ item.item.key }}-mapping
+      when: item is failed
+      loop: "{{ mappings.results }}"
+
+    - name: check if federation protocol exists
+      command: >-
+        openstack federation protocol show
+        --identity-provider {{ item.key }} {{ item.value.protocol }}
+      ignore_errors: true
+      changed_when: false
+      loop: "{{ keystone_identity_providers|dict2items }}"
+      register: protocols
+
+    - name: create federation protocol
+      command: >-
+        openstack federation protocol
+        create {{ item.item.value.protocol }}
+        --mapping {{ item.item.key }}-mapping
+        --identity-provider {{ item.item.key }}
+      when: item is failed
+      loop: "{{ protocols.results }}"
+  always:
+    - name: removing temporary directory
+      file:
+        path: "{{ tempdir.stdout }}"
+        state: absent
+      ignore_errors: true
+      changed_when: false

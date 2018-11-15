@@ -1,14 +1,12 @@
 ---
 parameter_defaults:
   KeystoneTrustedDashboards:
-    - https://massopen.cloud/engage1/signup/invitations/accept
-    - https://kumo.massopen.cloud/dashboard/auth/websso/
+    - https://k.massopen.cloud/dashboard/auth/websso/
 
   KeystoneOpenIdcIdpName: moc
   KeystoneOpenIdcProviderMetadataUrl:
       https://sso.massopen.cloud/auth/realms/moc/.well-known/openid-configuration
-  KeystoneOpenIdcClientId: kumo-openstack
-
+  KeystoneOpenIdcClientId: kaizen-openstack
   KeystoneIdentityProviders:
     moc:
       remote_id: https://sso.massopen.cloud/auth/realms/moc

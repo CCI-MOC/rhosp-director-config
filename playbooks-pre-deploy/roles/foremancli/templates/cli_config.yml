@@ -1,0 +1,5 @@
+:foreman:
+    :enable_module: true
+    :host: '{{ foreman_url }}'
+    :username: '{{ foreman_admin_user }}'
+    :password: '{{ foreman_admin_pass }}'

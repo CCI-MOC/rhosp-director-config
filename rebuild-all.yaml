@@ -1,7 +1,0 @@
-- hosts: localhost
-  gather_facts: false
-  tasks:
-    - name: trigger rebuild on overcloud hosts
-      command: >-
-        hammer host update --build true --name {{item}}
-      with_items: "{{ groups.overcloud }}"

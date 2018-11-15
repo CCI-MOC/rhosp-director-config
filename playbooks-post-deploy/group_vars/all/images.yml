@@ -1,0 +1,16 @@
+---
+glance_images:
+  - name: fedora-29-x86_64
+    url: https://download.fedoraproject.org/pub/fedora/linux/releases/29/Cloud/x86_64/images/Fedora-Cloud-Base-29-1.2.x86_64.qcow2
+    format: qcow2
+    public: true
+
+  - name: fedora-28-x86_64
+    url: https://download.fedoraproject.org/pub/fedora/linux/releases/28/Cloud/x86_64/images/Fedora-Cloud-Base-28-1.1.x86_64.qcow2
+    format: qcow2
+    public: true
+
+  - name: centos-7-x86_64
+    url: https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
+    format: qcow2
+    public: true

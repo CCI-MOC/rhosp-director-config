@@ -1,0 +1,15 @@
+---
+- name: install foreman cli
+  package:
+    name: "{{ foreman_cli_packages }}"
+    state: installed
+
+- name: install hammer config directory
+  file:
+    state: directory
+    path: "{{ stack_home }}/{{ hammer_config_file|dirname }}"
+
+- name: install foreman auth configuration
+  template:
+    src: cli_config.yml
+    dest: "{{ stack_home }}/{{ hammer_config_file }}"

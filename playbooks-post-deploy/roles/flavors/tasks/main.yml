@@ -1,0 +1,11 @@
+---
+- name: create flavors
+  tags: [flavors]
+  os_nova_flavor:
+    state: present
+    name: "{{ item.name }}"
+    ram: "{{ item.ram }}"
+    vcpus: "{{ item.vcpus }}"
+    disk: "{{ item.disk }}"
+    extra_specs: "{{ item.properties }}"
+  loop: "{{ nova_flavors }}"

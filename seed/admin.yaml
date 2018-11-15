@@ -8,7 +8,7 @@
         ram: "{{ item.ram }}"
         vcpus: "{{ item.vcpus }}"
         disk: "{{ item.disk }}"
-      loop: "{{ seed_flavors }}"
+      with_items: "{{ seed_flavors }}"
 
 - hosts: localhost
   tags: [image]
@@ -41,7 +41,9 @@
       os_subnet:
         name: external-subnet
         network_name: external
-        cidr: 128.31.28.0/24
+        cidr: 128.31.24.0/22
+        allocation_pool_start: 128.31.24.129
+        allocation_pool_end: 128.31.27.254
         enable_dhcp: false
 
 - hosts: localhost
@@ -51,7 +53,7 @@
       os_project:
         name: "{{ item }}"
         domain: default
-      loop: "{{ seed_projects }}"
+      with_items: "{{ seed_projects }}"
 
     - name: create users
       os_user:
@@ -61,17 +63,17 @@
         password: "{{ lookup('password', 'credentials/' + item.name + '-password length=20') }}"
         domain: default
         update_password: on_create
-      loop: "{{ seed_users }}"
+      with_items: "{{ seed_users }}"
 
     - name: assign user membership
       os_user_role:
         user: "{{ item.name }}"
         project: "{{ item.project }}"
         role: _member_
-      loop: "{{ seed_users }}"
+      with_items: "{{ seed_users }}"
 
     - name: create credentials files
       template:
         src: ./keystonerc.in
         dest: "credentials/keystonerc-{{ item.name }}"
-      loop: "{{ seed_users }}"
+      with_items: "{{ seed_users }}"

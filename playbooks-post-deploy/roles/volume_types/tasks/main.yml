@@ -1,0 +1,17 @@
+---
+- name: check if volume types exist
+  command: >-
+    openstack volume type show {{ item.name }}
+  loop: "{{ cinder_volume_types }}"
+  failed_when: false
+  changed_when: volume_type_check.rc != 0
+  ignore_errors: true
+  register: volume_type_check
+
+- name: create volume_types
+  command: >-
+    openstack
+    volume type create {{ item.item.name }}
+    --property volume_backend_name={{ item.item.volume_backend_name }}
+  when: item is failed
+  loop: "{{ volume_type_check.results }}"

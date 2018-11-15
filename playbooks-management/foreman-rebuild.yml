@@ -1,0 +1,11 @@
+- hosts: overcloud
+  gather_facts: false
+  become_user: stack
+  become: true
+  tasks:
+    - name: trigger rebuild on overcloud hosts
+      delegate_to: "{{ groups.undercloud.0 }}"
+      command: >-
+        hammer host update --build {{build_state|default("true")}}
+        --name {{item}}
+      with_items: "{{ inventory_hostname }}"

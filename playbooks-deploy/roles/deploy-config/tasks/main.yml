@@ -1,0 +1,30 @@
+---
+- name: hostnamemap.yaml
+  tags: [template, hostnamemap.yaml]
+  template:
+    src: hostnamemap.j2.yaml
+    dest: "../templates/hostnamemap.yaml"
+
+- name: deployedserverportmap.yaml
+  tags: [template, deployedserverportmap.yaml]
+  template:
+    src: deployedserverportmap.j2.yaml
+    dest: "../templates/deployedserverportmap.yaml"
+
+- name: fencing.yaml.in
+  tags: [template, fencing.yaml]
+  template:
+    src: fencing.j2.yaml
+    dest: "../templates/fencing.yaml"
+
+- name: overcloud-env.yaml
+  tags: [template, overcloud-env.yaml]
+  template:
+    src: overcloud-env.j2.sh
+    dest: "../overcloud-env.sh"
+
+- name: generate credentials.yaml
+  tags: [template, credentials.yaml]
+  template:
+    src: credentials.j2.yaml
+    dest: "../templates/credentials.yaml"

@@ -1,0 +1,122 @@
+---
+nova_flavors:
+  - disk: 10
+    name: m1.tiny
+    properties:
+      disk_read_bytes_sec: 12500000
+      disk_read_iops_sec: 1000
+      disk_write_bytes_sec: 3125000
+      disk_write_iops_sec: 250
+      vif_inbound_average: 2500
+      vif_inbound_burst: 3750000
+      vif_inbound_peak: 12500
+      vif_outbound_average: 2500
+      vif_outbound_burst: 3750000
+      vif_outbound_peak: 12500
+    ram: 1024
+    vcpus: 1
+  - disk: 10
+    name: m1.small
+    properties:
+      disk_read_bytes_sec: 25000000
+      disk_read_iops_sec: 2000
+      disk_write_bytes_sec: 6250000
+      disk_write_iops_sec: 500
+      vif_inbound_average: 5000
+      vif_inbound_burst: 7500000
+      vif_inbound_peak: 25000
+      vif_outbound_average: 5000
+      vif_outbound_burst: 7500000
+      vif_outbound_peak: 25000
+    ram: 2048
+    vcpus: 1
+  - disk: 10
+    name: m1.medium
+    properties:
+      disk_read_bytes_sec: 50000000
+      disk_read_iops_sec: 4000
+      disk_write_bytes_sec: 12500000
+      disk_write_iops_sec: 1000
+      vif_inbound_average: 10000
+      vif_inbound_burst: 15000000
+      vif_inbound_peak: 50000
+      vif_outbound_average: 10000
+      vif_outbound_burst: 15000000
+      vif_outbound_peak: 50000
+    ram: 4096
+    vcpus: 2
+  - disk: 10
+    name: m1.large
+    properties:
+      disk_read_bytes_sec: 64000000
+      disk_read_iops_sec: 6000
+      disk_write_bytes_sec: 16000000
+      disk_write_iops_sec: 1500
+      vif_inbound_average: 20000
+      vif_inbound_burst: 30000000
+      vif_inbound_peak: 100000
+      vif_outbound_average: 20000
+      vif_outbound_burst: 30000000
+      vif_outbound_peak: 100000
+    ram: 8192
+    vcpus: 4
+  - disk: 10
+    name: m1.xlarge
+    properties:
+      disk_read_bytes_sec: 128000000
+      disk_read_iops_sec: 8000
+      disk_write_bytes_sec: 32000000
+      disk_write_iops_sec: 2000
+      vif_inbound_average: 40000
+      vif_inbound_burst: 60000000
+      vif_inbound_peak: 200000
+      vif_outbound_average: 40000
+      vif_outbound_burst: 60000000
+      vif_outbound_peak: 200000
+    ram: 16384
+    vcpus: 8
+  - disk: 10
+    name: c1.xlarge
+    properties:
+      disk_read_bytes_sec: 131072000
+      disk_read_iops_sec: 12000
+      disk_write_bytes_sec: 32768000
+      disk_write_iops_sec: 3000
+      vif_inbound_average: 128000
+      vif_inbound_burst: 46080000
+      vif_inbound_peak: 255000
+      vif_outbound_average: 128000
+      vif_outbound_burst: 46080000
+      vif_outbound_peak: 255000
+    ram: 46080
+    vcpus: 10
+  - disk: 10
+    name: c1.2xlarge
+    properties:
+      disk_read_bytes_sec: 262144000
+      disk_read_iops_sec: 16000
+      disk_write_bytes_sec: 65536000
+      disk_write_iops_sec: 4000
+      vif_inbound_average: 256000
+      vif_inbound_burst: 92160000
+      vif_inbound_peak: 510000
+      vif_outbound_average: 256000
+      vif_outbound_burst: 92160000
+      vif_outbound_peak: 512000
+    ram: 92160
+    vcpus: 20
+  - disk: 10
+    name: c1.4xlarge
+    properties:
+      disk_read_bytes_sec: 524288000
+      disk_read_iops_sec: 32000
+      disk_write_bytes_sec: 131072000
+      disk_write_iops_sec: 8000
+      vif_inbound_average: 512000
+      vif_inbound_burst: 184320000
+      vif_inbound_peak: 1020000
+      vif_outbound_average: 512000
+      vif_outbound_burst: 184320000
+      vif_outbound_peak: 1020000
+    ram: 184320
+    vcpus: 40

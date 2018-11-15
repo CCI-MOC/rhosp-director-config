@@ -1,0 +1,28 @@
+---
+- name: install packages
+  tags: [packages]
+  package:
+    name: >-
+      {{ common_packages|default([]) +
+      hostvars[inventory_hostname][item + "_packages"]|default([]) }}
+    state: installed
+  with_items: "{{ group_names }}"
+
+- name: create stack user
+  tags: [stackuser]
+  user:
+    name: stack
+    createhome: true
+    comment: 'Director User'
+    generate_ssh_key: true
+    ssh_key_bits: 4096
+    ssh_key_file: '.ssh/id_rsa'
+
+- name: configure sudo access for stack user
+  tags: [stackuser]
+  copy:
+    src: sudoers
+    dest: /etc/sudoers.d/stack
+    mode: "0640"
+    owner: root
+    group: root
