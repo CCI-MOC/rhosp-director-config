@@ -82,7 +82,7 @@ deploy_args=(
 	# Most of our custom configuration.
 	-e $PWD/templates/deploy.yaml
 	-e $PWD/templates/credentials.yaml
-	-e $PWD/templates/fencing.yaml
+	#-e $PWD/templates/fencing.yaml
 
 	# Static ip assignment
 	-e $PWD/templates/hostnamemap.yaml

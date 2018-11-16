@@ -12,3 +12,5 @@ seed/credentials/
 tempest-deployer-input.conf
 templates/puppet_modules.yaml
 templates/deploy.yaml
+.facts
+*.pyc
