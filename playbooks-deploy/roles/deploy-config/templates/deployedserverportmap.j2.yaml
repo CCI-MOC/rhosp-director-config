@@ -5,12 +5,12 @@ parameter_defaults:
   DeployedServerPortMap:
 {% for group in ['controller', 'network', 'compute'] %}
 {% for host in groups[group]|hostname_sort %}
-{% set masked = hostvars[host]["ansible_" + internalapi_interface].ipv4.network + "/"
-   + hostvars[host]["ansible_" + internalapi_interface].ipv4.netmask %}
+{% set masked = hostvars[host]["ansible_" + ctlplane_interface].ipv4.network + "/"
+   + hostvars[host]["ansible_" + ctlplane_interface].ipv4.netmask %}
 {% set cidr = masked|ipaddr('net') %}
     {{ host.split('.')[0] }}-ctlplane:
       fixed_ips:
-        - ip_address: {{hostvars[host]["ansible_" + internalapi_interface].ipv4.address}}
+        - ip_address: {{hostvars[host]["ansible_" + ctlplane_interface].ipv4.address}}
       subnets:
         - cidr: {{cidr}}
 {% endfor %}
