@@ -3,15 +3,48 @@
   command: >-
     openstack volume type show {{ item.name }}
   loop: "{{ cinder_volume_types }}"
+  loop_control:
+    label: "{{ item.name }}"
   failed_when: false
-  changed_when: volume_type_check.rc != 0
-  ignore_errors: true
   register: volume_type_check
+  changed_when: volume_type_check.rc != 0
 
 - name: create volume_types
   command: >-
     openstack
     volume type create {{ item.item.name }}
     --property volume_backend_name={{ item.item.volume_backend_name }}
-  when: item is failed
+  when: item.rc != 0
   loop: "{{ volume_type_check.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"
+
+- name: check if qos policies exist
+  command: >-
+    openstack volume qos show {{ item.name }}-qos
+  loop: "{{ cinder_volume_types }}"
+  loop_control:
+    label: "{{ item.name }}-qos"
+  failed_when: false
+  register: qos_check
+  changed_when: qos_check.rc != 0
+
+- name: create qos policies
+  command: >-
+    openstack volume qos create
+    {% for k, v in item.item.qos_properties.items() %}
+    --property {{k}}={{v}}
+    {% endfor %}
+    {{ item.item.name }}-qos
+  when: item.rc != 0
+  loop: "{{ qos_check.results }}"
+  loop_control:
+    label: "{{ item.item.name }}-qos"
+
+- name: associate qos policies with volume types
+  command: >-
+    openstack volume qos associate
+    {{ item.name }}-qos {{ item.name }}
+  loop: "{{ cinder_volume_types }}"
+  loop_control:
+    label: "{{ item.name }}-qos"

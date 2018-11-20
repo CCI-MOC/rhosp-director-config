@@ -2,6 +2,16 @@
 cinder_volume_types:
   - name: default
     volume_backend_name: tripleo_ceph
+    qos_properties:
+      read_iops_sec: 10000
+      write_iops_sec: 2500
+      write_bytes_sec: 16000000
+      read_bytes_sec: 64000000
 
   - name: performance
     volume_backend_name: tripleo_ceph_performance2
+    qos_properties:
+      read_iops_sec: 20000
+      write_iops_sec: 5000
+      write_bytes_sec: 32000000
+      read_bytes_sec: 128000000
