@@ -1,0 +1,25 @@
+---
+- name: install containerized-libvirt-guests service
+  copy:
+    src: containerized-libvirt-guests.service
+    dest: /etc/systemd/system/containerized-libvirt-guests.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: reload systemd
+
+- name: install libvirt guests configuration
+  template:
+    src: libvirt-guests.sysconfig
+    dest: /etc/sysconfig/libvirt-guests
+    owner: root
+    group: root
+    mode: "0644"
+
+- meta: flush_handlers
+
+- name: activate containerized-libvirt-guests service
+  service:
+    name: containerized-libvirt-guests
+    state: started
+    enabled: true
