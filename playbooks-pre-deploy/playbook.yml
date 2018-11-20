@@ -32,3 +32,10 @@
     - bug/1642588-openvswitch-start
     - bug/1642591-openvswitch-selinux
     - selinux_relabel
+
+- name: prepare compute hosts
+  hosts: compute
+  tags: [prep, overcloud, compute]
+  become: true
+  roles:
+    - bug/1647828-libvirt-guests

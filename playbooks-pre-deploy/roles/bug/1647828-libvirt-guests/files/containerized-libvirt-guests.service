@@ -1,0 +1,25 @@
+[Unit]           
+Description=Suspend/Resume Running libvirt Guests   
+After=network.target 
+After=time-sync.target
+After=virt-guest-shutdown.target            
+After=docker.service      
+After=paunch-container-shutdown.service     
+After=rhel-push-plugin.service
+Documentation=man:libvirtd(8) 
+Documentation=https://libvirt.org           
+ 
+[Service]        
+EnvironmentFile=-/etc/sysconfig/libvirt-guests
+# Hack just call traditional service until we factor
+# out the code   
+ExecStart=/usr/libexec/libvirt-guests.sh start
+ExecStop=/usr/bin/docker stop nova_compute  
+ExecStop=/usr/libexec/libvirt-guests.sh stop
+Type=oneshot     
+RemainAfterExit=yes       
+StandardOutput=journal+console
+TimeoutStopSec=0 
+ 
+[Install]                 
+WantedBy=multi-user.target
