@@ -1,6 +1,6 @@
 import re
 
-re_hostname = re.compile('(?P<base>[^-]+)-(?P<position>\d+-\d+)-(?P<tail>).*')
+re_hostname = re.compile(r'(?P<base>[^-]+)-(?P<position>\d+-\d+)-(?P<tail>).*')
 
 
 def pos(host):
