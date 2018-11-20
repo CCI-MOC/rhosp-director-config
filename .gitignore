@@ -1,6 +1,11 @@
 templates/credentials.yaml
 templates/overcloud_images.yaml
+templates/fencing.yaml
+templates/deployedserverportmap.yaml
+templates/hostnamemap.yaml
 local_registry_images.yaml
+overcloud-env.sh
+ansible-modules-bitwarden
 
 overcloudrc*
 patches/docker/*/Dockerfile
@@ -14,3 +19,4 @@ templates/puppet_modules.yaml
 templates/deploy.yaml
 .facts
 *.pyc
+*.swp

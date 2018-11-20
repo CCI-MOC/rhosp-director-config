@@ -21,15 +21,17 @@ parameter_defaults:
   # The CloudName is used in public API endpoints.
   CloudName: k.massopen.cloud
   DnsServers:
-    - 172.16.0.3
-    - 172.16.0.8
+  #  - 172.16.0.3
+  #  - 172.16.0.8
+    - 1.1.1.1
+    - 1.0.0.1
 
   # For a normal install these would be ControllerCount and
   # ComputeCount, but since we're using pre-provisioned servers the
   # roles have different names.
   ControllerDeployedServerCount: 3
   NetworkerDeployedServerCount: 2
-  ComputeDeployedServerCount: 15
+  ComputeDeployedServerCount: 2
 
   KeystoneRegion: moc-kzn
 
@@ -61,21 +63,21 @@ parameter_defaults:
   InternalApiAllocationPools:
     - start: 172.16.32.10
       end: 172.16.63.200
-  InternalApiNetworkVlanID: 202
+  InternalApiNetworkVlanID: 257
 
   # The Storage network is used for Cinder, Ceph, and Swift.
   StorageNetCidr: 192.168.0.0/19
   StorageAllocationPools:
     - start: 192.168.0.10
       end: 192.168.3.200
-  StorageNetworkVlanID: 250
+  StorageNetworkVlanID: 252
 
   # The Tenant network is used for tenant-created networks.
   TenantNetCidr: 172.16.64.0/19
   TenantAllocationPools:
     - start: 172.16.64.10
       end: 172.16.95.200
-  TenantNetworkVlanID: 203
+  TenantNetworkVlanID: 259
 
   # The External network is used for public-facing services (like the
   # API endpoints and Horizon).
@@ -91,13 +93,13 @@ parameter_defaults:
 
   FloatingNetworkVlanId: 3802
 
-  ControlPlaneDefaultRoute: 172.16.0.1
-  ControlPlaneNetworkVlanID: 201
+  ControlPlaneDefaultRoute: 10.255.0.5
+  ControlPlaneNetworkVlanID: 500
   ControlPlaneSubnetCidr: 19
 
   # The overcloud nodes access the OpenStack metadata service at the
   # EC2MetadataIp address.
-  EC2MetadataIp: 172.16.0.5
+  EC2MetadataIp: 10.255.5.4
 
   # Setting NeutronExternalNetworkBridge to '' means that floating ips
   # can use any bridge. This maps to the `external_network_bridge`
@@ -159,24 +161,24 @@ parameter_defaults:
     nova::compute::libvirt::libvirt_cpu_mode: host-passthrough
     nova::compute::resume_guests_state_on_host_boot: true
 
-  ExtraConfig:
-    tripleo::firewall::firewall_rules:
-      '002 accept ssh from provisioning network ipv4':
-        dport: 22
-        proto: 'tcp'
-        source: 172.16.0.0/19
-      '002 accept ssh from vpn network ipv4':
-        dport: 22
-        proto: 'tcp'
-        source: 172.31.224.0/19
-      '002 reject all other ssh traffic ipv4':
-        dport: 22
-        proto: 'tcp'
-        action: drop
-      '100 accept snmp ipv4':
-        dport: 161
-        proto: udp
-        source: 172.16.0.0/19
+  #ExtraConfig:
+  #  tripleo::firewall::firewall_rules:
+  #    '002 accept ssh from provisioning network ipv4':
+  #      dport: 22
+  #      proto: 'tcp'
+  #      source: 172.16.0.0/19
+  #    '002 accept ssh from vpn network ipv4':
+  #      dport: 22
+  #      proto: 'tcp'
+  #      source: 172.31.224.0/19
+  #    '002 reject all other ssh traffic ipv4':
+  #      dport: 22
+  #      proto: 'tcp'
+  #      action: drop
+  #    '100 accept snmp ipv4':
+  #      dport: 161
+  #      proto: udp
+  #      source: 172.16.0.0/19
 
   SSLCertificate: |
     -----BEGIN CERTIFICATE-----

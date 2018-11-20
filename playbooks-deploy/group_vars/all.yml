@@ -1,2 +1,3 @@
 ---
-internalapi_interface: p3p1
+internalapi_interface: em2
+ctlplane_interface: ibft0

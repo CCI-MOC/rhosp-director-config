@@ -109,10 +109,10 @@ resources:
               network_config:
                 # p3p1 is the foreman provisioning network.
                 - type: interface
-                  name: p3p1
-                  mtu: 9050
-                  use_dhcp: false
-                  defroute: false
+                  name: ibft0
+                  mtu: 1500
+                  use_dhcp: true
+                  defroute: true
                   addresses:
                     - ip_netmask:
                         list_join:
@@ -132,12 +132,12 @@ resources:
                       next_hop: 172.16.0.1
 
                 - type: interface
-                  name: p3p2
+                  name: em2
                   mtu: 1500
 
                 # Put storage on p3p2
                 - type: vlan
-                  device: p3p2
+                  device: em2
                   mtu: 1500
                   vlan_id:
                     get_param: StorageNetworkVlanID
@@ -149,7 +149,7 @@ resources:
                 # Attach InternalApi, Storage, and
                 # External networks to p3p1
                 - type: vlan
-                  device: p3p1
+                  device: em2
                   mtu: 9050
                   vlan_id:
                     get_param: InternalApiNetworkVlanID
@@ -159,7 +159,7 @@ resources:
                         get_param: InternalApiIpSubnet
 
                 - type: vlan
-                  device: p3p1
+                  device: em2
                   mtu: 1500
                   vlan_id:
                     get_param: ExternalNetworkVlanID
@@ -173,7 +173,7 @@ resources:
                         get_param: ExternalInterfaceDefaultRoute
 
                 - type: vlan
-                  device: p3p1
+                  device: em2
                   mtu: 9050
                   vlan_id:
                     get_param: TenantNetworkVlanID
