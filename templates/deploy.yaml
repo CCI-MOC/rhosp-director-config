@@ -20,6 +20,11 @@ parameter_defaults:
 
   # The CloudName is used in public API endpoints.
   CloudName: k.massopen.cloud
+
+  # This is used to construct overcloud hostnames. It should match
+  # overcloud_domain_name in undercloud.conf.
+  CloudDomain: kzn.moc
+
   DnsServers:
     - 172.16.0.3
     - 172.16.0.8
