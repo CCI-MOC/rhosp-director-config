@@ -1,18 +1,5 @@
-- name: ControllerDeployedServer
+- CountDefault: 1
   HostnameFormatDefault: '%stackname%-controller-%index%'
-  CountDefault: 1
-  disable_constraints: true
-  tags:
-  - controller
-  - primary
-  networks:
-  - External
-  - InternalApi
-  - Storage
-  - StorageMgmt
-  - Tenant
-  default_route_networks:
-  - External
   ServicesDefault:
   - OS::Local::Services::PatchPuppetModules
   - OS::TripleO::Services::Aide
@@ -141,4 +128,17 @@
   - OS::TripleO::Services::Tuned
   - OS::TripleO::Services::Vpp
   - OS::TripleO::Services::Zaqar
+  default_route_networks:
+  - External
+  disable_constraints: true
+  name: ControllerDeployedServer
+  networks:
+  - External
+  - InternalApi
+  - Storage
+  - StorageMgmt
+  - Tenant
+  tags:
+  - controller
+  - primary
 

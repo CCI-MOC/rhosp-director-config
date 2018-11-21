@@ -1,14 +1,5 @@
-- name: ComputeDeployedServer
+- CountDefault: 1
   HostnameFormatDefault: '%stackname%-compute-%index%'
-  CountDefault: 1
-  disable_constraints: true
-  disable_upgrade_deployment: true
-  tags: []
-  networks:
-  - InternalApi
-  - Storage
-  - Tenant
-  default_route_networks: []
   ServicesDefault:
   - OS::Local::Services::PatchPuppetModules
   - OS::TripleO::Services::Aide
@@ -54,4 +45,13 @@
   - OS::TripleO::Services::TripleoPackages
   - OS::TripleO::Services::Tuned
   - OS::TripleO::Services::Vpp
+  default_route_networks: []
+  disable_constraints: true
+  disable_upgrade_deployment: true
+  name: ComputeDeployedServer
+  networks:
+  - InternalApi
+  - Storage
+  - Tenant
+  tags: []
 

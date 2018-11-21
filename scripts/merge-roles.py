@@ -110,7 +110,7 @@ def main():
         extraconfig.append(kv)
 
     new_networks = sorted(uniqify(networks, exclude=args.remove_network))
-    new_services = sorted(uniqify(services, exclude=args.remove_network))
+    new_services = sorted(uniqify(services, exclude=args.remove_service))
 
     new_role = [
         UnsortableOrderedDict(
