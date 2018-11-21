@@ -2,7 +2,7 @@
 # lost.
 ---
 parameter_defaults:
-  EnableFencing: true
+  EnableFencing: {{ enable_fencing }}
   FencingConfig:
     devices:
 {% for host in groups.controller %}
@@ -11,10 +11,8 @@ parameter_defaults:
       params:
         ipaddr: {{ hostvars[host].ipmi_host }}
         lanplus: true
-        login: >-
-          {{ lookup('bitwarden', 'idrac@kaizen', field='username') }}
-        passwd: >-
-          {{ lookup('bitwarden', 'idrac@kaizen') }}
+        login: {{ idrac_login }}
+        passwd: {{ idrac_password }}
         pcmk_host_list: {{ host.split('.').0 }}
         privlvl: administrator
 {% endfor %}

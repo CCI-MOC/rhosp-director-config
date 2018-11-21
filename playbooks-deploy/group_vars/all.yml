@@ -1,3 +1,14 @@
 ---
-internalapi_interface: em2
-ctlplane_interface: ibft0
+internalapi_interface: p3p1
+ctlplane_interface: p3p1
+enable_fencing: true
+idrac_login: {{ lookup('bitwarden', 'idrac@kaizen', field='username') }} 
+idrac_password: {{ lookup('bitwarden', 'idrac@kaizen') }}
+ceph_client_username: ostack2
+ceph_client_key: {{ lookup('bitwarden', 'ceph://ostack2@kaizen2') }}
+ceph_custer_fsid: {{ lookup('bitwarden', 'ceph://ostack2@kaizen2', field='CephClusterFSID', custom_field=true) }}
+ceph_external_mon_host: {{ lookup('bitwarden', 'ceph://ostack2@kaizen2', field='CephExternalMonHost', custom_field=true) }}
+admin_password: {{ lookup('bitwarden', 'keystone://admin@kaizen2') }}
+swift_password: {{ lookup('bitwarden', 'keystone://ceph@kaizen2') }}
+keystone_oidc_client_secret: {{ lookup('bitwarden', 'openidc://keystone@kaizen2') }}
+ssl_key: {{ (lookup('bitwarden', 'sslkey://kaizen.massopen.cloud', field='item')|from_json).notes|indent }
