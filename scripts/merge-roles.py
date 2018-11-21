@@ -53,6 +53,9 @@ def parse_args():
     p.add_argument('--service', '-s',
                    action='append',
                    default=[])
+    p.add_argument('--remove-service', '-r',
+                   action='append',
+                   default=[])
 
     p.add_argument('--extra', '-x',
                    type=kvarg,
@@ -106,16 +109,18 @@ def main():
     for kv in args.extra:
         extraconfig.append(kv)
 
+    new_networks = sorted(uniqify(networks, exclude=args.remove_network))
+    new_services = sorted(uniqify(services, exclude=args.remove_network))
+
     new_role = [
-        UnsortableOrderedDict((
-            ('name', args.name),
-        ) + tuple(extraconfig) + (
-            ('tags', sorted(uniqify(tags))),
-            ('networks', sorted(uniqify(networks, exclude=args.remove_network))),
-            ('default_route_networks',
-             sorted(uniqify(default_route_networks))),
-            ('ServicesDefault', sorted(uniqify(services))),
-        ))
+        UnsortableOrderedDict(
+            (('name', args.name),) + tuple(extraconfig) + (
+                ('tags', sorted(uniqify(tags))),
+                ('networks', new_networks),
+                ('default_route_networks',
+                 sorted(uniqify(default_route_networks))),
+                ('ServicesDefault', new_services),
+            ))
     ]
 
     with (open(args.output, 'w') if args.output else sys.stdout) as fd:
