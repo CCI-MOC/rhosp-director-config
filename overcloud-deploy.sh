@@ -59,6 +59,9 @@ deploy_args=(
 	# Enable Sahara
 	-e $TEMPLATES/environments/services/sahara.yaml
 
+	# Enable EC2 API
+	-e $TEMPLATES/environments/services/ec2-api.yaml
+
 	# Enable OpenIDC federation
 	-e $TEMPLATES/environments/enable-federation-openidc.yaml
 
