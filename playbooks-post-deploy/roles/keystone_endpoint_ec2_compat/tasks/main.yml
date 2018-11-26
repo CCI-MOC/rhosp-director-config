@@ -1,0 +1,26 @@
+---
+- name: get service catalog
+  os_auth:
+
+- name: extract ec2api public url and region
+  set_fact:
+    ec2api_public_url: >-
+      {{ ((service_catalog|selectattr('name', 'eq', 'ec2api')|list)
+      .0.endpoints|selectattr('interface', 'eq', 'public')|list).0.url }}
+    ec2api_public_region: >-
+      {{ ((service_catalog|selectattr('name', 'eq', 'ec2api')|list)
+      .0.endpoints|selectattr('interface', 'eq', 'public')|list).0.region }}
+
+- name: create ec2-compat service
+  os_keystone_service:
+    state: present
+    name: ec2-compat
+    service_type: ec2
+
+- name: create public endpoint for ec2-compat service
+  os_keystone_endpoint:
+    state: present
+    endpoint_interface: public
+    service: ec2-compat
+    region: "{{ ec2api_public_region }}"
+    url: "{{ ec2api_public_url }}"

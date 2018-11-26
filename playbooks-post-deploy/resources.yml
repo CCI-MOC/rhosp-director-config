@@ -25,3 +25,8 @@
       tags: [identity]
       import_role:
         name: keystone_federation
+
+    - name: create ec2 compat endpoint
+      tags: [ec2]
+      import_role:
+        name: keystone_endpoint_ec2_compat
