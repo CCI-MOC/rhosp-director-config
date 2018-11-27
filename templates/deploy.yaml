@@ -140,6 +140,14 @@ parameter_defaults:
   NetworkerDeployedServerExtraConfig:
     neutron::agents::ml2::ovs::of_interface: ovs-ofctl
 
+  # Enable Sahara "vanilla" plugin
+  SaharaPlugins:
+    - vanilla
+    - ambari
+    - cdh
+    - mapr
+
+  # Additional Hiera configuration to be placed on the controllers.
   ControllerDeployedServerExtraConfig:
     swift::keystone::auth::auth_name: ceph
     tripleo::haproxy::ssl_cipher_suite:
