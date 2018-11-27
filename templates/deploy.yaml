@@ -141,6 +141,13 @@ parameter_defaults:
   # (https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/13/html/manage_secrets_with_openstack_key_manager/installing_barbican)
   BarbicanSimpleCryptoGlobalDefault: true
 
+  # Enable Sahara "vanilla" plugin
+  SaharaPlugins:
+    - vanilla
+    - ambari
+    - cdh
+    - mapr
+
   # Additional Hiera configuration to be placed on the controllers.
   ControllerDeployedServerExtraConfig:
     swift::keystone::auth::auth_name: ceph
