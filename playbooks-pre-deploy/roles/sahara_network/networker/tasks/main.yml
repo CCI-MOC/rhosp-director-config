@@ -1,0 +1,21 @@
+---
+- name: set sahara interface name
+  set_fact:
+    sahara_net_interface: "{{ sahara_net_physdev }}.{{ sahara_net_vlan_id }}"
+
+- name: configure sahara network interface
+  template:
+    src: ifcfg.j2
+    dest: "/etc/sysconfig/network-scripts/ifcfg-{{ sahara_net_interface }}"
+
+- name: configure sahara network bridge
+  template:
+    src: ifcfg-ovs.j2
+    dest: "/etc/sysconfig/network-scripts/ifcfg-{{ sahara_ovs_bridge }}"
+
+- name: bring up interfaces
+  tags: [ifcfg, ifup]
+  command: "ifup {{ item }}"
+  with_items:
+    - "{{ sahara_ovs_bridge }}"
+    - "{{ sahara_net_interface }}"
