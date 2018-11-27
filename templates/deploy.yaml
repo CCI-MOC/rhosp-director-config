@@ -53,6 +53,14 @@ parameter_defaults:
   NeutronOVSFirewallDriver: openvswitch
   NeutronGlobalPhysnetMtu: 9050
 
+  # Setting NeutronExternalNetworkBridge to '' means that floating ips
+  # can use any bridge. This maps to the `external_network_bridge`
+  # Neutron configuration option.
+  NeutronExternalNetworkBridge: "''"
+
+  NeutronBridgeMappings: "datacentre:br-ex,sahara:br-sahara"
+  NeutronFlatNetworks: "datacenre,sahara"
+
   # Allow network configuration changes via stack update
   NetworkDeploymentActions:
     - CREATE
@@ -103,11 +111,6 @@ parameter_defaults:
   # The overcloud nodes access the OpenStack metadata service at the
   # EC2MetadataIp address.
   EC2MetadataIp: 172.16.0.5
-
-  # Setting NeutronExternalNetworkBridge to '' means that floating ips
-  # can use any bridge. This maps to the `external_network_bridge`
-  # Neutron configuration option.
-  NeutronExternalNetworkBridge: "''"
 
   ServiceNetMap:
     # In the stock configuration, CephCluster and SwiftMgmt traffic goes
