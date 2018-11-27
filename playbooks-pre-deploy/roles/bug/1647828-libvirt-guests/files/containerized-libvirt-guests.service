@@ -1,5 +1,6 @@
 [Unit]           
 Description=Suspend/Resume Running libvirt Guests   
+Requires=virt-guest-shutdown.target
 After=network.target 
 After=time-sync.target
 After=virt-guest-shutdown.target            

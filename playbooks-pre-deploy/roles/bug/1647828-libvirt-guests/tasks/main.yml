@@ -1,12 +1,15 @@
 ---
-- name: install containerized-libvirt-guests service
+- name: install virt guest shutdown units
   copy:
-    src: containerized-libvirt-guests.service
-    dest: /etc/systemd/system/containerized-libvirt-guests.service
+    src: "{{ item }}"
+    dest: /etc/systemd/system/
     owner: root
     group: root
     mode: "0644"
   notify: reload systemd
+  with_items:
+    - containerized-libvirt-guests.service
+    - virt-guest-shutdown.target
 
 - name: install libvirt guests configuration
   template:
@@ -18,8 +21,11 @@
 
 - meta: flush_handlers
 
-- name: activate containerized-libvirt-guests service
+- name: activate virt guest shutdown units
   service:
-    name: containerized-libvirt-guests
+    name: "{{ item }}"
     state: started
     enabled: true
+  with_items:
+    - containerized-libvirt-guests.service
+    - virt-guest-shutdown.target
