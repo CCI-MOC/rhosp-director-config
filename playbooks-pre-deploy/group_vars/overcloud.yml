@@ -7,3 +7,8 @@ controller_packages:
 
 compute_packages:
   - libvirt-client
+
+sahara_net_vlan_id: 207
+sahara_net_physdev: p3p1
+sahara_net_cidr: "10.251.0.0/16"
+sahara_ovs_bridge: br-sahara

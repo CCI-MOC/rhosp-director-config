@@ -1,0 +1,13 @@
+---
+- name: set sahara interface name
+  set_fact:
+    sahara_net_interface: "vlan{{ sahara_net_vlan_id }}"
+
+- name: configure sahara network interface
+  template:
+    src: ifcfg.j2
+    dest: "/etc/sysconfig/network-scripts/ifcfg-{{ sahara_net_interface }}"
+
+- name: bring up interface
+  tags: [ifcfg]
+  command: "ifup {{ sahara_net_interface }}"

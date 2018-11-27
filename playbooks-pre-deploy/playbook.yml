@@ -1,14 +1,12 @@
 ---
 - name: prepare all hosts
   hosts: undercloud:overcloud
-  tags: [prep, undercloud, overcloud]
   become: true
   roles:
     - all-prep
 
 - name: prepare undercloud
   hosts: undercloud
-  tags: [prep, undercloud]
   become: true
   roles:
     - undercloud-prep
@@ -16,7 +14,6 @@
 
 - name: prepare stack user on undercloud
   hosts: undercloud
-  tags: [prep, undercloud]
   become: true
   become_user: stack
   roles:
@@ -25,7 +22,7 @@
 
 - name: prepare overcloud
   hosts: overcloud
-  tags: [prep, overcloud]
+  tags: [bugs, openvswitch]
   become: true
   roles:
     - overcloud-prep
@@ -35,7 +32,21 @@
 
 - name: prepare compute hosts
   hosts: compute
-  tags: [prep, overcloud, compute]
+  tags: [bugs, libvirt]
   become: true
   roles:
     - bug/1647828-libvirt-guests
+
+- name: prepare sahara network on controllers
+  hosts: controller
+  tags: [sahara]
+  become: true
+  roles:
+    - sahara_network/controller
+
+- name: prepare sahara network on networkers
+  hosts: network
+  tags: [sahara]
+  become: true
+  roles:
+    - sahara_network/networker
