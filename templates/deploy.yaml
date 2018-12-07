@@ -141,7 +141,10 @@ parameter_defaults:
   # (https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/13/html/manage_secrets_with_openstack_key_manager/installing_barbican)
   BarbicanSimpleCryptoGlobalDefault: true
 
-  # Additional Hiera configuration to be placed on the controllers.
+  # work around https://bugzilla.redhat.com/show_bug.cgi?id=1654840
+  NetworkerDeployedServerExtraConfig:
+    neutron::agents::ml2::ovs::of_interface: ovs-ofctl
+
   ControllerDeployedServerExtraConfig:
     swift::keystone::auth::auth_name: ceph
     tripleo::haproxy::ssl_cipher_suite:
