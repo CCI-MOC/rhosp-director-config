@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+python-openstackclient = '*'
+python-octaviaclient = '*'
+openstacksdk = {git = "https://github.com/openstack/python-openstacksdk"}
+ansible = {git = "https://github.com/ansible/ansible"}
+python-saharaclient = "*"
+
+[dev-packages]
+pytest = "*"
+testinfra = "*"
+
+[requires]
+python_version = "3.6"
