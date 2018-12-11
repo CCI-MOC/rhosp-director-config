@@ -7,7 +7,7 @@ parameter_defaults:
     devices:
 {% for host in groups.controller %}
     - agent: fence_ipmilan
-      host_mac: {{ hostvars[host]["ansible_" + ctlplane_interface].macaddress }}
+      host_mac: {{ hostvars[host]["ansible_" + hostvars[host].ctlplane_interface].macaddress }}
       params:
         ipaddr: {{ hostvars[host].ipmi_host }}
         lanplus: true
