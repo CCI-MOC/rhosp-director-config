@@ -1,18 +1,16 @@
 import re
 
-re_hostname = re.compile(r'(?P<base>[^-]+)-(?P<position>\d+-\d+)-(?P<tail>).*')
+re_hostname = re.compile(r'overcloud-(?P<hosttype>[^-]+)-(?P<position>\d+)')
 
 
-def pos(host):
-    mo = re_hostname.match(host)
-    if not mo:
-        raise ValueError('invalid hostname: {}'.format(host))
-
-    return tuple(int(x) for x in mo.group('position').split('-'))
+def pos(host, hostvars):
+    ooo_name = hostvars[host]['ooo_name']
+    ooo_seq = int(ooo_name.split('-')[-1])
+    return ooo_seq
 
 
-def filter_hostname_sort(v):
-    return sorted(v, key=pos)
+def filter_hostname_sort(v, hostvars=None):
+    return sorted(v, key=lambda host: pos(host, hostvars))
 
 
 class FilterModule(object):

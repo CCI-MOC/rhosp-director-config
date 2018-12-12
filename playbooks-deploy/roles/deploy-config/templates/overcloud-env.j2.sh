@@ -4,17 +4,17 @@
 # lost.
 
 export ControllerDeployedServer_hosts="
-{% for host in groups.controller %}
+{% for host in groups.controller|hostname_sort(hostvars) %}
 {{host}}
 {% endfor %}
 "
 export ComputeDeployedServer_hosts="
-{% for host in groups.compute %}
+{% for host in groups.compute|hostname_sort(hostvars) %}
 {{host}}
 {% endfor %}
 "
 export NetworkerDeployedServer_hosts="
-{% for host in groups.network %}
+{% for host in groups.network|hostname_sort(hostvars) %}
 {{host}}
 {% endfor %}
 "
