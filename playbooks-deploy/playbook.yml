@@ -2,6 +2,7 @@
 - name: gather facts from overcloud hosts
   hosts: overcloud
   gather_facts: false
+  any_errors_fatal: true
   tasks:
     - name: gather facts from overcloud hosts
       tags: [always]
