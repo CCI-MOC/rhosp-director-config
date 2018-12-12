@@ -61,6 +61,10 @@ parameter_defaults:
   NeutronBridgeMappings: "datacentre:br-ex,sahara:br-sahara"
   NeutronFlatNetworks: "datacenre,sahara"
 
+  # Do not allow network configuration changes via stack update
+  NetworkDeploymentActions:
+    - CREATE
+
   # The InternalApi network is used for OpenStack REST API traffic
   # between the controllers and compute nodes, as well as for AMQ
   # traffic, database access, and most other traffic internal to the
