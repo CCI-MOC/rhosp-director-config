@@ -1,7 +1,8 @@
 ---
-- name: set sahara interface name
+- name: set sahara interface facts
   set_fact:
     sahara_net_interface: "vlan{{ sahara_net_vlan_id }}"
+    sahara_net_address: "{{ sahara_net_cidr|nthhost(10 + groups.controller.index(inventory_hostname)) }}"
 
 - name: configure sahara network interface
   template:
