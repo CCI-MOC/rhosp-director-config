@@ -110,7 +110,7 @@ resources:
                 # p3p1 is the foreman provisioning network.
                 - type: interface
                   name: p3p1
-                  mtu: 9050
+                  mtu: 1500
                   use_dhcp: false
                   defroute: false
                   addresses:
@@ -131,13 +131,9 @@ resources:
                     - ip_netmask: 172.31.224.0/19
                       next_hop: 172.16.0.1
 
-                - type: interface
-                  name: p3p2
-                  mtu: 1500
-
-                # Put storage on p3p2
+                # Put Ceph traffic on p3p1
                 - type: vlan
-                  device: p3p2
+                  device: p3p1
                   mtu: 1500
                   vlan_id:
                     get_param: StorageNetworkVlanID
@@ -146,18 +142,8 @@ resources:
                     - ip_netmask:
                         get_param: StorageIpSubnet
 
-                # Attach InternalApi, Storage, and
-                # External networks to p3p1
-                - type: vlan
-                  device: p3p1
-                  mtu: 9050
-                  vlan_id:
-                    get_param: InternalApiNetworkVlanID
-                  use_dhcp: false
-                  addresses:
-                    - ip_netmask:
-                        get_param: InternalApiIpSubnet
-
+                # External traffic doesn't really benefit from jumbo
+                # frames, so put it on p3p1 also.
                 - type: vlan
                   device: p3p1
                   mtu: 1500
@@ -172,8 +158,23 @@ resources:
                       next_hop:
                         get_param: ExternalInterfaceDefaultRoute
 
+                # Put everything else on p3p2
+                - type: interface
+                  name: p3p2
+                  mtu: 9050
+
                 - type: vlan
-                  device: p3p1
+                  device: p3p2
+                  mtu: 9050
+                  vlan_id:
+                    get_param: InternalApiNetworkVlanID
+                  use_dhcp: false
+                  addresses:
+                    - ip_netmask:
+                        get_param: InternalApiIpSubnet
+
+                - type: vlan
+                  device: p3p2
                   mtu: 9050
                   vlan_id:
                     get_param: TenantNetworkVlanID
