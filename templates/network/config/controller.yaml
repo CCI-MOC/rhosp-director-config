@@ -107,9 +107,9 @@ resources:
             # script mentioned in the preceding get_file directive.
             $network_config:
               network_config:
-                # p3p1 is the foreman provisioning network.
+                # nic1 is the foreman provisioning network.
                 - type: interface
-                  name: p3p1
+                  name: nic1
                   mtu: 1500
                   use_dhcp: false
                   defroute: false
@@ -131,9 +131,9 @@ resources:
                     - ip_netmask: 172.31.224.0/19
                       next_hop: 172.16.0.1
 
-                # Put Ceph traffic on p3p1
+                # Put Ceph traffic on nic1
                 - type: vlan
-                  device: p3p1
+                  device: nic1
                   mtu: 1500
                   vlan_id:
                     get_param: StorageNetworkVlanID
@@ -143,9 +143,9 @@ resources:
                         get_param: StorageIpSubnet
 
                 # External traffic doesn't really benefit from jumbo
-                # frames, so put it on p3p1 also.
+                # frames, so put it on nic1 also.
                 - type: vlan
-                  device: p3p1
+                  device: nic1
                   mtu: 1500
                   vlan_id:
                     get_param: ExternalNetworkVlanID
@@ -158,13 +158,13 @@ resources:
                       next_hop:
                         get_param: ExternalInterfaceDefaultRoute
 
-                # Put everything else on p3p2
+                # Put everything else on nic2
                 - type: interface
-                  name: p3p2
+                  name: nic2
                   mtu: 9050
 
                 - type: vlan
-                  device: p3p2
+                  device: nic2
                   mtu: 9050
                   vlan_id:
                     get_param: InternalApiNetworkVlanID
@@ -174,7 +174,7 @@ resources:
                         get_param: InternalApiIpSubnet
 
                 - type: vlan
-                  device: p3p2
+                  device: nic2
                   mtu: 9050
                   vlan_id:
                     get_param: TenantNetworkVlanID

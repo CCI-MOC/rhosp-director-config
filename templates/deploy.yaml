@@ -107,6 +107,19 @@ parameter_defaults:
   ControlPlaneNetworkVlanID: 201
   ControlPlaneSubnetCidr: 19
 
+  NetConfigDataLookup:
+    nodegroup1:
+      dmiString: "system-product-name"
+      id: "PowerEdge R620"
+      nic1: p3p1
+      nic2: p3p2
+
+    nodegroup2:
+      dmiString: "system-product-name"
+      id: "PowerEdge R730"
+      nic1: p6p1
+      nic2: p6p2
+
   # The overcloud nodes access the OpenStack metadata service at the
   # EC2MetadataIp address.
   EC2MetadataIp: 172.16.0.5
@@ -138,6 +151,23 @@ parameter_defaults:
     allow_owners_to_reset:
       key: 'os_compute_api:os-admin-actions:reset_state'
       value: 'rule:admin_or_owner'
+
+  # Configuration for GPU passthrough
+  NovaPCIPassthrough:
+    - vendor_id: 10de
+      product_id: 15f7
+
+  NovaSchedulerDefaultFilters:
+    - RetryFilter
+    - AvailabilityZoneFilter
+    - RamFilter
+    - DiskFilter
+    - ComputeFilter
+    - ComputeCapabilitiesFilter
+    - ImagePropertiesFilter
+    - ServerGroupAntiAffinityFilter
+    - ServerGroupAffinityFilter
+    - PciPassthroughFilter
 
   # Enable simple crypto backend as global default.
   # (https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/13/html/manage_secrets_with_openstack_key_manager/installing_barbican)
@@ -172,6 +202,12 @@ parameter_defaults:
       tune.ssl.default-dh-param: 2048
       ssl-default-bind-options: no-sslv3 no-tlsv10
       ssl-default-server-options: no-sslv3 no-tlsv10
+
+    nova::api::pci_alias:
+      - vendor_id: "10de"
+        product_id: "15f7"
+        device_type: "type-PCI"
+        name: "tesla-p100"
 
   ComputeDeployedServerExtraConfig:
     nova::compute::libvirt::libvirt_cpu_mode: host-passthrough

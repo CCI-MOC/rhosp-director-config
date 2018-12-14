@@ -107,9 +107,9 @@ resources:
             # script mentioned in the preceding get_file directive.
             $network_config:
               network_config:
-                # p3p1 is the foreman provisioning network
+                # nic1 is the foreman provisioning network
                 - type: interface
-                  name: p3p1
+                  name: nic1
                   mtu: 1500
                   use_dhcp: false
                   addresses:
@@ -126,7 +126,7 @@ resources:
                         get_param: ControlPlaneDefaultRoute
                     # This sets up a static route to the OpenStack
                     # metadata service.  This will be placed into
-                    # /etc/sysconfig/network-scripts/routes-p3p1 by
+                    # /etc/sysconfig/network-scripts/routes-nic1 by
                     # os-net-config.
                     - ip_netmask: 169.254.169.254/32
                       next_hop: {get_param: EC2MetadataIp}
@@ -134,10 +134,10 @@ resources:
                     - ip_netmask: 172.31.224.0/19
                       next_hop: 172.16.0.1
 
-                # Put Ceph traffic on p3p1
+                # Put Ceph traffic on nic1
                 - type: vlan
                   mtu: 1500
-                  device: p3p1
+                  device: nic1
                   vlan_id:
                     get_param: StorageNetworkVlanID
                   use_dhcp: false
@@ -145,13 +145,13 @@ resources:
                     - ip_netmask:
                         get_param: StorageIpSubnet
 
-                # Everything else goes on p3p2
+                # Everything else goes on nic2
                 - type: interface
-                  name: p3p2
+                  name: nic2
                   mtu: 9050
 
                 - type: vlan
-                  device: p3p2
+                  device: nic2
                   mtu: 9050
                   vlan_id:
                     get_param: InternalApiNetworkVlanID
@@ -161,7 +161,7 @@ resources:
                         get_param: InternalApiIpSubnet
 
                 - type: vlan
-                  device: p3p2
+                  device: nic2
                   mtu: 9050
                   vlan_id:
                     get_param: TenantNetworkVlanID
