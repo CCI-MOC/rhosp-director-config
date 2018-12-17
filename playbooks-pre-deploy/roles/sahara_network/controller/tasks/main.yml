@@ -8,7 +8,11 @@
   template:
     src: ifcfg.j2
     dest: "/etc/sysconfig/network-scripts/ifcfg-{{ sahara_net_interface }}"
+  register: iface
+
+- name: bring down interface
+  command: "ifdown {{ sahara_net_interface }}"
+  when: iface is changed
 
 - name: bring up interface
-  tags: [ifcfg]
   command: "ifup {{ sahara_net_interface }}"
