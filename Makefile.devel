@@ -57,6 +57,7 @@ roles/NetworkerDeployedServer.yaml: $(NETWORKER_SRC_ROLES)
 		-s OS::Local::Services::PatchPuppetModules \
 		-s OS::TripleO::Services::Securetty \
 		-s OS::TripleO::Services::Sshd \
+		-s OS::TripleO::Services::NeutronCorePlugin \
 		-x disable_constraints=true \
 		-x HostnameFormatDefault='%stackname%-networker-%index%' \
 		NetworkerDeployedServer \
