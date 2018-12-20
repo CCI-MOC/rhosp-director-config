@@ -59,7 +59,7 @@ parameter_defaults:
   NeutronExternalNetworkBridge: "''"
 
   NeutronBridgeMappings: "datacentre:br-ex,sahara:br-sahara"
-  NeutronFlatNetworks: "datacenre,sahara"
+  NeutronFlatNetworks: "datacentre,sahara"
 
   # Do not allow network configuration changes via stack update
   NetworkDeploymentActions:
