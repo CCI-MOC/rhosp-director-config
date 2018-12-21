@@ -28,3 +28,9 @@
   template:
     src: credentials.j2.yaml
     dest: "../templates/credentials.yaml"
+
+- name: generate rolecount.yaml
+  tags: [template, rolecount.yaml]
+  template:
+    src: rolecount.j2.yaml
+    dest: "../templates/rolecount.yaml"

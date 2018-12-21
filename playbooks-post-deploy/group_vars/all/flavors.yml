@@ -120,3 +120,19 @@ nova_flavors:
       quota:vif_outbound_peak: 1020000
     ram: 184320
     vcpus: 40
+  - name: gpu.P100
+    disk: 10
+    properties:
+      pci_passthrough:alias: "tesla-p100:1"
+      quota:disk_read_bytes_sec: 262144000
+      quota:disk_read_iops_sec: 16000
+      quota:disk_write_bytes_sec: 65536000
+      quota:disk_write_iops_sec: 4000
+      quota:vif_inbound_average: 256000
+      quota:vif_inbound_burst: 92160000
+      quota:vif_inbound_peak: 510000
+      quota:vif_outbound_average: 256000
+      quota:vif_outbound_burst: 92160000
+      quota:vif_outbound_peak: 512000
+    ram: 122880
+    vcpus: 56
