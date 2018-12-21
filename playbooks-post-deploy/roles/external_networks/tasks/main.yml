@@ -17,5 +17,5 @@
     allocation_pool_start: "{{ item.1.allocation_pool_start }}"
     allocation_pool_end: "{{ item.1.allocation_pool_end }}"
     enable_dhcp: false
-    gateway_ip: "{{ item.1.gateway }}"
+    gateway_ip: "{{ item.1.gateway|default(omit) }}"
   loop: "{{ external_networks|subelements('subnets') }}"

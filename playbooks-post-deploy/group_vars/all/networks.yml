@@ -9,3 +9,11 @@ external_networks:
         allocation_pool_start: 128.31.27.0
         allocation_pool_end: 128.31.27.254
         gateway: 128.31.24.1
+  - name: sahara-access
+    physical_network: sahara
+    network_type: flat
+    subnets:
+      - name: sahara-subnet-0
+        cidr: 10.251.0.0/16
+        allocation_pool_start: 10.251.0.20
+        allocation_pool_end: 10.251.255.254
