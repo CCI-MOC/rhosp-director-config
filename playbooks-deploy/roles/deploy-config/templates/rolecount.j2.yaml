@@ -1,0 +1,8 @@
+parameter_defaults:
+
+  # For a normal install these would be ControllerCount and
+  # ComputeCount, but since we're using pre-provisioned servers the
+  # roles have different names.
+  ControllerDeployedServerCount: {{ groups.controller|length }}
+  NetworkerDeployedServerCount: {{ groups.network|length }}
+  ComputeDeployedServerCount: {{ groups.compute|length }}
