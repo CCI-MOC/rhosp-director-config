@@ -9,6 +9,7 @@ openstack overcloud container image prepare \
   --output-images-file $PWD/local_registry_images.yaml
 
 openstack overcloud container image upload \
+  --update-existing \
   --config-file  $PWD/local_registry_images.yaml \
   --verbose
 
