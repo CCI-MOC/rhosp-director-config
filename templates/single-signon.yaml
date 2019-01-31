@@ -6,7 +6,7 @@ parameter_defaults:
   KeystoneOpenIdcIdpName: moc
   KeystoneOpenIdcProviderMetadataUrl:
       https://sso.massopen.cloud/auth/realms/moc/.well-known/openid-configuration
-  KeystoneOpenIdcClientId: kaizen-openstack
+  KeystoneOpenIdcClientId: kaizen
 
   KeystoneIdentityProviders:
     moc:
