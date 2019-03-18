@@ -8,4 +8,5 @@
     vcpus: "{{ item.vcpus }}"
     disk: "{{ item.disk }}"
     extra_specs: "{{ item.properties }}"
+  when: only_flavor is not defined or item.name == only_flavor
   loop: "{{ nova_flavors }}"
