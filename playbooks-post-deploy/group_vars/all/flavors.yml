@@ -134,5 +134,5 @@ nova_flavors:
       quota:vif_outbound_average: 256000
       quota:vif_outbound_burst: 92160000
       quota:vif_outbound_peak: 512000
-    ram: 122880
+    ram: 112640
     vcpus: 54
