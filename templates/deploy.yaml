@@ -228,9 +228,7 @@ parameter_defaults:
         dport: 22
         proto: 'tcp'
         action: drop
-      '100 accept snmp ipv4':
-        dport: 161
-        proto: udp
+      '100 allow all from admin network':
         source: 172.16.0.0/19
 
   SSLCertificate: |
