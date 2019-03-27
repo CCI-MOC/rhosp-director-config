@@ -1,0 +1,9 @@
+---
+- hosts: overcloud
+  gather_facts: false
+  tasks:
+    - name: delete foreman host
+      delegate_to: "{{ groups.undercloud[0] }}"
+      command: >-
+        hammer host delete
+        --name {{ inventory_hostname }}
