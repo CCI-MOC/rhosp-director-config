@@ -49,14 +49,14 @@ all:
               ipmi_host: 10.0.15.4
               ooo_name: overcloud-compute-0
               interfaces:
-                - 00:0f:53:28:61:81
                 - 00:0f:53:28:61:80
+                - 00:0f:53:28:61:81
             neu-3-1.kzn.moc:
               ipmi_host: 10.0.3.1
               ooo_name: overcloud-compute-1
               interfaces:
-                - 00:0f:53:22:2d:89
                 - 00:0f:53:22:2d:88
+                - 00:0f:53:22:2d:89
     overcloud-ipmi:
       vars:
         ansible_user: "{{ ipmi_user }}"
