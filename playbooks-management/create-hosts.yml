@@ -1,0 +1,16 @@
+---
+- hosts: overcloud
+  gather_facts: false
+  tasks:
+    - name: create foreman host
+      delegate_to: "{{ groups.undercloud[0] }}"
+      command: >-
+        hammer host create
+        --architecture x86_64
+        --environment {{ foreman_environment }}
+        --domain {{ foreman_domain }}
+        --hostgroup {{ foreman_hostgroup }}
+        --mac "{{ interfaces[0] }}"
+        --operatingsystem-id {{ foreman_os_id }}
+        --subnet {{ foreman_subnet }}
+        --name {{ inventory_hostname }}
