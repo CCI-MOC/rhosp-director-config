@@ -1,0 +1,8 @@
+---
+sysinfo_dir: ./sysinfo
+
+foreman_environment: KZNStack
+foreman_domain: kzn.moc
+foreman_hostgroup: KZN-OSP-Director-Staging
+foreman_os_id: 3
+foreman_subnet: Provision-staging

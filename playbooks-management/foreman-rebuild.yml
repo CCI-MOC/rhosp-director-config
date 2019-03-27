@@ -6,6 +6,6 @@
     - name: trigger rebuild on overcloud hosts
       delegate_to: "{{ groups.undercloud.0 }}"
       command: >-
-        hammer host update --build {{build_state|default("true")}}
-        --name {{item}}
-      with_items: "{{ inventory_hostname }}"
+        hammer host update
+        --build {{ build_state|default("true") }}
+        --name {{ inventory_hostname }}

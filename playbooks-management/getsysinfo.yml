@@ -1,4 +1,14 @@
 ---
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: create sysinfo directory
+      run_once: true
+      delegate_to: localhost
+      file:
+        path: "{{ sysinfo_dir }}"
+        state: directory
+
 - hosts: overcloud
   gather_facts: false
   roles:
@@ -8,15 +18,8 @@
       delegate_to: "{{ ipmi_host }}"
       register: sysinfo
 
-    - name: create sysinfo directory
-      run_once: true
-      delegate_to: localhost
-      file:
-        path: ./sysinfo
-        state: directory
-
     - name: write sysinfo to local file
       delegate_to: localhost
       copy:
         content: "{{ sysinfo.stdout }}"
-        dest: "./sysinfo/{{ inventory_hostname }}.txt"
+        dest: "{{ sysinfo_dir }}/{{ inventory_hostname }}.txt"
