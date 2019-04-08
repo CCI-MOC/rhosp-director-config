@@ -214,6 +214,9 @@ parameter_defaults:
     nova::compute::resume_guests_state_on_host_boot: true
     nova::compute::reserved_host_cpus: 2
 
+    # https://trello.com/c/5umGRzcy/143-k2-increase-nova-volume-wait-timeout
+    nova::compute::block_device_allocate_retries: 300
+
   ExtraConfig:
     tripleo::firewall::firewall_rules:
       '002 accept ssh from provisioning network ipv4':
