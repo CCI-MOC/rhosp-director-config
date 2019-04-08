@@ -195,7 +195,7 @@ parameter_defaults:
     horizon::websso_idp_mapping:
       moc_openid: ["moc", "openid"]
     horizon::help_url:
-      https://osticket.massopen.cloud/index.php
+      https://osticket.massopen.cloud/open.php
     cinder::api::default_volume_type: default
 
     tripleo::haproxy::haproxy_globals_override:
