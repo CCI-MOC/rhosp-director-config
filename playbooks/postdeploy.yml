@@ -1,0 +1,32 @@
+---
+- hosts: localhost
+  tasks:
+    - name: create flavors
+      tags: [flavors]
+      import_role:
+        name: postdeploy/flavors
+
+    - name: create disk images
+      tags: [images]
+      import_role:
+        name: postdeploy/images
+
+    - name: create volume types
+      tags: [volumes]
+      import_role:
+        name: postdeploy/volume_types
+
+    - name: create external networks
+      tags: [networks]
+      import_role:
+        name: postdeploy/external_networks
+
+    - name: create identity providers
+      tags: [identity]
+      import_role:
+        name: postdeploy/keystone_federation
+
+    - name: create ec2 compat endpoint
+      tags: [ec2]
+      import_role:
+        name: postdeploy/keystone_endpoint_ec2_compat

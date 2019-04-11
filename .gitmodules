@@ -1,0 +1,3 @@
+[submodule "patches/docker/horizon/moc_theme"]
+	path = patches/docker/horizon/moc_theme
+	url = https://github.com/cci-moc/moc_theme

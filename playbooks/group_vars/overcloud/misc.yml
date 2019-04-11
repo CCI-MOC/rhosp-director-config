@@ -1,0 +1,9 @@
+---
+overcloud_packages:
+  - openstack-heat-agents
+
+controller_packages:
+  - python-openstackclient
+
+compute_packages:
+  - libvirt-client

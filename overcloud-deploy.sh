@@ -13,21 +13,33 @@ else
 	TEMPLATES=/usr/share/openstack-tripleo-heat-templates
 fi
 
+. ./overcloud-env.sh
+
+case "$MOC_TARGET" in
+	(production)
+		moc_target_yaml=$PWD/templates/production.yml
+		;;
+	(staging)
+		moc_target_yaml=$PWD/templates/staging.yml
+		;;
+
+	(*)	echo "ERROR: MOC_TARGET must be one of 'staging' or 'production'." >&2
+		exit 1
+		;;
+esac
+
 # Generate files
-ansible-playbook playbooks-deploy/playbook.yml
+ansible-playbook playbooks/deploy.yml
 
 # This is necessary to work around bugs #1645503 and #1645134
-. ./overcloud-env.sh
 bash $TEMPLATES/deployed-server/scripts/enable-ssh-admin.sh
 
-# When passing environment files (`-e ...`) to the `overcloud deploy`
-# command, order is important! Your custom configuration
-# (`$PWD/templates/deploy.yaml` in this script) should come *last*,
-# in particular because the network interface configuration is
-# initialized by `deployed-server-environment.yaml`.  If your custom
-# configuration were provided first, the network interface
-# configuration you provide would be lost and replaced with the
-# defaults.
+# When passing environment files (`-e ...`) to the `overcloud deploy` command,
+# order is important! Your custom configuration should come *last*, in
+# particular because the network interface configuration is initialized by
+# `deployed-server-environment.yaml`.  If your custom configuration were
+# provided first, the network interface configuration you provide would be lost
+# and replaced with the defaults.
 
 deploy_args=(
 	# network_data.yaml defines a custom network configuration. In 
@@ -83,7 +95,8 @@ deploy_args=(
 	-e $PWD/templates/disable-snmp.yaml
 
 	# Most of our custom configuration.
-	-e $PWD/templates/deploy.yaml
+	-e $PWD/templates/common.yaml
+	-e $moc_target_yaml
 	-e $PWD/templates/rolecount.yaml
 	-e $PWD/templates/credentials.yaml
 	-e $PWD/templates/fencing.yaml

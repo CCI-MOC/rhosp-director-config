@@ -1,0 +1,10 @@
+- hosts: overcloud
+  gather_facts: false
+  tasks:
+    - name: perform hard reset
+      delegate_to: ipmi-gw
+      changed_when: false
+      command: >
+        ipmitool -I lanplus -H {{ ipmi_host }}
+        -U {{ ipmi_user }} -P {{ ipmi_pass }}
+        chassis power reset

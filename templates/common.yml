@@ -1,0 +1,275 @@
+---
+resource_registry:
+
+  # These lines activate our network interface configuration files.
+  # Notice that because we are using pre-provisioned servers, our
+  # roles are named ComputeDeployedServer and
+  # ControllerDeployedServer, rather than Compute and Controller.
+  OS::TripleO::ComputeDeployedServer::Net::SoftwareConfig:
+    network/config/compute.yaml
+  OS::TripleO::ControllerDeployedServer::Net::SoftwareConfig:
+    network/config/controller.yaml
+  OS::TripleO::NetworkerDeployedServer::Net::SoftwareConfig:
+    network/config/networker.yaml
+  OS::Local::Services::PatchPuppetModules:
+    ./services/patch-puppet-modules.yaml
+  OS::TripleO::DeployedServer::ControlPlanePort:
+    /usr/share/openstack-tripleo-heat-templates/deployed-server/deployed-neutron-port.yaml
+
+parameter_defaults:
+
+  KeystoneRegion: moc-kzn
+
+  NtpServer:
+    - 0.rhel.pool.ntp.org
+    - 1.rhel.pool.ntp.org
+    - 2.rhel.pool.ntp.org
+    - 3.rhel.pool.ntp.org
+
+  ##
+  ## Network configuration
+  ##
+
+  # Use the openvswitch firewall driver for implementing security
+  # groups.
+  NeutronOVSFirewallDriver: openvswitch
+  NeutronGlobalPhysnetMtu: 9050
+
+  # Setting NeutronExternalNetworkBridge to '' means that floating ips
+  # can use any bridge. This maps to the `external_network_bridge`
+  # Neutron configuration option.
+  NeutronExternalNetworkBridge: "''"
+
+  NeutronBridgeMappings: "datacentre:br-ex,sahara:br-sahara"
+  NeutronFlatNetworks: "datacentre,sahara"
+
+  # Do not allow network configuration changes via stack update
+  NetworkDeploymentActions:
+    - CREATE
+
+  NeutronDhcpAgentDnsmasqDnsServers:
+    - 8.8.8.8
+    - 8.8.4.4
+
+  NetConfigDataLookup:
+    nodegroup1:
+      dmiString: "system-product-name"
+      id: "PowerEdge R620"
+      nic1: p3p1
+      nic2: p3p2
+
+    nodegroup2:
+      dmiString: "system-product-name"
+      id: "PowerEdge R730"
+      nic1: p6p1
+      nic2: p6p2
+
+  ServiceNetMap:
+    # In the stock configuration, CephCluster and SwiftMgmt traffic goes
+    # over the StorageManagement network, but I've disabled that in this
+    # deployment.  The default rules means that in the absence of the
+    # StorageManagement network, this traffic would instead go over the
+    # ControlPlane network.  The following lines modify that default
+    # so that the CephCluster and SwiftMgmt traffic goes over the
+    # Storage network instead.
+    CephClusterNetwork: storage
+    SwiftMgmtNetwork: storage
+
+    # Director likes to place the Keystone 'admin' endpoint on the
+    # ControlPlane network, but since in our environment that network
+    # won't be accessible from anywhere other than the undercloud,
+    # we're moving that to the internal network.
+    KeystoneAdminApiNetwork: internal_api
+
+  # Set timezone of deployed hosts
+  TimeZone: "US/Eastern"
+
+  NovaApiPolicies:
+    # Allow Nova instance owners to use the "reset-state" command.
+    # Note that the key here ("allow_owners_to_reset") is not
+    # significant (but it should be unique).
+    allow_owners_to_reset:
+      key: 'os_compute_api:os-admin-actions:reset_state'
+      value: 'rule:admin_or_owner'
+
+  # Configuration for GPU passthrough
+  NovaPCIPassthrough:
+    - vendor_id: 10de
+      product_id: 15f7
+
+  NovaSchedulerDefaultFilters:
+    - RetryFilter
+    - AvailabilityZoneFilter
+    - RamFilter
+    - DiskFilter
+    - ComputeFilter
+    - ComputeCapabilitiesFilter
+    - ImagePropertiesFilter
+    - ServerGroupAntiAffinityFilter
+    - ServerGroupAffinityFilter
+    - PciPassthroughFilter
+
+  # Enable simple crypto backend as global default.
+  # (https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/13/html/manage_secrets_with_openstack_key_manager/installing_barbican)
+  BarbicanSimpleCryptoGlobalDefault: true
+
+  # work around https://bugzilla.redhat.com/show_bug.cgi?id=1654840
+  NetworkerDeployedServerExtraConfig:
+    neutron::agents::ml2::ovs::of_interface: ovs-ofctl
+
+  # Enable Sahara "vanilla" plugin
+  SaharaPlugins:
+    - vanilla
+    - ambari
+    - cdh
+    - mapr
+
+  # Additional Hiera configuration to be placed on the controllers.
+  ControllerDeployedServerExtraConfig:
+    keystone::federation::openidc::openidc_enable_oauth: true
+    keystone::federation::openidc::openidc_introspection_endpoint: >-
+      https://sso.massopen.cloud/auth/realms/moc/protocol/openid-connect/token/introspect
+    swift::keystone::auth::auth_name: ceph
+    tripleo::haproxy::ssl_cipher_suite:
+      ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:!RSA+AESGCM:!RSA+AES:!aNULL:!MD5:!DSS
+    horizon::websso_enabled: "True"
+    horizon::websso_choices:
+      - ["moc_openid", "Institution Account"]
+    horizon::websso_idp_mapping:
+      moc_openid: ["moc", "openid"]
+    horizon::help_url:
+      https://osticket.massopen.cloud/open.php
+    cinder::api::default_volume_type: default
+
+    tripleo::haproxy::haproxy_globals_override:
+      tune.ssl.default-dh-param: 2048
+      ssl-default-bind-options: no-sslv3 no-tlsv10
+      ssl-default-server-options: no-sslv3 no-tlsv10
+
+    nova::api::pci_alias:
+      - vendor_id: "10de"
+        product_id: "15f7"
+        device_type: "type-PCI"
+        name: "tesla-p100"
+
+  ComputeDeployedServerExtraConfig:
+    nova::compute::libvirt::libvirt_cpu_mode: host-passthrough
+    nova::compute::resume_guests_state_on_host_boot: true
+    nova::compute::reserved_host_cpus: 2
+
+    # https://trello.com/c/5umGRzcy/143-k2-increase-nova-volume-wait-timeout
+    nova::compute::block_device_allocate_retries: 300
+
+  ExtraConfig:
+    tripleo::firewall::firewall_rules:
+      '002 accept ssh from provisioning network ipv4':
+        dport: 22
+        proto: 'tcp'
+        source: 172.16.0.0/19
+      '002 accept ssh from vpn network ipv4':
+        dport: 22
+        proto: 'tcp'
+        source: 172.31.224.0/19
+      '002 reject all other ssh traffic ipv4':
+        dport: 22
+        proto: 'tcp'
+        action: drop
+      '100 allow all from admin network':
+        source: 172.16.0.0/19
+
+  SSLCertificate: |
+    -----BEGIN CERTIFICATE-----
+    MIIGuDCCBaCgAwIBAgIJALiDvkTzEISyMA0GCSqGSIb3DQEBCwUAMIG0MQswCQYD
+    VQQGEwJVUzEQMA4GA1UECBMHQXJpem9uYTETMBEGA1UEBxMKU2NvdHRzZGFsZTEa
+    MBgGA1UEChMRR29EYWRkeS5jb20sIEluYy4xLTArBgNVBAsTJGh0dHA6Ly9jZXJ0
+    cy5nb2RhZGR5LmNvbS9yZXBvc2l0b3J5LzEzMDEGA1UEAxMqR28gRGFkZHkgU2Vj
+    dXJlIENlcnRpZmljYXRlIEF1dGhvcml0eSAtIEcyMB4XDTE5MDIwODE1NDQzNVoX
+    DTIxMDQxMjE1NDkwMFowPjEhMB8GA1UECxMYRG9tYWluIENvbnRyb2wgVmFsaWRh
+    dGVkMRkwFwYDVQQDDBAqLm1hc3NvcGVuLmNsb3VkMIIBIjANBgkqhkiG9w0BAQEF
+    AAOCAQ8AMIIBCgKCAQEAxfopTNjf2+sJ/KyUBnlc5GK04+ZPIvClPv2jlEAjVpYg
+    pzU/cFeVwJvJR4G8Puh5JSKg+lhPfP8ZLEF67On4s5UndzAOD4kH5wVqyARa0Rtp
+    cQEDxW/mhhiQEK3XYD0kS4bHXhkjP80pwLiuxjJ7+Tyhn93Z7IUk3ogj+R3Y2zoE
+    Og13lRki5RIBYGN9Xm+5oqaY+Hxxh3C6KH06Wy/rErbekqgFznP9TDy6pteIePfo
+    vBuxHB/+d0h1dr3qFt6gYHxgbjZpc4tN6b8j7MDOEAQy8nJNrWRyBrimeMDP2Myl
+    yhiXJfmOEsFjteiyTCdAKTJr/BLDjPkgfqEbJBnw4wIDAQABo4IDQDCCAzwwDAYD
+    VR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDgYDVR0P
+    AQH/BAQDAgWgMDcGA1UdHwQwMC4wLKAqoCiGJmh0dHA6Ly9jcmwuZ29kYWRkeS5j
+    b20vZ2RpZzJzMS05MTIuY3JsMF0GA1UdIARWMFQwSAYLYIZIAYb9bQEHFwEwOTA3
+    BggrBgEFBQcCARYraHR0cDovL2NlcnRpZmljYXRlcy5nb2RhZGR5LmNvbS9yZXBv
+    c2l0b3J5LzAIBgZngQwBAgEwdgYIKwYBBQUHAQEEajBoMCQGCCsGAQUFBzABhhho
+    dHRwOi8vb2NzcC5nb2RhZGR5LmNvbS8wQAYIKwYBBQUHMAKGNGh0dHA6Ly9jZXJ0
+    aWZpY2F0ZXMuZ29kYWRkeS5jb20vcmVwb3NpdG9yeS9nZGlnMi5jcnQwHwYDVR0j
+    BBgwFoAUQMK9J47MNIMwojPX+2yz8LQsgM4wKwYDVR0RBCQwIoIQKi5tYXNzb3Bl
+    bi5jbG91ZIIObWFzc29wZW4uY2xvdWQwHQYDVR0OBBYEFH+trOW3Yw25mpCIfRsd
+    RV5SlAm4MIIBfgYKKwYBBAHWeQIEAgSCAW4EggFqAWgAdgCkuQmQtBhYFIe7E6LM
+    Z3AKPDWYBPkb37jjd80OyA3cEAAAAWjNyDMNAAAEAwBHMEUCIQD42VD9nijTt0mS
+    rF/KSuDxb/+o30pXeOFmIPjzVb4cTwIgGaIYFtq0YkWd4O2apARmDZrcURU5glzO
+    mUMj9mrRMGoAdgDuS723dc5guuFCaR+r4Z5mow9+X7By2IMAxHuJeqj9ywAAAWjN
+    yDV/AAAEAwBHMEUCIF+EdseFGrPbXPTxCcE5lOLoghMyxN1JBIC0ojfkxw0QAiEA
+    yt48N+XYHSTfKNNzVB3tMJVg4KVVaS2pPsTBLIOVWsgAdgBElGUusO7Or8RAB9io
+    /ijA2uaCvtjLMbU/0zOWtbaBqAAAAWjNyDgiAAAEAwBHMEUCIQCKXwQqoNHUoByI
+    3qVLH/xY1MkUVGJeKuB17+K0mFyUnAIgKaN5Tlv8muI7uDFJ+Fo1menH9irvmQ+Y
+    uHO9gauVWVIwDQYJKoZIhvcNAQELBQADggEBAG3lIWjD3RK6NG0983s8RtzsCpR/
+    xFmHkbpXdTobqY2UIyhZQ4HweEOYTkzFSg73IDrzfqiIOq59Lct0Mgrr3/IGyhqY
+    oeDMDhxyy11UsD8RKkXI2JxoPsUWQpa+eRNAV9l19WpBc7qk7J9EDv0T3htGKPbY
+    7IW7VlnHcCfEKsT2NRe8uCEZSn+KUVr6UQ0EDXIIxWfF0zb5HPy7RGMohLAOGM3j
+    ixEvby3g0IUtO+6Yn8NyM63mFntz7aqgOe9Eo+sLI1wLRGzAKV/1tQ/xsHlzkzE1
+    KkyrTYlbFYt1Fc0c+GrbEypAS3nKJAkvkGqFNIquni0hpLG7HLtQL6TLt5I=
+    -----END CERTIFICATE-----
+
+  SSLIntermediateCertificate: |
+    -----BEGIN CERTIFICATE-----
+    MIIE0DCCA7igAwIBAgIBBzANBgkqhkiG9w0BAQsFADCBgzELMAkGA1UEBhMCVVMx
+    EDAOBgNVBAgTB0FyaXpvbmExEzARBgNVBAcTClNjb3R0c2RhbGUxGjAYBgNVBAoT
+    EUdvRGFkZHkuY29tLCBJbmMuMTEwLwYDVQQDEyhHbyBEYWRkeSBSb290IENlcnRp
+    ZmljYXRlIEF1dGhvcml0eSAtIEcyMB4XDTExMDUwMzA3MDAwMFoXDTMxMDUwMzA3
+    MDAwMFowgbQxCzAJBgNVBAYTAlVTMRAwDgYDVQQIEwdBcml6b25hMRMwEQYDVQQH
+    EwpTY290dHNkYWxlMRowGAYDVQQKExFHb0RhZGR5LmNvbSwgSW5jLjEtMCsGA1UE
+    CxMkaHR0cDovL2NlcnRzLmdvZGFkZHkuY29tL3JlcG9zaXRvcnkvMTMwMQYDVQQD
+    EypHbyBEYWRkeSBTZWN1cmUgQ2VydGlmaWNhdGUgQXV0aG9yaXR5IC0gRzIwggEi
+    MA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC54MsQ1K92vdSTYuswZLiBCGzD
+    BNliF44v/z5lz4/OYuY8UhzaFkVLVat4a2ODYpDOD2lsmcgaFItMzEUz6ojcnqOv
+    K/6AYZ15V8TPLvQ/MDxdR/yaFrzDN5ZBUY4RS1T4KL7QjL7wMDge87Am+GZHY23e
+    cSZHjzhHU9FGHbTj3ADqRay9vHHZqm8A29vNMDp5T19MR/gd71vCxJ1gO7GyQ5HY
+    pDNO6rPWJ0+tJYqlxvTV0KaudAVkV4i1RFXULSo6Pvi4vekyCgKUZMQWOlDxSq7n
+    eTOvDCAHf+jfBDnCaQJsY1L6d8EbyHSHyLmTGFBUNUtpTrw700kuH9zB0lL7AgMB
+    AAGjggEaMIIBFjAPBgNVHRMBAf8EBTADAQH/MA4GA1UdDwEB/wQEAwIBBjAdBgNV
+    HQ4EFgQUQMK9J47MNIMwojPX+2yz8LQsgM4wHwYDVR0jBBgwFoAUOpqFBxBnKLbv
+    9r0FQW4gwZTaD94wNAYIKwYBBQUHAQEEKDAmMCQGCCsGAQUFBzABhhhodHRwOi8v
+    b2NzcC5nb2RhZGR5LmNvbS8wNQYDVR0fBC4wLDAqoCigJoYkaHR0cDovL2NybC5n
+    b2RhZGR5LmNvbS9nZHJvb3QtZzIuY3JsMEYGA1UdIAQ/MD0wOwYEVR0gADAzMDEG
+    CCsGAQUFBwIBFiVodHRwczovL2NlcnRzLmdvZGFkZHkuY29tL3JlcG9zaXRvcnkv
+    MA0GCSqGSIb3DQEBCwUAA4IBAQAIfmyTEMg4uJapkEv/oV9PBO9sPpyIBslQj6Zz
+    91cxG7685C/b+LrTW+C05+Z5Yg4MotdqY3MxtfWoSKQ7CC2iXZDXtHwlTxFWMMS2
+    RJ17LJ3lXubvDGGqv+QqG+6EnriDfcFDzkSnE3ANkR/0yBOtg2DZ2HKocyQetawi
+    DsoXiWJYRBuriSUBAA/NxBti21G00w9RKpv0vHP8ds42pM3Z2Czqrpv1KrKQ0U11
+    GIo/ikGQI31bS/6kA1ibRrLDYGCD+H1QQc7CoZDDu+8CL9IVVO5EFdkKrqeKM+2x
+    LXY2JtwE65/3YR8V3Idv7kaWKK2hJn0KCacuBKONvPi8BDAB
+    -----END CERTIFICATE-----
+    -----BEGIN CERTIFICATE-----
+    MIIEfTCCA2WgAwIBAgIDG+cVMA0GCSqGSIb3DQEBCwUAMGMxCzAJBgNVBAYTAlVT
+    MSEwHwYDVQQKExhUaGUgR28gRGFkZHkgR3JvdXAsIEluYy4xMTAvBgNVBAsTKEdv
+    IERhZGR5IENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMTQwMTAx
+    MDcwMDAwWhcNMzEwNTMwMDcwMDAwWjCBgzELMAkGA1UEBhMCVVMxEDAOBgNVBAgT
+    B0FyaXpvbmExEzARBgNVBAcTClNjb3R0c2RhbGUxGjAYBgNVBAoTEUdvRGFkZHku
+    Y29tLCBJbmMuMTEwLwYDVQQDEyhHbyBEYWRkeSBSb290IENlcnRpZmljYXRlIEF1
+    dGhvcml0eSAtIEcyMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAv3Fi
+    CPH6WTT3G8kYo/eASVjpIoMTpsUgQwE7hPHmhUmfJ+r2hBtOoLTbcJjHMgGxBT4H
+    Tu70+k8vWTAi56sZVmvigAf88xZ1gDlRe+X5NbZ0TqmNghPktj+pA4P6or6KFWp/
+    3gvDthkUBcrqw6gElDtGfDIN8wBmIsiNaW02jBEYt9OyHGC0OPoCjM7T3UYH3go+
+    6118yHz7sCtTpJJiaVElBWEaRIGMLKlDliPfrDqBmg4pxRyp6V0etp6eMAo5zvGI
+    gPtLXcwy7IViQyU0AlYnAZG0O3AqP26x6JyIAX2f1PnbU21gnb8s51iruF9G/M7E
+    GwM8CetJMVxpRrPgRwIDAQABo4IBFzCCARMwDwYDVR0TAQH/BAUwAwEB/zAOBgNV
+    HQ8BAf8EBAMCAQYwHQYDVR0OBBYEFDqahQcQZyi27/a9BUFuIMGU2g/eMB8GA1Ud
+    IwQYMBaAFNLEsNKR1EwRcbNhyz2h/t2oatTjMDQGCCsGAQUFBwEBBCgwJjAkBggr
+    BgEFBQcwAYYYaHR0cDovL29jc3AuZ29kYWRkeS5jb20vMDIGA1UdHwQrMCkwJ6Al
+    oCOGIWh0dHA6Ly9jcmwuZ29kYWRkeS5jb20vZ2Ryb290LmNybDBGBgNVHSAEPzA9
+    MDsGBFUdIAAwMzAxBggrBgEFBQcCARYlaHR0cHM6Ly9jZXJ0cy5nb2RhZGR5LmNv
+    bS9yZXBvc2l0b3J5LzANBgkqhkiG9w0BAQsFAAOCAQEAWQtTvZKGEacke+1bMc8d
+    H2xwxbhuvk679r6XUOEwf7ooXGKUwuN+M/f7QnaF25UcjCJYdQkMiGVnOQoWCcWg
+    OJekxSOTP7QYpgEGRJHjp2kntFolfzq3Ms3dhP8qOCkzpN1nsoX+oYggHFCJyNwq
+    9kIDN0zmiN/VryTyscPfzLXs4Jlet0lUIDyUGAzHHFIYSaRt4bNYC8nY7NmuHDKO
+    KHAN4v6mF56ED71XcLNa6R+ghlO773z/aQvgSMO3kwvIClTErF0UZzdsyqUvMQg3
+    qm5vjLyb4lddJIGvl5echK1srDdMZvNhkREg5L4wn3qkKQmw4TRfZHcYQFHfjDCm
+    rw==
+    -----END CERTIFICATE-----

@@ -4,7 +4,6 @@ local_registry_images.yaml
 
 overcloudrc*
 patches/docker/*/Dockerfile
-patches/docker/horizon/moc_theme/
 patches/docker/overcloud_images.yaml
 patches/tripleo-heat-templates/
 puppet-modules.tar.gz

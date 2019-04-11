@@ -1,0 +1,12 @@
+---
+undercloud_packages:
+  - python-tripleoclient
+  - git
+  - rubygem-hammer_cli_foreman
+  - ceph-ansible
+
+undercloud_authorized_keys:
+  - key: https://github.com/larsks.keys
+    comment: lars@redhat.com
+  - key: https://github.com/naved001.keys
+    comment: naved001@bu.edu

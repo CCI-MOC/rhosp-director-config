@@ -1,0 +1,58 @@
+---
+- name: prepare all hosts
+  hosts: undercloud:overcloud
+  become: true
+  roles:
+    - predeploy/all-prep
+
+- name: prepare undercloud
+  hosts: undercloud
+  become: true
+  roles:
+    - predeploy/undercloud-prep
+    - predeploy/selinux_relabel
+
+- name: prepare stack user on undercloud
+  hosts: undercloud
+  become: true
+  become_user: stack
+  roles:
+    - predeploy/stackuser
+    - predeploy/foremancli
+
+- name: prepare overcloud
+  hosts: overcloud
+  become: true
+  roles:
+    - predeploy/overcloud-prep
+    - predeploy/selinux_relabel
+
+- name: fix openvswitch bugs
+  hosts: overcloud
+  tags: [bugs, openvswitch]
+  become: true
+  roles:
+    - predeploy/bug/1642588-openvswitch-start
+    - predeploy/bug/1642591-openvswitch-selinux
+    - predeploy/selinux_relabel
+
+- name: prepare compute hosts
+  hosts: compute
+  tags: [bugs, libvirt]
+  become: true
+  roles:
+    - predeploy/bug/1647828-libvirt-guests
+
+- name: prepare sahara network on controllers
+  hosts: controller
+  tags: [sahara]
+  become: true
+  roles:
+    - predeploy/sahara_network/controller
+
+- name: prepare sahara network on networkers
+  hosts: network
+  tags: [sahara]
+  become: true
+  roles:
+    - predeploy/sahara_network/networker

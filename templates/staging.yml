@@ -1,0 +1,76 @@
+---
+parameter_defaults:
+
+  # The CloudName is used in public API endpoints.
+  CloudName: kaizen.massopen.cloud
+
+  # This is used to construct overcloud hostnames. It should match
+  # overcloud_domain_name in undercloud.conf.
+  CloudDomain: kzn.moc
+
+  DnsServers:
+    - 172.16.0.3
+    - 172.16.0.8
+
+  # The InternalApi network is used for OpenStack REST API traffic
+  # between the controllers and compute nodes, as well as for AMQ
+  # traffic, database access, and most other traffic internal to the
+  # overcloud.
+  InternalApiNetCidr: 172.16.32.0/19
+  InternalApiAllocationPools:
+    - start: 172.16.32.10
+      end: 172.16.63.200
+  InternalApiNetworkVlanID: 270
+
+  # The Storage network is used for Cinder, Ceph, and Swift.
+  StorageNetCidr: 192.168.0.0/19
+  StorageAllocationPools:
+    - start: 192.168.0.10
+      end: 192.168.3.200
+  StorageNetworkVlanID: 250
+
+  # The Tenant network is used for tenant-created networks.
+  TenantNetCidr: 172.16.64.0/19
+  TenantAllocationPools:
+    - start: 172.16.64.10
+      end: 172.16.95.200
+  TenantNetworkVlanID: 271
+
+  # The External network is used for public-facing services (like the
+  # API endpoints and Horizon).
+  ExternalNetCidr: 10.111.0.0/24
+  ExternalInterfaceDefaultRoute: 10.111.0.1
+  ExternalAllocationPools:
+    - start: 10.111.0.20
+      end: 10.111.0.200
+  ExternalNetworkVlanID: 272
+  PublicVirtualFixedIPs:
+    - ip_address: 10.111.0.111
+
+
+  FloatingNetworkVlanId: 274
+
+  ControlPlaneDefaultRoute: 172.17.0.1
+  ControlPlaneNetworkVlanID: 259
+  ControlPlaneSubnetCidr: 19
+
+  # The overcloud nodes access the OpenStack metadata service at the
+  # EC2MetadataIp address.
+  EC2MetadataIp: 172.17.0.5
+
+  ExtraConfig:
+    tripleo::firewall::firewall_rules:
+      '002 accept ssh from provisioning network ipv4':
+        dport: 22
+        proto: 'tcp'
+        source: 172.17.0.0/19
+      '002 accept ssh from vpn network ipv4':
+        dport: 22
+        proto: 'tcp'
+        source: 172.31.224.0/19
+      '002 reject all other ssh traffic ipv4':
+        dport: 22
+        proto: 'tcp'
+        action: drop
+      '100 allow all from admin network':
+        source: 172.17.0.0/19

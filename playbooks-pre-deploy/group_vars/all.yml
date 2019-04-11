@@ -1,4 +1,0 @@
----
-common_packages:
-  - tcpdump
-  - strace

@@ -1,0 +1,6 @@
+---
+sahara_net_vlan_id: 207
+sahara_net_physdev: p3p2
+sahara_net_cidr: "10.251.0.0/16"
+sahara_ovs_bridge: br-sahara
+

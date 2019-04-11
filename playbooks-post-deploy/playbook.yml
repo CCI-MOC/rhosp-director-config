@@ -1,3 +1,0 @@
----
-- import_playbook: credentials.yml
-- import_playbook: resources.yml
