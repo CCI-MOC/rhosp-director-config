@@ -136,3 +136,63 @@ nova_flavors:
       quota:vif_outbound_peak: 512000
     ram: 112640
     vcpus: 54
+  - name: custom.4c.16g
+    vcpus: 4
+    ram: 16384
+    disk: 10
+    properties:
+      quota:disk_read_bytes_sec: 32768000
+      quota:disk_read_iops_sec: 12000
+      quota:disk_write_bytes_sec: 32768000
+      quota:disk_write_iops_sec: 3000
+      quota:vif_inbound_average: 128000
+      quota:vif_inbound_burst: 46080000
+      quota:vif_inbound_peak: 255000
+      quota:vif_outbound_average: 128000
+      quota:vif_outbound_burst: 46080000
+      quota:vif_outbound_peak: 255000
+  - name: custom.4c.32g
+    vcpus: 4
+    ram: 32768
+    disk: 10
+    properties:
+      quota:disk_read_bytes_sec: 32768000
+      quota:disk_read_iops_sec: 12000
+      quota:disk_write_bytes_sec: 32768000
+      quota:disk_write_iops_sec: 3000
+      quota:vif_inbound_average: 128000
+      quota:vif_inbound_burst: 46080000
+      quota:vif_inbound_peak: 255000
+      quota:vif_outbound_average: 128000
+      quota:vif_outbound_burst: 46080000
+      quota:vif_outbound_peak: 255000
+  - name: custom.8c.32g
+    vcpus: 8
+    ram: 32768
+    disk: 10
+    properties:
+      quota:disk_read_bytes_sec: 32768000
+      quota:disk_read_iops_sec: 12000
+      quota:disk_write_bytes_sec: 32768000
+      quota:disk_write_iops_sec: 3000
+      quota:vif_inbound_average: 128000
+      quota:vif_inbound_burst: 46080000
+      quota:vif_inbound_peak: 255000
+      quota:vif_outbound_average: 128000
+      quota:vif_outbound_burst: 46080000
+      quota:vif_outbound_peak: 255000
+  - name: custom.8c.64g
+    vcpus: 8
+    ram: 65536
+    disk: 10
+    properties:
+      quota:disk_read_bytes_sec: 32768000
+      quota:disk_read_iops_sec: 12000
+      quota:disk_write_bytes_sec: 32768000
+      quota:disk_write_iops_sec: 3000
+      quota:vif_inbound_average: 128000
+      quota:vif_inbound_burst: 46080000
+      quota:vif_inbound_peak: 255000
+      quota:vif_outbound_average: 128000
+      quota:vif_outbound_burst: 46080000
+      quota:vif_outbound_peak: 255000
