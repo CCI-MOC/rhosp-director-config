@@ -12,3 +12,5 @@
     - only_flavor is not defined or item.name == only_flavor
     - flavor_filter is not defined or flavor_filter in item.name
   loop: "{{ nova_flavors }}"
+  loop_control:
+    label: "{{ item.name }}"
