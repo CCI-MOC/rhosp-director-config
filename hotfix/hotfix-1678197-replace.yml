@@ -1,0 +1,22 @@
+---
+- name: inspect {{ container_name }} container
+  command: docker inspect {{ container_name }}
+  changed_when: false
+  register: container
+
+- when: >-
+    (container.stdout|from_json).0.Config.Labels.release !=
+    image_name.split('-')[-1]
+  block:
+
+    - name: remove {{ container_name }} container
+      command: docker rm -f {{ container_name }}
+      ignore_errors: true
+
+    - name: start replacement {{ container_name }} container
+      command: >-
+        paunch debug
+        --file /var/lib/tripleo-config/hashed-docker-container-startup-config-step_{{ step }}.json
+        --overrides '{"image": "{{ image_name }}"}'
+        --container {{ container_name }}
+        --action run

@@ -1,0 +1,28 @@
+---
+- hosts: network
+  become: true
+  serial: 1
+  any_errors_fatal: true
+  vars:
+    DockerOpenvswitchImage: "172.16.0.5:8787/rhosp13/openstack-neutron-openvswitch-agent:13.0-76.1554788875"
+    DockerNeutronDHCPImage: "172.16.0.5:8787/rhosp13/openstack-neutron-dhcp-agent:13.0-77.1554788896"
+    DockerNeutronL3AgentImage: "172.16.0.5:8787/rhosp13/openstack-neutron-l3-agent:13.0-75.1554788897"
+
+    replacements:
+      - container_name: neutron_ovs_agent
+        image_name: "{{ DockerOpenvswitchImage }}"
+        step: 4
+      - container_name: neutron_l3_agent
+        image_name: "{{ DockerNeutronL3AgentImage }}"
+        step: 4
+      - container_name: neutron_dhcp
+        image_name: "{{ DockerNeutronDHCPImage }}"
+        step: 4
+
+  tasks:
+    - include_tasks: hotfix-1678197-replace.yml
+      vars:
+        container_name: "{{ item.container_name }}"
+        image_name: "{{ item.image_name }}"
+        step: "{{ item.step }}"
+      loop: "{{ replacements }}"
