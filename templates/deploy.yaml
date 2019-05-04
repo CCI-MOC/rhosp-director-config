@@ -31,6 +31,10 @@ parameter_defaults:
 
   KeystoneRegion: moc-kzn
 
+  # Allow Grafana to access Gnocchi
+  KeystoneCorsAllowedOrigin: "*"
+  GnocchiCorsAllowedOrigin: "*"
+
   NtpServer:
     - 0.rhel.pool.ntp.org
     - 1.rhel.pool.ntp.org
