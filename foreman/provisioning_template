@@ -1,75 +1,103 @@
 <%#
+name: KZNStack provision
+snippet: false
+model: ProvisioningTemplate
 kind: provision
-name: Kickstart KUMO default
 oses:
-- RedHat 4
-- RedHat 5
-- RedHat 6
-- RedHat 7
+- CentOS
+- RHEL
 %>
 <%#
 This template accepts the following parameters:
 - lang: string (default="en_US.UTF-8")
-- selinux: string (default="enforcing")
+- selinux-mode: string (default="enforcing")
 - keyboard: string (default="us")
 - time-zone: string (default="UTC")
 - http-proxy: string (default="")
 - http-proxy-port: string (default="")
 - force-puppet: boolean (default=false)
+- enable-epel: boolean (default=true)
 - enable-puppetlabs-repo: boolean (default=false)
-- salt_master: string (default=undef)
+- enable-puppetlabs-pc1-repo: boolean (default=false)
+- enable-puppetlabs-puppet5-repo: boolean (default=false)
 - ntp-server: string (default="0.fedora.pool.ntp.org")
 - bootloader-append: string (default="nofb quiet splash=quiet")
+- disable-firewall: boolean (default=false)
+- package_upgrade: boolean (default=true)
+- disable-uek: boolean (default=false)
 %>
 <%
+  rhel_compatible = @host.operatingsystem.family == 'Redhat' && @host.operatingsystem.name != 'Fedora'
   os_major = @host.operatingsystem.major.to_i
+  realm_compatible = (@host.operatingsystem.name == 'Fedora' && os_major >= 20) || (rhel_compatible && os_major >= 7)
   # safemode renderer does not support unary negation
   pm_set = @host.puppetmaster.empty? ? false : true
-  proxy_uri = @host.params['http-proxy'] ? "http://#{@host.params['http-proxy']}:#{@host.params['http-proxy-port']}" : nil
+  proxy_uri = host_param('http-proxy') ? "http://#{host_param('http-proxy')}:#{host_param('http-proxy-port')}" : nil
   proxy_string = proxy_uri ? " --proxy=#{proxy_uri}" : ''
-  puppet_enabled = false  #pm_set || @host.param_true?('force-puppet')
-  salt_enabled = @host.params['salt_master'] ? true : false
-  section_end = os_major <= 5 ? '' : '%end'
+  puppet_enabled = pm_set || host_param_true?('force-puppet')
+  section_end = (rhel_compatible && os_major <= 5) ? '' : '%end'
 %>
+<% if @host.operatingsystem.name != 'Fedora' || os_major < 29 -%>
 install
+<% end -%>
+<% if host_param('kickstart_liveimg') %>
+liveimg --url=<%= host_param('kickstart_liveimg') %> <%= proxy_string %>
+<% else %>
 <%= @mediapath %><%= proxy_string %>
-lang <%= @host.params['lang'] || 'en_US.UTF-8' %>
-selinux --<%= @host.params['selinux'] || 'enforcing' %>
-keyboard <%= @host.params['keyboard'] || 'us' %>
+<% end %>
+lang <%= host_param('lang') || 'en_US.UTF-8' %>
+selinux --<%= host_param('selinux-mode') || host_param('selinux') || 'enforcing' %>
+keyboard <%= host_param('keyboard') || 'us' %>
 skipx
 
 <% subnet = @host.subnet -%>
 <% if subnet.respond_to?(:dhcp_boot_mode?) -%>
-  <% dhcp = subnet.dhcp_boot_mode? && !@static -%>
+<% dhcp = subnet.dhcp_boot_mode? && !@static -%>
 <% else -%>
-  <% dhcp = !@static -%>
+<% dhcp = !@static -%>
 <% end -%>
-network --bootproto <%= dhcp ? 'dhcp' : "static --ip=#{@host.ip} --netmask=#{subnet.mask} --gateway=#{subnet.gateway} --nameserver=#{[subnet.dns_primary, subnet.dns_secondary].select(&:present?).join(',')}" %> --hostname <%= @host %><%= os_major >= 6 ? " --device=#{@host.mac}" : '' -%>
+
+network --bootproto <%= dhcp ? 'dhcp' : "static --ip=#{@host.ip} --netmask=#{subnet.mask} --gateway=#{subnet.gateway} --nameserver=#{[subnet.dns_primary, subnet.dns_secondary].select{ |item| item.present? }.join(',')} --mtu=#{subnet.mtu.to_s}" %> --hostname <%= @host %><%= os_major >= 6 ? " --device=#{@host.mac}" : '' -%>
 
 rootpw --iscrypted <%= root_pass %>
+<% if host_param_true?('disable-firewall') -%>
+firewall --disable
+<% else -%>
 firewall --<%= os_major >= 6 ? 'service=' : '' %>ssh
-authconfig --useshadow --passalgo=sha256 --kickstart
-timezone America/New_York
-
-<% if os_major >= 7 && @host.info['parameters']['realm'] && @host.realm && @host.realm.realm_type == 'Active Directory' -%>
-# One-time password will be requested at install time. Otherwise, $HOST[OTP] is used as a placeholder value.
-realm join --one-time-password=<%= @host.otp || "$HOST[OTP]" %> <%= @host.realm %>
 <% end -%>
-
-<% if os_major > 4 -%>
+<% if @host.operatingsystem.name == 'Fedora' && os_major >= 28 -%>
+authselect --useshadow --passalgo=<%= @host.operatingsystem.password_hash.downcase || 'sha256' %> --kickstart
+<% else -%>
+authconfig --useshadow --passalgo=<%= @host.operatingsystem.password_hash.downcase || 'sha256' %> --kickstart
+<% end -%>
+timezone --utc <%= host_param('time-zone') || 'UTC' %>
+<% if rhel_compatible -%>
 services --disabled gpm,sendmail,cups,pcmcia,isdn,rawdevices,hpoj,bluetooth,openibd,avahi-daemon,avahi-dnsconfd,hidd,hplip,pcscd
-
-<% if puppet_enabled && @host.param_true?('enable-puppetlabs-repo') -%>
-repo --name=puppetlabs-products --baseurl=http://yum.puppetlabs.com/el/<%= @host.operatingsystem.major %>/products/<%= @host.architecture %><%= proxy_string %>
-repo --name=puppetlabs-deps --baseurl=http://yum.puppetlabs.com/el/<%= @host.operatingsystem.major %>/dependencies/<%= @host.architecture %><%= proxy_string %>
-<% end -%>
 <% end -%>
 
-bootloader --location=mbr --append="<%= @host.params['bootloader-append'] || 'nofb quiet splash=quiet' %>" <%= grub_pass %>
+<% if realm_compatible && host_enc['parameters']['realm'] && @host.realm && @host.realm.realm_type == 'Active Directory' -%>
+# One-time password will be requested at install time. Otherwise, $HOST[OTP] is used as a placeholder value.
+realm join --one-time-password='<%= @host.otp || "$HOST[OTP]" %>' <%= @host.realm %>
+<% end -%>
+
+<% if @host.operatingsystem.name == 'Fedora' -%>
+repo --name=fedora-everything --mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=fedora-<%= @host.operatingsystem.major %>&arch=<%= @host.architecture %><%= proxy_string %>
+<% end -%>
+
+<% if @host.operatingsystem.name == 'OracleLinux' && os_major == 7 -%>
+repo --name="Server-Mysql"
+<% end -%>
+
+<% if @host.operatingsystem.name == 'Fedora' && os_major <= 16 -%>
+# Bootloader exception for Fedora 16:
+bootloader --append="<%= host_param('bootloader-append') || 'nofb quiet splash=quiet' %> <%= ks_console %>" <%= @grub_pass %>
+part biosboot --fstype=biosboot --size=1
+<% else -%>
+bootloader --location=mbr --append="<%= host_param('bootloader-append') || 'nofb quiet splash=quiet' %>" <%= @grub_pass %>
 <% if os_major == 5 -%>
 key --skip
 <% end -%>
-
+<% end -%>
 
 <% if @dynamic -%>
 %include /tmp/diskpart.cfg
@@ -78,34 +106,30 @@ key --skip
 <% end -%>
 
 text
+<% if @host.respond_to?(:bootdisk_build?) && @host.bootdisk_build? %>
+reboot --eject
+<% else -%>
 reboot
+<% end -%>
 
 %packages
-@Core
-bind-utils
-deltarpm
+yum
 dhclient
-hdparm
+ntp
+deltarpm
 mailx
 mc
 net-tools
 ntp
 smartmontools
-strace
-tcpdump
-traceroute
 vim
-yum
 yum-utils
+sos
+@Core
 <% if os_major >= 6 -%>
 redhat-lsb-core
 <% end -%>
-<% if puppet_enabled && @host.param_true?('enable-puppetlabs-repo') -%>
-puppetlabs-release
-<% end -%>
-<% if salt_enabled %>
-salt-minion
-<% end -%>
+
 <%= section_end -%>
 
 <% if @dynamic -%>
@@ -114,145 +138,211 @@ salt-minion
 <%= section_end -%>
 <% end -%>
 
-%post --nochroot
-exec < /dev/tty3 > /dev/tty3
-#changing to VT 3 so that we can see whats going on....
-/usr/bin/chvt 3
-(
+%post --nochroot --log /mnt/sysimage/root/install.postnochroot.log
 cp -va /etc/resolv.conf /mnt/sysimage/etc/resolv.conf
-/usr/bin/chvt 1
-) 2>&1 | tee /mnt/sysimage/root/install.postnochroot.log
 <%= section_end -%>
 
-%post
-logger "Starting anaconda <%= @host %> postinstall"
-exec < /dev/tty3 > /dev/tty3
-#changing to VT 3 so that we can see whats going on....
-/usr/bin/chvt 3
-(
-<% if subnet.respond_to?(:dhcp_boot_mode?) -%>
-<%= snippet 'kumostack_networking_setup' %>
+%post --log /root/ks-post-1.log
+<% if subnet.respond_to?(:dhcp_boot_mode?) || @host.subnet6.respond_to?(:dhcp_boot_mode?) -%>
+<%= snippet 'kickstart_networking_setup' %>
 <% end -%>
 
-#update local time
-echo "updating system time"
-/usr/sbin/ntpdate -sub <%= @host.params['ntp-server'] || '0.fedora.pool.ntp.org' %>
-/usr/sbin/hwclock --systohc
-
-mkdir /root/.ssh 
+mkdir -m 700 /root/.ssh 
 cat <<EOF > /root/.ssh/authorized_keys
-<%= @host.params['ssh-keys'] %>
+<%= host_param('ssh-keys') %>
 EOF
-chmod 700 /root/.ssh
 chmod 600 /root/.ssh/authorized_keys
-
-cat >> /etc/sysctl.conf <<EOF
-fs.file-max = 100000
-EOF
-
-cat >> /etc/security/limits.conf <<EOF
-*      soft nproc 10000
-*      hard nproc 10000
-*      soft nofile 10000
-*      hard nofile 10000
-EOF
-
-echo "Setting local repos and updating..."
-grep -i 'red hat' /etc/redhat-release &&
-	curl http://repos/repos/rhel7local.repo -o /etc/yum.repos.d/rhel7local.repo 
-grep -i 'centos' /etc/redhat-release &&
-	curl http://repos/repos/centos7local.repo -o /etc/yum.repos.d/centos7local.repo &&
-	rm -rf /etc/yum.repos.d/Cent*
-
-curl http://repos/repos/sensulocal.repo -o /etc/yum.repos.d/sensulocal.repo
 
 <% if proxy_uri -%>
 # Yum proxy
 echo 'proxy = <%= proxy_uri %>' >> /etc/yum.conf
 <% end -%>
 
-# enable openstack repository
-yum-config-manager --enable rhel-7-server-openstack-<%= @host.params['rhel-osp-version'] %>{,-tools,-optools}-rpms-local
-
-# update all the base packages from the updates repository
-yum -y -e 0 update
-
-# install Director required packages
-yum -y -e 0  install python-heat-agent\*
-
-useradd -c 'Director user' stack
-install -d -m 700 -o stack -g stack /home/stack/.ssh
-install -m 600 -o stack -g stack /dev/null /home/stack/.ssh/authorized_keys
-cat > /home/stack/.ssh/authorized_keys <<EOF
-<%= @host.params['ssh-keys'] %>
-<%= @host.params['undercloud-ssh-keys'] %>
-EOF
-
-install -m 440 -o root -g root /dev/null /etc/sudoers.d/stack
-cat > /etc/sudoers.d/stack <<EOF
-stack ALL = NOPASSWD: ALL
-EOF
-
-cat > /etc/sysconfig/network-scripts/route-eth2 <<EOF
-192.168.24.1 via 172.16.1.1 metric 1000
-EOF
-
-sed -i '/wheel/d' /etc/sudoers
-sed -i '/Defaults    requiretty/d' /etc/sudoers
-echo '%wheel  ALL=(ALL)       NOPASSWD: ALL'  >> /etc/sudoers.d/wheel
-
-if ! grep -q radonm /etc/aliases; then
-	echo root: radonm@bu.edu >> /etc/aliases
-	newaliases
-fi
-
-if [ "`dmidecode |grep 'PowerEdge R730'`" ]; then
-  curl -O repos/misc/perccli_7.3-007.0318_linux.tar.gz
-  tar -xzvf perccli_7.3-007.0318_linux.tar.gz
-  yum -y -e 0 install perccli_7.3-007.0318_linux/Linux/perccli-007.0318.0000.0000-1.noarch.rpm
-  echo '*/5 * * * *     root   [ "`/opt/MegaRAID/perccli/perccli64 show | tail -n 12|head -n1|cut -d " " -f 41`" == "Opt" ] || echo `/opt/MegaRAID/perccli/perccli64 show` | mail -s "Check raid on `hostname`" root' > /etc/cron.d/checkraid
-  echo '*/5 * * * *     root   [ "`/opt/MegaRAID/perccli/perccli64 show | tail -n 12|head -n1|cut -d " " -f 29`" == "Msng" ] ||  [ "`/opt/MegaRAID/perccli/perccli64 show | tail -n 12|head -n1|cut -d " " -f 29`" == "Opt" ]  || echo `/opt/MegaRAID/perccli/perccli64 show` | mail -s "Check raid on `hostname`" root' >> /etc/cron.d/checkraid
-fi
-
-sed -i 's|PasswordAuthentication yes|PasswordAuthentication no|g' /etc/ssh/sshd_config
-
 <%= snippet 'redhat_register' %>
 
-<% if @host.info['parameters']['realm'] && @host.realm && @host.realm.realm_type == 'FreeIPA' -%>
+<% if host_enc['parameters']['realm'] && @host.realm && @host.realm.realm_type == 'FreeIPA' -%>
 <%= snippet 'freeipa_register' %>
 <% end -%>
 
+<%= snippet('remote_execution_ssh_keys') %>
+
+<%= snippet "blacklist_kernel_modules" %>
+
 <% if puppet_enabled %>
-# add the puppet package
-yum -t -y -e 0 install puppet
-
-echo "Configuring puppet"
-cat > /etc/puppet/puppet.conf << EOF
-<%= snippet 'puppet.conf' %>
-EOF
-
- Setup puppet to run on system reboot
-systemctl enable puppet
-
-/usr/bin/puppet agent --config /etc/puppet/puppet.conf -o --tags no_such_tag <%= @host.puppetmaster.blank? ? '' : "--server #{@host.puppetmaster}" %> --no-daemonize
+<% if host_param_true?('enable-puppetlabs-pc1-repo') || host_param_true?('enable-puppetlabs-repo') || host_param_true?('enable-puppetlabs-puppet5-repo') -%>
+<%= snippet 'puppetlabs_repo' %>
+<% end -%>
+<%= snippet 'puppet_setup' %>
 <% end -%>
 
-<% if salt_enabled %>
-cat > /etc/salt/minion << EOF
-<%= snippet 'saltstack_minion' %>
-EOF
-# Setup salt-minion to run on system reboot
-/sbin/chkconfig --level 345 salt-minion on
-# Running salt-call to trigger key signing
-salt-call --no-color --grains >/dev/null
+<% if @host.operatingsystem.name == 'OracleLinux' && host_param_true?('disable-uek') -%>
+# Uninstall the Oracle Unbreakable Kernel packages
+yum -t -y remove kernel-uek*
+sed -e 's/DEFAULTKERNEL=kernel-uek/DEFAULTKERNEL=kernel/g' -i /etc/sysconfig/kernel
 <% end -%>
+
+curl -sf http://mochat.massopen.cloud/repos/kznstack.repo -o /etc/yum.repos.d/kznstack.repo
+yum -y -e0 localinstall https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+yum-config-manager --disable epel
+yum -y -e0 --enablerepo=epel install ansible
 
 sync
-
-# Inform the build system that we are done.
-echo "Informing Foreman that we are built"
-curl -sf -o /dev/null -k <%= foreman_url('built') %>
-) 2>&1 | tee /root/install.post.log
 exit 0
 
+<%= section_end -%>
+
+%post --interpreter /usr/bin/ansible-playbook --log /root/ks-post-2.log
+---
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: remove firewalld
+      package:
+        name: firewalld
+        state: absent
+
+    - name: sync system clock
+      command: >-
+        /usr/sbin/ntpdate -sub <%= host_param('ntp-server') || '0.fedora.pool.ntp.org' %>
+
+    - name: sync hardware clock
+      command: >-
+        /usr/sbin/hwclock --systohc
+
+    - name: set sysctl values
+      sysctl:
+        name: "{{ item.name }}"
+        value: "{{ item.value }}"
+      loop:
+        - name: fs.file-max
+          value: 100000
+
+    - name: configure limits.conf
+      blockinfile:
+        dest: /etc/security/limits.conf
+        block: |
+          *      soft nproc 10000
+          *      hard nproc 10000
+          *      soft nofile 10000
+          *      hard nofile 10000
+
+    - name: install local repository files
+      get_url:
+        url: http://mochat.massopen.cloud/repos/kznstack.repo
+        dest: /etc/yum.repos.d/kznstack.repo
+
+    - name: enable openstack repositories
+      command: >-
+        yum-config-manager --enable {{ item }}
+      loop:
+        - rhel-7-server-openstack-<%= host_param('rhel-osp-version') %>-rpms-local
+        - rhel-7-server-openstack-<%= host_param('rhel-osp-version') %>-tools-rpms-local
+        - rhel-7-server-openstack-<%= host_param('rhel-osp-version') %>-optools-rpms-local
+
+    - name: update packages
+      package:
+        name: "*"
+        state: latest
+
+    - name: install packages
+      package:
+        name: "{{ packages }}"
+        state: installed
+      vars:
+        packages:
+          - net-snmp
+          - yum-cron
+          - lsof
+          - mc
+          - logwatch
+          - net-tools
+          - bind-utils
+          - virt-what
+
+    - name: detect virtualization
+      command: virt-what
+      register: virt_what
+
+    - name: install ovirt-guest-agent if necessary
+      package:
+        name: ovirt-guest-agent
+        state: installed
+      when: '"ovirt" in virt_what.stdout'
+
+    - name: blacklist nouveau driver
+      copy:
+        content: "blacklist nouveau"
+        dest: /etc/modprobe.d/blacklist-nouveau.conf
+
+    - name: rebuild initrd
+      command: dracut -f
+
+    - name: enable yum-cron
+      service:
+        name: yum-cron
+        enabled: true
+
+    - name: configure yum-cron
+      lineinfile:
+        path: /etc/yum/yum-cron.conf
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      loop:
+        - regexp: "^download_updates"
+          line: "download_updates = yes"
+        - regexp: "^apply_updates"
+          line: "apply_updates = yes"
+        - regexp: "^random_sleep"
+          line: "random_sleep = 180"
+
+    - name: configure sudo
+      copy:
+        dest: /etc/sudoers.d/wheel
+        content: |
+          %wheel ALL=(ALL) NOPASSWD: ALL
+        owner: root
+        group: root
+        mode: 440
+
+    - name: install snmp configuration
+      get_url:
+        url: http://config:mocconfig@mochat.massopen.cloud/config/kzn/snmpd.conf
+        dest: /etc/snmp/snmpd.conf
+        force: true
+
+    - name: enable snmp
+      service:
+        name: snmpd
+        enabled: true
+
+    - name: update repository files
+      cron:
+        name: update kznstack repository configuration
+        minute: 1
+        hour: 23
+        user: root
+        job: >-
+          curl -sf http://mochat.massopen.cloud/repos/kznstack.repo -o /tmp/kznstack.repo &> /dev/null && /bin/mv /tmp/kznstack.repo /etc/yum.repos.d/
+
+    - name: configure /etc/aliases
+      lineinfile:
+        path: /etc/aliases
+        line: "root: rootmail@lists.massopen.cloud"
+        regexp: "^root:"
+    
+    - name: rebuild alias database
+      command: newaliases
+
+    - name: disable ssh password authentication
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        line: "PasswordAuthentication no"
+        regexp: "^#?PasswordAuthentication"
+
+    - name: inform foreman that build is complete
+      uri:
+        url: <%= foreman_url('built') %>
+        status_code:
+          - 200
+          - 201
 <%= section_end -%>
