@@ -1,4 +1,10 @@
 ---
+- name: upgrade packages
+  tags: [packages]
+  package:
+    name: '*'
+    state: latest
+
 - name: install packages
   tags: [packages]
   package:
