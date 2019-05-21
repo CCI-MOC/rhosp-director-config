@@ -203,7 +203,8 @@ exit 0
 
     - name: sync system clock
       command: >-
-        /usr/sbin/ntpdate -sub <%= host_param('ntp-server') || '0.fedora.pool.ntp.org' %>
+        /usr/sbin/ntpdate -sub
+        <%= host_param('ntp-server') || '0.fedora.pool.ntp.org' %>
 
     - name: sync hardware clock
       command: >-
@@ -322,14 +323,16 @@ exit 0
         hour: 23
         user: root
         job: >-
-          curl -sf http://mochat.massopen.cloud/repos/kznstack.repo -o /tmp/kznstack.repo &> /dev/null && /bin/mv /tmp/kznstack.repo /etc/yum.repos.d/
+          curl -sf http://mochat.massopen.cloud/repos/kznstack.repo
+          -o /tmp/kznstack.repo &> /dev/null &&
+          /bin/mv /tmp/kznstack.repo /etc/yum.repos.d/
 
     - name: configure /etc/aliases
       lineinfile:
         path: /etc/aliases
         line: "root: rootmail@lists.massopen.cloud"
         regexp: "^root:"
-    
+
     - name: rebuild alias database
       command: newaliases
 
@@ -339,6 +342,12 @@ exit 0
         line: "PasswordAuthentication no"
         regexp: "^#?PasswordAuthentication"
 
+    - name: configure name resolution
+      lineinfile:
+        path: /etc/resolv.conf
+        regexp: "^options"
+        line: "options timeout:1 attempts:1 rotate"
+
     - name: inform foreman that build is complete
       uri:
         url: <%= foreman_url('built') %>
@@ -346,3 +355,5 @@ exit 0
           - 200
           - 201
 <%= section_end -%>
+
+# vim: set ft=yaml :
