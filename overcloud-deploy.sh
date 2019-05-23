@@ -13,23 +13,15 @@ else
 	TEMPLATES=/usr/share/openstack-tripleo-heat-templates
 fi
 
-. ./overcloud-env.sh
-
-case "$MOC_TARGET" in
-	(production)
-		moc_target_yaml=$PWD/templates/production.yml
-		;;
-	(staging)
-		moc_target_yaml=$PWD/templates/staging.yml
-		;;
-
-	(*)	echo "ERROR: MOC_TARGET must be one of 'staging' or 'production'." >&2
-		exit 1
-		;;
-esac
-
 # Generate files
 ansible-playbook playbooks/deploy.yml
+
+. ./overcloud-env.sh
+
+if [ "$MOC_ENVIRONMENT" = "" ]; then
+	echo "ERROR: MOC_ENVIRONMENT variable must be set." >&2
+	exit 1
+fi
 
 # This is necessary to work around bugs #1645503 and #1645134
 bash $TEMPLATES/deployed-server/scripts/enable-ssh-admin.sh
@@ -96,7 +88,7 @@ deploy_args=(
 
 	# Most of our custom configuration.
 	-e $PWD/templates/common.yaml
-	-e $moc_target_yaml
+	-e $PWD/templates/${MOC_ENVIRONMENT}.yaml
 	-e $PWD/templates/rolecount.yaml
 	-e $PWD/templates/credentials.yaml
 	-e $PWD/templates/fencing.yaml
