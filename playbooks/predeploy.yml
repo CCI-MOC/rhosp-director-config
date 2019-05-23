@@ -11,6 +11,7 @@
   roles:
     - predeploy/undercloud-prep
     - predeploy/selinux_relabel
+    - predeploy/bitwarden
 
 - name: prepare stack user on undercloud
   hosts: undercloud

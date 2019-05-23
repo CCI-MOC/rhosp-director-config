@@ -1,0 +1,19 @@
+---
+- name: download bitwarden cli
+  tags: [bitwarden]
+  get_url:
+    url: "{{ bitwarden_cli_url }}"
+    dest: /tmp/bitwarden.zip
+
+- name: extract bitwarden cli
+  tags: [bitwarden]
+  unarchive:
+    remote_src: true
+    src: /tmp/bitwarden.zip
+    dest: /usr/local/bin
+
+- name: ensure correct permissions on bitwarden cli
+  tags: [bitwarden]
+  file:
+    path: /usr/local/bin/bw
+    mode: "0755"

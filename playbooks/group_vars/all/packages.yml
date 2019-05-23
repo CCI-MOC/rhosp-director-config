@@ -3,3 +3,4 @@ common_packages:
   - git
   - tcpdump
   - strace
+  - unzip
