@@ -160,23 +160,6 @@ parameter_defaults:
     # https://trello.com/c/5umGRzcy/143-k2-increase-nova-volume-wait-timeout
     nova::compute::block_device_allocate_retries: 300
 
-  ExtraConfig:
-    tripleo::firewall::firewall_rules:
-      '002 accept ssh from provisioning network ipv4':
-        dport: 22
-        proto: 'tcp'
-        source: 172.16.0.0/19
-      '002 accept ssh from vpn network ipv4':
-        dport: 22
-        proto: 'tcp'
-        source: 172.31.224.0/19
-      '002 reject all other ssh traffic ipv4':
-        dport: 22
-        proto: 'tcp'
-        action: drop
-      '100 allow all from admin network':
-        source: 172.16.0.0/19
-
   SSLCertificate: |
     -----BEGIN CERTIFICATE-----
     MIIGuDCCBaCgAwIBAgIJALiDvkTzEISyMA0GCSqGSIb3DQEBCwUAMIG0MQswCQYD
