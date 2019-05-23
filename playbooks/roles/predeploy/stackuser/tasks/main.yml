@@ -10,6 +10,7 @@
 - name: clone director configuration
   git:
     repo: https://github.com/cci-moc/rhosp-director-config
+    version: "{{ config_repo_version|default('master') }}"
     dest: "{{ stack_home }}/rhosp-director-config"
 
 - name: create undercloud.conf symlink
