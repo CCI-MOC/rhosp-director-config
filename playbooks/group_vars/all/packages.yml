@@ -4,3 +4,5 @@ common_packages:
   - tcpdump
   - strace
   - unzip
+  - screen
+  - tmux
