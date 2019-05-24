@@ -1,4 +1,24 @@
 ---
+- name: set undercloud_ip
+  set_fact:
+    undercloud_ip: >-
+      {{
+      (ansible_default_ipv4.address ~ "/" ~ ansible_default_ipv4.netmask) |
+      ipaddr(query='cidr')
+      }}
+
+- name: undercloud.conf
+  tags: [template, undercloud_conf]
+  template:
+    src: undercloud.j2.conf
+    dest: "../undercloud.conf"
+
+- name: create undercloud.conf symlink
+  file:
+    src: "rhosp-director-config/undercloud.conf"
+    dest: "~/undercloud.conf"
+    state: link
+
 - name: hostnamemap.yaml
   tags: [template, hostnamemap.yaml]
   template:

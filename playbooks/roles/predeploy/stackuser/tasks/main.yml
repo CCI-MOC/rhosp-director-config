@@ -12,9 +12,4 @@
     repo: https://github.com/cci-moc/rhosp-director-config
     version: "{{ config_repo_version|default('master') }}"
     dest: "{{ stack_home }}/rhosp-director-config"
-
-- name: create undercloud.conf symlink
-  file:
-    src: "rhosp-director-config/undercloud.conf"
-    dest: "{{ stack_home }}/undercloud.conf"
-    state: link
+    recursive: true

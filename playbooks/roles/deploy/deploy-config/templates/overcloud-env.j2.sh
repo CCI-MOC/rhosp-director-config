@@ -4,6 +4,7 @@
 # lost.
 
 export MOC_ENVIRONMENT={{ moc_environment }}
+export UNDERCLOUD_IP={{ undercloud_ip | ipaddr(query="address") }}
 
 export ControllerDeployedServer_hosts="
 {% for host in groups.controller|hostname_sort(hostvars) %}
