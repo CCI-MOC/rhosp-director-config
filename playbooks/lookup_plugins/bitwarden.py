@@ -27,28 +27,28 @@ except ImportError:
 
 
 DOCUMENTATION = """
-    lookup: bitwarden
-    author:
-      -  Matt Stofko <matt@mjslabs.com>
-    requirements:
-      - bw (command line utility)
-      - BW_SESSION environment var (from `bw login` or `bw unlock`)
-    short_description: look up data from a bitwarden vault
-    description:
-      - use the bw command line utility to grab one or more items stored in a
-        bitwarden vault
-    options:
-      _terms:
-        description: name of item that contains the field to fetch
-        required: True
-      field:
-        description: field to return from bitwarden
-        default: 'password'
-     custom_field:
-        description: If True, look up named field in custom fields instead
-          of top-level dictionary.
-     sync:
-        description: If True, call `bw sync` before lookup
+lookup: bitwarden
+author:
+  - Matt Stofko <matt@mjslabs.com>
+requirements:
+  - bw (command line utility)
+  - BW_SESSION environment var (from `bw login` or `bw unlock`)
+short_description: look up data from a bitwarden vault
+description:
+  - use the bw command line utility to grab one or more items stored in a
+    bitwarden vault
+options:
+  _terms:
+    description: name of item that contains the field to fetch
+    required: true
+field:
+  description: field to return from bitwarden
+  default: 'password'
+custom_field:
+  description: If True, look up named field in custom fields instead
+      of top-level dictionary.
+sync:
+  description: If True, call `bw sync` before lookup
 """
 
 EXAMPLES = """
@@ -111,6 +111,10 @@ class Bitwarden(object):
     def get_entry(self, key, field):
         return self._run(["get", field, key]).decode('utf-8')
 
+    def get_notes(self, key):
+        data = json.loads(self.get_entry(key, 'item'))
+        return data['notes']
+
     def get_custom_field(self, key, field):
         data = json.loads(self.get_entry(key, 'item'))
         return next(x for x in data['fields'] if x['name'] == field)['value']
@@ -135,6 +139,8 @@ class LookupModule(LookupBase):
         for term in terms:
             if kwargs.get('custom_field'):
                 values.append(bw.get_custom_field(term, field))
+            elif field == 'notes':
+                values.append(bw.get_notes(term))
             else:
                 values.append(bw.get_entry(term, field))
         return values
