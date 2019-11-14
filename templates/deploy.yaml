@@ -155,8 +155,10 @@ parameter_defaults:
 
   # Configuration for GPU passthrough
   NovaPCIPassthrough:
-    - vendor_id: 10de
-      product_id: 15f7
+    - vendor_id: "10de"
+      product_id: "15f7"
+    - vendor_id: "8086"
+      product_id: "09c4"
 
   NovaSchedulerDefaultFilters:
     - RetryFilter
@@ -214,6 +216,10 @@ parameter_defaults:
         product_id: "15f7"
         device_type: "type-PCI"
         name: "tesla-p100"
+      - vendor_id: "8086"
+        product_id: "09c4"
+        device_type: "type-PCI"
+        name: "intel-fpga"
 
   ComputeDeployedServerExtraConfig:
     nova::compute::libvirt::libvirt_cpu_mode: host-passthrough
