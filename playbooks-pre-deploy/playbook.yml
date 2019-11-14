@@ -9,7 +9,8 @@
   hosts: undercloud
   become: true
   roles:
-    - undercloud-prep
+    - role: undercloud-prep
+      tags: [undercloud-prep]
     - selinux_relabel
 
 - name: prepare stack user on undercloud
@@ -22,10 +23,11 @@
 
 - name: prepare overcloud
   hosts: overcloud
-  tags: [bugs, openvswitch]
+  tags: [bugs, openvswitch, overcloud-prep]
   become: true
   roles:
-    - overcloud-prep
+    - role: overcloud-prep
+      tags: [overcloud-prep]
     - bug/1642588-openvswitch-start
     - bug/1642591-openvswitch-selinux
     - selinux_relabel
