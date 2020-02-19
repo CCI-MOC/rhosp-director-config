@@ -244,8 +244,10 @@ parameter_defaults:
         dport: 22
         proto: 'tcp'
         action: drop
-      '100 allow all from admin network':
+      '100 allow all tcp from admin network':
         source: 172.16.0.0/19
+        proto: tcp
+        port: all
 
   SSLCertificate: |
     -----BEGIN CERTIFICATE-----
