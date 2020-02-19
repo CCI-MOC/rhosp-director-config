@@ -12,7 +12,8 @@ resource_registry:
   OS::TripleO::NetworkerDeployedServer::Net::SoftwareConfig:
     network/config/networker.yaml
   OS::Local::Services::PatchPuppetModules:
-    ./services/patch-puppet-modules.yaml
+    OS::Heat::None
+#   ./services/patch-puppet-modules.yaml
   OS::TripleO::DeployedServer::ControlPlanePort:
     /usr/share/openstack-tripleo-heat-templates/deployed-server/deployed-neutron-port.yaml
 
