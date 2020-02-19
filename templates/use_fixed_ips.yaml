@@ -1,0 +1,127 @@
+resource_registry:
+
+  OS::TripleO::ControllerDeployedServer::Ports::ExternalPort: /usr/share/openstack-tripleo-heat-templates/network/ports/external_from_pool.yaml
+  OS::TripleO::ControllerDeployedServer::Ports::InternalApiPort: /usr/share/openstack-tripleo-heat-templates/network/ports/internal_api_from_pool.yaml
+  OS::TripleO::ControllerDeployedServer::Ports::StoragePort: /usr/share/openstack-tripleo-heat-templates/network/ports/storage_from_pool.yaml
+  OS::TripleO::ControllerDeployedServer::Ports::TenantPort: /usr/share/openstack-tripleo-heat-templates/network/ports/tenant_from_pool.yaml
+
+  OS::TripleO::NetworkerDeployedServer::Ports::InternalApiPort: /usr/share/openstack-tripleo-heat-templates/network/ports/internal_api_from_pool.yaml
+  OS::TripleO::NetworkerDeployedServer::Ports::TenantPort: /usr/share/openstack-tripleo-heat-templates/network/ports/tenant_from_pool.yaml
+
+  OS::TripleO::ComputeDeployedServer::Ports::InternalApiPort: /usr/share/openstack-tripleo-heat-templates/network/ports/internal_api_from_pool.yaml
+  OS::TripleO::ComputeDeployedServer::Ports::StoragePort: /usr/share/openstack-tripleo-heat-templates/network/ports/storage_from_pool.yaml
+  OS::TripleO::ComputeDeployedServer::Ports::TenantPort: /usr/share/openstack-tripleo-heat-templates/network/ports/tenant_from_pool.yaml
+
+parameter_defaults:
+
+  ControlFixedIPs: [{'ip_address':'172.16.31.203'}]
+  InternalApiVirtualFixedIPs: [{'ip_address':'172.16.32.19'}]
+  StorageVirtualFixedIPs: [{'ip_address':'192.168.0.24'}]
+  StorageMgmtVirtualFixedIPs: [{'ip_address':'172.16.31.203'}]
+  RedisVirtualFixedIPs: [{'ip_address':'172.16.32.29'}]
+
+
+  ControllerDeployedServerIPs:
+    ctlplane:
+      - "172.16.15.39" # neu-15-39-control1.kzn.moc overcloud-controller-0
+      - "172.16.5.39" # neu-5-39-control2.kzn.moc overcloud-controller-1
+      - "172.16.3.39" # neu-3-39-control3.kzn.moc overcloud-controller-2
+    storage:
+      - "192.168.0.21" # neu-15-39-control1.kzn.moc overcloud-controller-0
+      - "192.168.0.11" # neu-5-39-control2.kzn.moc overcloud-controller-1
+      - "192.168.0.13" # neu-3-39-control3.kzn.moc overcloud-controller-2
+    internal_api:
+      - "172.16.32.10" # neu-15-39-control1.kzn.moc overcloud-controller-0
+      - "172.16.32.11" # neu-5-39-control2.kzn.moc overcloud-controller-1
+      - "172.16.32.28" # neu-3-39-control3.kzn.moc overcloud-controller-2
+    tenant:
+      - "172.16.64.18" # neu-15-39-control1.kzn.moc overcloud-controller-0
+      - "172.16.64.12" # neu-5-39-control2.kzn.moc overcloud-controller-1
+      - "172.16.64.13" # neu-3-39-control3.kzn.moc overcloud-controller-2
+    external:
+      - "129.10.5.100" # neu-15-39-control1.kzn.moc overcloud-controller-0
+      - "129.10.5.10" # neu-5-39-control2.kzn.moc overcloud-controller-1
+      - "129.10.5.24" # neu-3-39-control3.kzn.moc overcloud-controller-2
+
+  NetworkerDeployedServerIPs:
+    ctlplane:
+      - "172.16.19.11" # neu-19-11-nc1.kzn.moc overcloud-networker-0
+      - "172.16.17.11" # neu-17-11-nc2.kzn.moc overcloud-networker-1
+    internal_api:
+      - "172.16.32.53" # neu-19-11-nc1.kzn.moc overcloud-networker-0
+      - "172.16.32.27" # neu-17-11-nc2.kzn.moc overcloud-networker-1
+    tenant:
+      - "172.16.64.45" # neu-19-11-nc1.kzn.moc overcloud-networker-0
+      - "172.16.64.29" # neu-17-11-nc2.kzn.moc overcloud-networker-1
+
+  ComputeDeployedServerIPs:
+    ctlplane:
+      - "172.16.3.34" # neu-3-34-stackcomp.kzn.moc overcloud-compute-0
+      - "172.16.3.35" # neu-3-35-stackcomp.kzn.moc overcloud-compute-1
+      - "172.16.3.36" # neu-3-36-stackcomp.kzn.moc overcloud-compute-2
+      - "172.16.3.37" # neu-3-37-stackcomp.kzn.moc overcloud-compute-3
+      - "172.16.3.38" # neu-3-38-stackcomp.kzn.moc overcloud-compute-4
+      - "172.16.5.34" # neu-5-34-stackcomp.kzn.moc overcloud-compute-5
+      - "172.16.5.35" # neu-5-35-stackcomp.kzn.moc overcloud-compute-6
+      - "172.16.5.36" # neu-5-36-stackcomp.kzn.moc overcloud-compute-7
+      - "172.16.5.37" # neu-5-37-stackcomp.kzn.moc overcloud-compute-8
+      - "172.16.5.38" # neu-5-38-stackcomp.kzn.moc overcloud-compute-9
+      - "172.16.15.34" # neu-15-34-stackcomp.kzn.moc overcloud-compute-10
+      - "172.16.15.35" # neu-15-35-stackcomp.kzn.moc overcloud-compute-11
+      - "172.16.15.36" # neu-15-36-stackcomp.kzn.moc overcloud-compute-12
+      - "172.16.15.37" # neu-15-37-stackcomp.kzn.moc overcloud-compute-13
+      - "172.16.15.38" # neu-15-38-stackcomp.kzn.moc overcloud-compute-14
+      - "172.16.15.12" # neu-15-12-gcomp.kzn.moc overcloud-compute-15
+    storage:
+      - "192.168.0.16" # neu-3-34-stackcomp.kzn.moc overcloud-compute-0
+      - "192.168.0.40" # neu-3-35-stackcomp.kzn.moc overcloud-compute-1
+      - "192.168.0.10" # neu-3-36-stackcomp.kzn.moc overcloud-compute-2
+      - "192.168.0.29" # neu-3-37-stackcomp.kzn.moc overcloud-compute-3
+      - "192.168.0.12" # neu-3-38-stackcomp.kzn.moc overcloud-compute-4
+      - "192.168.0.19" # neu-5-34-stackcomp.kzn.moc overcloud-compute-5
+      - "192.168.0.14" # neu-5-35-stackcomp.kzn.moc overcloud-compute-6
+      - "192.168.0.28" # neu-5-36-stackcomp.kzn.moc overcloud-compute-7
+      - "192.168.0.42" # neu-5-37-stackcomp.kzn.moc overcloud-compute-8
+      - "192.168.0.43" # neu-5-38-stackcomp.kzn.moc overcloud-compute-9
+      - "192.168.0.15" # neu-15-34-stackcomp.kzn.moc overcloud-compute-10
+      - "192.168.0.26" # neu-15-35-stackcomp.kzn.moc overcloud-compute-11
+      - "192.168.0.17" # neu-15-36-stackcomp.kzn.moc overcloud-compute-12
+      - "192.168.0.18" # neu-15-37-stackcomp.kzn.moc overcloud-compute-13
+      - "192.168.0.30" # neu-15-38-stackcomp.kzn.moc overcloud-compute-14
+      - "192.168.0.25" # neu-15-12-gcomp.kzn.moc overcloud-compute-15
+    tenant:
+      - "172.16.64.26" # neu-3-34-stackcomp.kzn.moc overcloud-compute-0
+      - "172.16.64.36" # neu-3-35-stackcomp.kzn.moc overcloud-compute-1
+      - "172.16.64.10" # neu-3-36-stackcomp.kzn.moc overcloud-compute-2
+      - "172.16.64.31" # neu-3-37-stackcomp.kzn.moc overcloud-compute-3
+      - "172.16.64.21" # neu-3-38-stackcomp.kzn.moc overcloud-compute-4
+      - "172.16.64.22" # neu-5-34-stackcomp.kzn.moc overcloud-compute-5
+      - "172.16.64.20" # neu-5-35-stackcomp.kzn.moc overcloud-compute-6
+      - "172.16.64.28" # neu-5-36-stackcomp.kzn.moc overcloud-compute-7
+      - "172.16.64.14" # neu-5-37-stackcomp.kzn.moc overcloud-compute-8
+      - "172.16.64.11" # neu-5-38-stackcomp.kzn.moc overcloud-compute-9
+      - "172.16.64.35" # neu-15-34-stackcomp.kzn.moc overcloud-compute-10
+      - "172.16.64.15" # neu-15-35-stackcomp.kzn.moc overcloud-compute-11
+      - "172.16.64.38" # neu-15-36-stackcomp.kzn.moc overcloud-compute-12
+      - "172.16.64.53" # neu-15-37-stackcomp.kzn.moc overcloud-compute-13
+      - "172.16.64.27" # neu-15-38-stackcomp.kzn.moc overcloud-compute-14
+      - "172.16.64.17" # neu-15-12-gcomp.kzn.moc overcloud-compute-15
+    internal_api:
+      - "172.16.32.18" # neu-3-34-stackcomp.kzn.moc overcloud-compute-0
+      - "172.16.32.16" # neu-3-35-stackcomp.kzn.moc overcloud-compute-1
+      - "172.16.32.20" # neu-3-36-stackcomp.kzn.moc overcloud-compute-2
+      - "172.16.32.12" # neu-3-37-stackcomp.kzn.moc overcloud-compute-3
+      - "172.16.32.17" # neu-3-38-stackcomp.kzn.moc overcloud-compute-4
+      - "172.16.32.25" # neu-5-34-stackcomp.kzn.moc overcloud-compute-5
+      - "172.16.32.15" # neu-5-35-stackcomp.kzn.moc overcloud-compute-6
+      - "172.16.32.24" # neu-5-36-stackcomp.kzn.moc overcloud-compute-7
+      - "172.16.32.34" # neu-5-37-stackcomp.kzn.moc overcloud-compute-8
+      - "172.16.32.13" # neu-5-38-stackcomp.kzn.moc overcloud-compute-9
+      - "172.16.32.31" # neu-15-34-stackcomp.kzn.moc overcloud-compute-10
+      - "172.16.32.40" # neu-15-35-stackcomp.kzn.moc overcloud-compute-11
+      - "172.16.32.33" # neu-15-36-stackcomp.kzn.moc overcloud-compute-12
+      - "172.16.32.43" # neu-15-37-stackcomp.kzn.moc overcloud-compute-13
+      - "172.16.32.35" # neu-15-38-stackcomp.kzn.moc overcloud-compute-14
+      - "172.16.32.23" # neu-15-12-gcomp.kzn.moc overcloud-compute-15
+
+# vim: set ts=2 sw=2 expandtab ai :

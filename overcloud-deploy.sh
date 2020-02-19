@@ -91,6 +91,9 @@ deploy_args=(
 	# Static ip assignment
 	-e $PWD/templates/hostnamemap.yaml
 	-e $PWD/templates/deployedserverportmap.yaml
+
+	# per https://access.redhat.com/support/cases/#/case/02552401
+	-e $PWD/templates/use_fixed_ips.yaml
 )
 
 if [ -d patches/puppet-modules ]; then
