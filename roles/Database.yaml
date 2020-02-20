@@ -7,6 +7,7 @@
   networks:
     - InternalApi
   HostnameFormatDefault: '%stackname%-database-%index%'
+  update_serial: 1
   ServicesDefault:
     - OS::TripleO::Services::Aide
     - OS::TripleO::Services::AuditD
@@ -16,9 +17,11 @@
     - OS::TripleO::Services::Clustercheck
     - OS::TripleO::Services::Docker
     - OS::TripleO::Services::Fluentd
+    - OS::TripleO::Services::IpaClient
     - OS::TripleO::Services::Ipsec
     - OS::TripleO::Services::Kernel
     - OS::TripleO::Services::LoginDefs
+    - OS::TripleO::Services::MetricsQdr
     - OS::TripleO::Services::MySQL
     - OS::TripleO::Services::MySQLClient
     - OS::TripleO::Services::Ntp

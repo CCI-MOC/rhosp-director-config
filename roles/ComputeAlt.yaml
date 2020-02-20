@@ -12,6 +12,9 @@
   HostnameFormatDefault: '%stackname%-novacomputealt-%index%'
   disable_upgrade_deployment: True
   disable_constraints: True
+  RoleParametersDefault:
+    TunedProfileName: "virtual-host"
+  update_serial: 25
   ServicesDefault:
     - OS::TripleO::Services::AuditD
     - OS::TripleO::Services::CACerts
@@ -25,6 +28,7 @@
     - OS::TripleO::Services::ComputeNeutronMetadataAgent
     - OS::TripleO::Services::ComputeNeutronOvsAgentAlt
     - OS::TripleO::Services::FluentdAlt
+    - OS::TripleO::Services::IpaClient
     - OS::TripleO::Services::IscsidAlt
     - OS::TripleO::Services::Kernel
     - OS::TripleO::Services::MySQLClient

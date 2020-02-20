@@ -12,6 +12,9 @@
   networks_skip_config:
     - Tenant
   HostnameFormatDefault: '%stackname%-lionovacompute-%index%'
+  RoleParametersDefault:
+    TunedProfileName: "virtual-host"
+  update_serial: 25
   ServicesDefault:
     - OS::TripleO::Services::Aide
     - OS::TripleO::Services::AuditD
@@ -27,16 +30,19 @@
     - OS::TripleO::Services::ComputeNeutronOvsAgent
     - OS::TripleO::Services::Docker
     - OS::TripleO::Services::Fluentd
+    - OS::TripleO::Services::IpaClient
     - OS::TripleO::Services::Ipsec
     - OS::TripleO::Services::Iscsid
     - OS::TripleO::Services::Kernel
     - OS::TripleO::Services::LoginDefs
+    - OS::TripleO::Services::MetricsQdr
     - OS::TripleO::Services::MySQLClient
     - OS::TripleO::Services::NeutronBgpVpnBagpipe
     - OS::TripleO::Services::NeutronLinuxbridgeAgent
     - OS::TripleO::Services::NeutronVppAgent
     - OS::TripleO::Services::NovaCompute
     - OS::TripleO::Services::NovaLibvirt
+    - OS::TripleO::Services::NovaLibvirtGuests
     - OS::TripleO::Services::NovaMigrationTarget
     - OS::TripleO::Services::Ntp
     - OS::TripleO::Services::LiquidioCompute

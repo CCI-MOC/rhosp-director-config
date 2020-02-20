@@ -6,6 +6,7 @@
     Standalone messaging role with RabbitMQ being managed via Pacemaker
   networks:
     - InternalApi
+  update_serial: 1
   HostnameFormatDefault: '%stackname%-messaging-%index%'
   ServicesDefault:
     - OS::TripleO::Services::Aide
@@ -15,9 +16,11 @@
     - OS::TripleO::Services::Collectd
     - OS::TripleO::Services::Docker
     - OS::TripleO::Services::Fluentd
+    - OS::TripleO::Services::IpaClient
     - OS::TripleO::Services::Ipsec
     - OS::TripleO::Services::Kernel
     - OS::TripleO::Services::LoginDefs
+    - OS::TripleO::Services::MetricsQdr
     - OS::TripleO::Services::Ntp
     - OS::TripleO::Services::ContainersLogrotateCrond
     - OS::TripleO::Services::Pacemaker
@@ -29,4 +32,3 @@
     - OS::TripleO::Services::TripleoFirewall
     - OS::TripleO::Services::TripleoPackages
     - OS::TripleO::Services::Tuned
-

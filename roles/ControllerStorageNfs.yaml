@@ -1,11 +1,14 @@
 ###############################################################################
-# Role: Controller                                                            #
+# Role: ControllerStorageNfs                                                  #
 ###############################################################################
-- name: Controller
+- name: ControllerStorageNfs
   description: |
-    Controller role that has all the controler services loaded and handles
-    Database, Messaging and Network functions.
-  CountDefault: 1
+    Controller role that has all the controller services loaded, handles
+    Database, Messaging and Network functions, and additionally runs a ganesha
+    service as a CephFS to NFS gateway.  The gateway serves NFS exports via a
+    VIP on a new isolated StorageNFS network.
+  # ganesha service should always be deployed in HA configuration.
+  CountDefault: 3
   tags:
     - primary
     - controller
@@ -23,6 +26,7 @@
   deprecated_param_extraconfig: 'controllerExtraConfig'
   deprecated_param_flavor: 'OvercloudControlFlavor'
   deprecated_param_image: 'controllerImage'
+  update_serial: 1
   ServicesDefault:
     - OS::TripleO::Services::Aide
     - OS::TripleO::Services::AodhApi
@@ -53,6 +57,7 @@
     - OS::TripleO::Services::CinderBackendDellEMCVMAXISCSI
     - OS::TripleO::Services::CinderBackendDellEMCXTREMIOISCSI
     - OS::TripleO::Services::CinderBackendNetApp
+    - OS::TripleO::Services::CinderBackendPure
     - OS::TripleO::Services::CinderBackendScaleIO
     - OS::TripleO::Services::CinderBackendVRTSHyperScale
     - OS::TripleO::Services::CinderBackup
@@ -78,6 +83,7 @@
     - OS::TripleO::Services::HeatApiCfn
     - OS::TripleO::Services::HeatEngine
     - OS::TripleO::Services::Horizon
+    - OS::TripleO::Services::IpaClient
     - OS::TripleO::Services::Ipsec
     - OS::TripleO::Services::IronicApi
     - OS::TripleO::Services::IronicConductor
@@ -97,6 +103,7 @@
     - OS::TripleO::Services::ManilaScheduler
     - OS::TripleO::Services::ManilaShare
     - OS::TripleO::Services::Memcached
+    - OS::TripleO::Services::MetricsQdr
     - OS::TripleO::Services::MongoDb
     - OS::TripleO::Services::MySQL
     - OS::TripleO::Services::MySQLClient

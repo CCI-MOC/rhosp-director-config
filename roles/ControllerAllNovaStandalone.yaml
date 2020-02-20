@@ -17,6 +17,7 @@
     - Tenant
   default_route_networks: ['External']
   HostnameFormatDefault: '%stackname%-controller-%index%'
+  update_serial: 1
   ServicesDefault:
     - OS::TripleO::Services::AodhApi
     - OS::TripleO::Services::AodhEvaluator
@@ -44,10 +45,12 @@
     - OS::TripleO::Services::CinderScheduler
     - OS::TripleO::Services::CinderVolume
     - OS::TripleO::Services::Collectd
+    - OS::TripleO::Services::MetricsQdr
     - OS::TripleO::Services::Congress
     - OS::TripleO::Services::Docker
     - OS::TripleO::Services::Etcd
     - OS::TripleO::Services::Fluentd
+    - OS::TripleO::Services::IpaClient
     - OS::TripleO::Services::Ipsec
     - OS::TripleO::Services::GlanceApi
     - OS::TripleO::Services::GlanceRegistry

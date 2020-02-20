@@ -10,6 +10,7 @@
     - StorageMgmt
   uses_deprecated_params: False
   deprecated_nic_config_name: 'cinder-storage.yaml'
+  update_serial: 25
   ServicesDefault:
     - OS::TripleO::Services::Aide
     - OS::TripleO::Services::AuditD
@@ -20,10 +21,12 @@
     - OS::TripleO::Services::Collectd
     - OS::TripleO::Services::Docker
     - OS::TripleO::Services::Fluentd
+    - OS::TripleO::Services::IpaClient
     - OS::TripleO::Services::Ipsec
     - OS::TripleO::Services::Iscsid
     - OS::TripleO::Services::Kernel
     - OS::TripleO::Services::LoginDefs
+    - OS::TripleO::Services::MetricsQdr
     - OS::TripleO::Services::MySQLClient
     - OS::TripleO::Services::Ntp
     - OS::TripleO::Services::ContainersLogrotateCrond

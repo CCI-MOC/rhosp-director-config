@@ -17,6 +17,7 @@
     - Tenant
   default_route_networks: ['External']
   HostnameFormatDefault: '%stackname%-controller-%index%'
+  update_serial: 1
   ServicesDefault:
     - OS::TripleO::Services::Aide
     - OS::TripleO::Services::AodhApi
@@ -53,6 +54,7 @@
     - OS::TripleO::Services::Ec2Api
     - OS::TripleO::Services::Etcd
     - OS::TripleO::Services::Fluentd
+    - OS::TripleO::Services::IpaClient
     - OS::TripleO::Services::Ipsec
     - OS::TripleO::Services::GlanceApi
     - OS::TripleO::Services::GlanceRegistry
@@ -82,6 +84,7 @@
     - OS::TripleO::Services::ManilaBackendVMAX
     - OS::TripleO::Services::ManilaScheduler
     - OS::TripleO::Services::ManilaShare
+    - OS::TripleO::Services::MetricsQdr
     - OS::TripleO::Services::Memcached
     - OS::TripleO::Services::MistralApi
     - OS::TripleO::Services::MistralEngine

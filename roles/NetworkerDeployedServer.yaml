@@ -10,9 +10,11 @@
   - OS::TripleO::Services::ContainersLogrotateCrond
   - OS::TripleO::Services::Docker
   - OS::TripleO::Services::Fluentd
+  - OS::TripleO::Services::IpaClient
   - OS::TripleO::Services::Ipsec
   - OS::TripleO::Services::Kernel
   - OS::TripleO::Services::LoginDefs
+  - OS::TripleO::Services::MetricsQdr
   - OS::TripleO::Services::MySQLClient
   - OS::TripleO::Services::NeutronCorePlugin
   - OS::TripleO::Services::NeutronDhcpAgent
