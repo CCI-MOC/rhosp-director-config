@@ -63,7 +63,7 @@ deploy_args=(
 	-e $TEMPLATES/environments/services/ec2-api.yaml
 
 	# Enable OpenIDC federation
-	-e $TEMPLATES/environments/enable-federation-openidc.yaml
+	#-e $TEMPLATES/environments/enable-federation-openidc.yaml
 
 	# Use Docker registry on the undercloud.
 	-e $PWD/templates/overcloud_images.yaml
