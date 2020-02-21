@@ -96,21 +96,6 @@ deploy_args=(
 	-e $PWD/templates/use_fixed_ips.yaml
 )
 
-if [ -d patches/puppet-modules ]; then
-	echo "archiving puppet modules..."
-	tar -cz -f puppet-modules.tar.gz -C patches/puppet-modules .
-
-	echo "uploading puppet modules..."
-	upload-swift-artifacts \
-		-f puppet-modules.tar.gz \
-		--environment $PWD/templates/puppet_modules.yaml
-
-	sed -i s/DeployArtifactURLs/PuppetModuleUrls/ \
-		$PWD/templates/puppet_modules.yaml
-
-	deploy_args+=(-e $PWD/templates/puppet_modules.yaml)
-fi
-
 if [ -f local_deploy_config.sh ]; then
 	. local_deploy_config.sh
 fi
