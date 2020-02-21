@@ -207,6 +207,16 @@ parameter_defaults:
       https://osticket.massopen.cloud/open.php
     cinder::api::default_volume_type: default
     horizon::keystone_url: https://kaizen.massopen.cloud:13000/v3
+    keystone::config::keystone_config:
+      auth/methods:
+        value: password,token,openid,application_credential
+      openid/remote_id_attribute:
+        value: HTTP_OIDC_ISS
+      federation/trusted_dashboard:
+        value:
+          - http://onboarding.massopen.cloud/auth/websso/
+          - https://onboarding.massopen.cloud/auth/websso/
+          - https://kaizen.massopen.cloud/dashboard/auth/websso/
 
     tripleo::haproxy::haproxy_globals_override:
       tune.ssl.default-dh-param: 2048
