@@ -1,4 +1,6 @@
 ---
 common_packages:
+  - rsync
+  - tmpwatch
   - tcpdump
   - strace

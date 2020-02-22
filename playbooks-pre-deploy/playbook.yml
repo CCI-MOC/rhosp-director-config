@@ -5,6 +5,12 @@
   roles:
     - all-prep
 
+- name: prepare compute hosts
+  hosts: compute
+  become: true
+  roles:
+    - openvswitch
+
 - name: prepare undercloud
   hosts: undercloud
   become: true

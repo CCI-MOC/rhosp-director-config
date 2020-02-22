@@ -1,0 +1,24 @@
+---
+- name: ensure that openvswitch is installed
+  package:
+    name: openvswitch
+    state: installed
+
+- name: ensure that openvswitch is active
+  service:
+    name: openvswitch
+    state: started
+    enabled: true
+
+- name: get list of ovs bridges
+  command: >-
+    ovs-vsctl list-br
+  register: bridges
+
+- name: create external network bridges
+  command: >-
+    ovs-vsctl add-br {{ item }}
+  when: item not in bridges.stdout_lines
+  loop:
+    - br-ex
+    - br-sahara
