@@ -64,7 +64,7 @@ def find_existing_ips(config):
 def main(static_ip_file, count):
     logging.basicConfig(level=logging.INFO)
     with static_ip_file:
-        static_ip_config = yaml.load(static_ip_file)
+        static_ip_config = yaml.safe_load(static_ip_file)
 
     LOG.info('scanning existing addresses')
     allocated = find_existing_ips(static_ip_config)

@@ -97,6 +97,30 @@ all:
             neu-17-2-stackcomp.kzn.moc:
               ipmi_host: 10.0.17.2
               ooo_name: overcloud-compute-17
+            neu-17-3-stackcomp.kzn.moc:
+              ipmi_host: 10.0.17.3
+              ooo_name: overcloud-compute-18
+            neu-17-4-stackcomp.kzn.moc:
+              ipmi_host: 10.0.17.4
+              ooo_name: overcloud-compute-19
+            neu-17-5-stackcomp.kzn.moc:
+              ipmi_host: 10.0.17.5
+              ooo_name: overcloud-compute-20
+            neu-19-1-stackcomp.kzn.moc:
+              ipmi_host: 10.0.19.1
+              ooo_name: overcloud-compute-21
+            neu-19-2-stackcomp.kzn.moc:
+              ipmi_host: 10.0.19.2
+              ooo_name: overcloud-compute-22
+            neu-19-3-stackcomp.kzn.moc:
+              ipmi_host: 10.0.19.3
+              ooo_name: overcloud-compute-23
+            neu-19-4-stackcomp.kzn.moc:
+              ipmi_host: 10.0.19.4
+              ooo_name: overcloud-compute-24
+            neu-19-5-stackcomp.kzn.moc:
+              ipmi_host: 10.0.19.5
+              ooo_name: overcloud-compute-25
           vars:
             ansible_user: root
             ctlplane_interface: p3p1
@@ -131,3 +155,13 @@ all:
             10.0.15.36:
             10.0.15.37:
             10.0.15.38:
+            10.0.17.1:
+            10.0.17.2:
+            10.0.17.3:
+            10.0.17.4:
+            10.0.17.5:
+            10.0.19.1:
+            10.0.19.2:
+            10.0.19.3:
+            10.0.19.4:
+            10.0.19.5:
