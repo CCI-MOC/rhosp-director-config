@@ -12,5 +12,4 @@
   hosts: localhost
   tags: [templates]
   roles:
-    - ansible-modules-bitwarden
     - deploy-config
