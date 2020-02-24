@@ -43,8 +43,24 @@ all:
                 neu-15-12-gcomp.kzn.moc:
                   ipmi_host: 10.0.15.12
                   ooo_name: overcloud-compute-15
+                neu-17-12-gcomp.kzn.moc:
+                  ipmi_host: 10.0.17.12
+                  ooo_name: overcloud-compute-26
+                neu-19-12-gcomp.kzn.moc:
+                  ipmi_host: 10.0.19.12
+                  ooo_name: overcloud-compute-27
               vars:
                 ctlplane_interface: p6p1
+            fpgacompute:
+              hosts:
+                neu-17-8-fpga.kzn.moc:
+                  ipmi_host: 10.0.17.8
+                  ooo_name: overcloud-compute-28
+                neu-19-8-fpga.kzn.moc:
+                  ipmi_host: 10.0.19.8
+                  ooo_name: overcloud-compute-29
+              vars:
+                ctlplane_interface: ens803f0
           hosts:
             neu-3-34-stackcomp.kzn.moc:
               ipmi_host: 10.0.3.34
@@ -140,6 +156,26 @@ all:
             10.0.17.11:
         compute-ipmi:
           hosts:
+            10.0.15.12:
+            10.0.15.34:
+            10.0.15.35:
+            10.0.15.36:
+            10.0.15.37:
+            10.0.15.38:
+            10.0.17.1:
+            10.0.17.12:
+            10.0.17.2:
+            10.0.17.3:
+            10.0.17.4:
+            10.0.17.5:
+            10.0.17.8:
+            10.0.19.1:
+            10.0.19.12:
+            10.0.19.2:
+            10.0.19.3:
+            10.0.19.4:
+            10.0.19.5:
+            10.0.19.8:
             10.0.3.34:
             10.0.3.35:
             10.0.3.36:
@@ -150,18 +186,3 @@ all:
             10.0.5.36:
             10.0.5.37:
             10.0.5.38:
-            10.0.15.34:
-            10.0.15.35:
-            10.0.15.36:
-            10.0.15.37:
-            10.0.15.38:
-            10.0.17.1:
-            10.0.17.2:
-            10.0.17.3:
-            10.0.17.4:
-            10.0.17.5:
-            10.0.19.1:
-            10.0.19.2:
-            10.0.19.3:
-            10.0.19.4:
-            10.0.19.5:

@@ -122,6 +122,12 @@ parameter_defaults:
       nic1: p6p1
       nic2: p6p2
 
+    nodegroup3:
+      dmiString: "system-product-name"
+      id: "S2600WTT"
+      nic1: ens803f0
+      nic2: ens803f1
+
   # The overcloud nodes access the OpenStack metadata service at the
   # EC2MetadataIp address.
   EC2MetadataIp: 172.16.0.5
