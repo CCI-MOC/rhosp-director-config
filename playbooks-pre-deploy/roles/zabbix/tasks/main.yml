@@ -1,0 +1,7 @@
+---
+- name: install zabbix ssh key
+  authorized_key:
+    user: root
+    state: present
+    key: "{{ lookup('file', '%s/files/zabbix_rsa_pub' % (role_path,)) }}"
+  notify: relabel-root-files

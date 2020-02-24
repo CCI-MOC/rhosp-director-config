@@ -7,10 +7,16 @@
               . $HOME/stackrc
       fi
 
+- name: check if config repo exists
+  stat:
+    path: "{{ stack_home }}/rhosp-director-config"
+  register: conf_check
+
 - name: clone director configuration
   git:
     repo: https://github.com/cci-moc/rhosp-director-config
     dest: "{{ stack_home }}/rhosp-director-config"
+  when: not conf_check.stat.exists
 
 - name: create undercloud.conf symlink
   file:

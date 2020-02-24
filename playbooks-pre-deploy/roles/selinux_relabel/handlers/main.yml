@@ -1,0 +1,8 @@
+---
+- name: relabel-root-files
+  command: >-
+    restorecon -R /root
+
+- name: relabel-etc-files
+  command: >-
+    restorecon -R /etc

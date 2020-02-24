@@ -2,22 +2,16 @@
 - name: prepare all hosts
   hosts: undercloud:overcloud
   become: true
+  tags: [all-prep]
   roles:
     - all-prep
-
-- name: prepare compute hosts
-  hosts: compute
-  become: true
-  roles:
-    - openvswitch
 
 - name: prepare undercloud
   hosts: undercloud
   become: true
+  tags: [undercloud-prep]
   roles:
     - role: undercloud-prep
-      tags: [undercloud-prep]
-    - selinux_relabel
 
 - name: prepare stack user on undercloud
   hosts: undercloud
@@ -25,7 +19,6 @@
   become_user: stack
   roles:
     - stackuser
-    - foremancli
 
 - name: prepare overcloud
   hosts: overcloud
@@ -33,4 +26,11 @@
   become: true
   roles:
     - overcloud-prep
-    - selinux_relabel
+
+- name: prepare compute hosts
+  hosts: compute
+  become: true
+  tags: [compute-prep]
+  roles:
+    - openvswitch
+    - zabbix
