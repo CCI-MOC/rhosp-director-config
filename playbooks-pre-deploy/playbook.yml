@@ -26,3 +26,11 @@
   roles:
     - stackuser
     - foremancli
+
+- name: prepare overcloud
+  hosts: overcloud
+  tags: [overcloud-prep]
+  become: true
+  roles:
+    - overcloud-prep
+    - selinux_relabel
