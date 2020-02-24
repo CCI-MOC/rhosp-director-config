@@ -13,3 +13,8 @@ tempest-deployer-input.conf
 templates/puppet_modules.yaml
 templates/deploy.yaml
 .facts/
+templates/deployedserverportmap.yaml
+templates/fencing.yaml
+templates/hostnamemap.yaml
+templates/rolecount.yaml
+overcloud-env.sh
