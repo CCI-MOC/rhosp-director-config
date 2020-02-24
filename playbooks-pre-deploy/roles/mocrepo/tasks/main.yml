@@ -1,0 +1,6 @@
+---
+- name: install temporary MOC yum repository
+  copy:
+    src: moc.repo
+    dest: /etc/yum.repos.d/moc.repo
+  notify: relabel-etc-files

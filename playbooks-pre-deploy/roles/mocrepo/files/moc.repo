@@ -1,0 +1,69 @@
+[rhel-7-fast-datapath-rpms]
+name = rhel-7-fast-datapath-rpms
+baseurl = http://128.31.27.92/mirrors/rhel-7-fast-datapath-rpms
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+metadata_expire = 86400
+
+[rhel-7-server-extras-rpms]
+name = rhel-7-server-extras-rpms
+baseurl = http://128.31.27.92/mirrors/rhel-7-server-extras-rpms
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+metadata_expire = 86400
+
+[rhel-7-server-openstack-13-deployment-tools-rpms]
+name = rhel-7-server-openstack-13-deployment-tools-rpms
+baseurl = http://128.31.27.92/mirrors/rhel-7-server-openstack-13-deployment-tools-rpms
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+metadata_expire = 86400
+
+[rhel-7-server-openstack-13-rpms]
+name = rhel-7-server-openstack-13-rpms
+baseurl = http://128.31.27.92/mirrors/rhel-7-server-openstack-13-rpms
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+metadata_expire = 86400
+
+[rhel-7-server-openstack-13-tools-rpms]
+name = rhel-7-server-openstack-13-tools-rpms
+baseurl = http://128.31.27.92/mirrors/rhel-7-server-openstack-13-tools-rpms
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+metadata_expire = 86400
+
+[rhel-7-server-optional-rpms]
+name = rhel-7-server-optional-rpms
+baseurl = http://128.31.27.92/mirrors/rhel-7-server-optional-rpms
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+metadata_expire = 86400
+
+[rhel-7-server-rhceph-3-tools-rpms]
+name = rhel-7-server-rhceph-3-tools-rpms
+baseurl = http://128.31.27.92/mirrors/rhel-7-server-rhceph-3-tools-rpms
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+metadata_expire = 86400
+
+[rhel-7-server-rh-common-rpms]
+name = rhel-7-server-rh-common-rpms
+baseurl = http://128.31.27.92/mirrors/rhel-7-server-rh-common-rpms
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+metadata_expire = 86400
+
+[rhel-7-server-rpms]
+name = rhel-7-server-rpms
+baseurl = http://128.31.27.92/mirrors/rhel-7-server-rpms
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+metadata_expire = 86400
+
+[rhel-ha-for-rhel-7-server-rpms]
+name = rhel-ha-for-rhel-7-server-rpms
+baseurl = http://128.31.27.92/mirrors/rhel-ha-for-rhel-7-server-rpms
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+metadata_expire = 86400

@@ -25,6 +25,7 @@
   tags: [overcloud-prep]
   become: true
   roles:
+    - mocrepo
     - overcloud-prep
 
 - name: prepare compute hosts
