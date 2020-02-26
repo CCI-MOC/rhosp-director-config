@@ -1,3 +1,5 @@
+# This file is generated with Ansible. Any changes made here will be
+# lost.
 ---
 resource_registry:
 
@@ -223,6 +225,45 @@ parameter_defaults:
           - http://onboarding.massopen.cloud/auth/websso/
           - https://onboarding.massopen.cloud/auth/websso/
           - https://kaizen.massopen.cloud/dashboard/auth/websso/
+
+    keystone::wsgi::apache::vhost_custom_fragment: |
+      LoadModule auth_openidc_module modules/mod_auth_openidc.so
+      OIDCClaimPrefix "OIDC-"
+      OIDCResponseType "id_token"
+      OIDCScope "openid email profile"
+      OIDCProviderMetadataURL "https://sso.massopen.cloud/auth/realms/moc/.well-known/openid-configuration"
+      OIDCClientID "kaizen"
+      OIDCClientSecret "{{ oidc_client_secret }}"
+      OIDCCryptoPassphrase "{{ oidc_crypto_passphrase }}"
+    
+      OIDCCacheType memcache
+      OIDCMemCacheServers "172.16.32.10:11211 172.16.32.11:11211 172.16.32.28:11211"
+    
+      # The following directives are necessary to support websso from Horizon
+      # (Per https://docs.openstack.org/keystone/pike/advanced-topics/federation/websso.html)
+      OIDCRedirectURI "https://kaizen.massopen.cloud:13000/v3/auth/OS-FEDERATION/identity_providers/moc/protocols/openid/websso"
+      OIDCRedirectURI "https://kaizen.massopen.cloud:13000/v3/auth/OS-FEDERATION/websso/openid"
+    
+      <LocationMatch "/v3/auth/OS-FEDERATION/websso/openid">
+          AuthType "openid-connect"
+          Require valid-user
+      </LocationMatch>
+    
+      <LocationMatch "/v3/auth/OS-FEDERATION/identity_providers/moc/protocols/openid/websso">
+          AuthType "openid-connect"
+          Require valid-user
+      </LocationMatch>
+    
+      OIDCOAuthClientID "kaizen"
+      OIDCOAuthClientSecret "{{ oidc_oauth_client_secret }}"
+      OIDCOAuthIntrospectionEndpoint "https://sso.massopen.cloud/auth/realms/moc/protocol/openid-connect/token/introspect"
+    
+      <Location ~ "/v3/OS-FEDERATION/identity_providers/moc/protocols/openid/auth">
+          AuthType oauth20
+          Require valid-user
+      </Location>
+
+
 
     tripleo::haproxy::haproxy_globals_override:
       tune.ssl.default-dh-param: 2048

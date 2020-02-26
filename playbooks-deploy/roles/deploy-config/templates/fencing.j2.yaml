@@ -11,10 +11,8 @@ parameter_defaults:
       params:
         ipaddr: {{ hostvars[host].ipmi_host }}
         lanplus: true
-        login: >-
-          {{ lookup('bitwarden', 'idrac@kaizen', field='username') }}
-        passwd: >-
-          {{ lookup('bitwarden', 'idrac@kaizen') }}
+        login: {{ ipmi_user }}
+        passwd: {{ ipmi_pass }}
         pcmk_host_list: {{ host.split('.').0 }}
         privlvl: administrator
 {% endfor %}

@@ -18,3 +18,5 @@ templates/fencing.yaml
 templates/hostnamemap.yaml
 templates/rolecount.yaml
 overcloud-env.sh
+hotfix
+.vault_password

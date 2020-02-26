@@ -34,3 +34,9 @@
   template:
     src: rolecount.j2.yaml
     dest: "../templates/rolecount.yaml"
+
+- name: generate deploy.yaml
+  tags: [template, deploy.yaml]
+  template:
+    src: deploy.j2.yaml
+    dest: "../templates/deploy.yaml"

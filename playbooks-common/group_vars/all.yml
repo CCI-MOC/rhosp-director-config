@@ -1,6 +1,0 @@
----
-# These need to be here rather than in overcloud-ipmi.yml because
-# we need to access to these values when delegating tasks.
-ipmi_user: root
-ipmi_pass: >-
-  {{ lookup('bitwarden', 'idrac@kaizen') }}

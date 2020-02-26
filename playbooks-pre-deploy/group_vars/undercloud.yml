@@ -9,10 +9,6 @@ undercloud_authorized_keys:
   - key: https://github.com/larsks.keys
     comment: lars@redhat.com
 
-foreman_url: >-
-  {{ (lookup('bitwarden', 'foreman@kaizen',
-  field='item')|from_json).login.uris.0.uri }}
-foreman_admin_user: >-
-  {{ lookup('bitwarden', 'foreman@kaizen', field='username') }}
-foreman_admin_pass: >-
-  {{ lookup('bitwarden', 'foreman@kaizen') }}
+foreman_url: https://kzn-foreman.kzn.moc/
+foreman_admin_user: admin
+foreman_admin_pass: "{{ foreman_admin_password }}"
