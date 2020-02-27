@@ -1,4 +1,0 @@
-FROM {{ image_info.build_from_image }}
-
-COPY rhel7local.repo /etc/yum.repos.d/rhel7local.repo
-RUN yum -y install mod_auth_openidc

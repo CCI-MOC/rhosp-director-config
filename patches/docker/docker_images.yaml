@@ -4,9 +4,3 @@ images:
     replace:
       - DockerHorizonImage
       - DockerHorizonConfigImage
-
-  keystone:
-    from: DockerKeystoneImage
-    replace:
-      - DockerKeystoneImage
-      - DockerKeystoneConfigImage
