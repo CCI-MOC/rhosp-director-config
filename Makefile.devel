@@ -33,7 +33,6 @@ roles_data.yaml: $(CUSTOM_ROLES)
 
 roles/ControllerDeployedServer.yaml: $(CONTROLLER_SRC_ROLES)
 	./scripts/merge-roles.py -o $@ \
-		-s OS::Local::Services::PatchPuppetModules \
 		-s OS::TripleO::Services::Securetty \
 		-s OS::TripleO::Services::ExternalSwiftProxy \
 		-s OS::TripleO::Services::NeutronOvsAgent \
@@ -44,7 +43,6 @@ roles/ControllerDeployedServer.yaml: $(CONTROLLER_SRC_ROLES)
 
 roles/ComputeDeployedServer.yaml: $(COMPUTE_SRC_ROLES)
 	./scripts/merge-roles.py -o $@ \
-		-s OS::Local::Services::PatchPuppetModules \
 		-s OS::TripleO::Services::Securetty \
 		-x disable_constraints=true \
 		-x disable_upgrade_deployment=true \
@@ -54,7 +52,6 @@ roles/ComputeDeployedServer.yaml: $(COMPUTE_SRC_ROLES)
 
 roles/NetworkerDeployedServer.yaml: $(NETWORKER_SRC_ROLES)
 	./scripts/merge-roles.py -o $@ \
-		-s OS::Local::Services::PatchPuppetModules \
 		-s OS::TripleO::Services::Securetty \
 		-s OS::TripleO::Services::Sshd \
 		-s OS::TripleO::Services::NeutronCorePlugin \

@@ -1,7 +1,6 @@
 - CountDefault: 1
   HostnameFormatDefault: '%stackname%-compute-%index%'
   ServicesDefault:
-  - OS::Local::Services::PatchPuppetModules
   - OS::TripleO::Services::Aide
   - OS::TripleO::Services::AuditD
   - OS::TripleO::Services::CACerts

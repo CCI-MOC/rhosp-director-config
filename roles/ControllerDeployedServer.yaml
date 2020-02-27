@@ -1,7 +1,6 @@
 - CountDefault: 1
   HostnameFormatDefault: '%stackname%-controller-%index%'
   ServicesDefault:
-  - OS::Local::Services::PatchPuppetModules
   - OS::TripleO::Services::Aide
   - OS::TripleO::Services::AodhApi
   - OS::TripleO::Services::AodhEvaluator

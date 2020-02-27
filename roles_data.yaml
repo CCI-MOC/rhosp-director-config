@@ -4,7 +4,6 @@
 - CountDefault: 1
   HostnameFormatDefault: '%stackname%-controller-%index%'
   ServicesDefault:
-  - OS::Local::Services::PatchPuppetModules
   - OS::TripleO::Services::Aide
   - OS::TripleO::Services::AodhApi
   - OS::TripleO::Services::AodhEvaluator
@@ -150,7 +149,6 @@
 - CountDefault: 1
   HostnameFormatDefault: '%stackname%-compute-%index%'
   ServicesDefault:
-  - OS::Local::Services::PatchPuppetModules
   - OS::TripleO::Services::Aide
   - OS::TripleO::Services::AuditD
   - OS::TripleO::Services::CACerts
@@ -210,7 +208,6 @@
 - CountDefault: 1
   HostnameFormatDefault: '%stackname%-networker-%index%'
   ServicesDefault:
-  - OS::Local::Services::PatchPuppetModules
   - OS::TripleO::Services::Aide
   - OS::TripleO::Services::AuditD
   - OS::TripleO::Services::CACerts
