@@ -1,0 +1,3 @@
+---
+- import_playbook: fetch-overcloud-credentials.yml
+- import_playbook: create-overcloud-resources.yml

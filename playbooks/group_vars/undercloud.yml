@@ -10,5 +10,3 @@ undercloud_authorized_keys:
     comment: lars@redhat.com
 
 foreman_url: https://kzn-foreman.kzn.moc/
-foreman_admin_user: admin
-foreman_admin_pass: "{{ foreman_admin_password }}"
