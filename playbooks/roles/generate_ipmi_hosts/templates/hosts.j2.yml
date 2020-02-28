@@ -1,0 +1,19 @@
+---
+all:
+  children:
+    overcloud_ipmi:
+      vars:
+        ansible_user: "{{ ipmi_user }}"
+        ansible_password: "{{ ipmi_pass }}"
+        ansible_ssh_common_args: "-o ProxyJump=kzn-proxy"
+      children:
+        overcloud_ipmi_dell:
+          hosts:
+{% for host in groups.overcloud if hostvars[host].ipmi_group == "dell" %}
+            {{ hostvars[host].ipmi_host }}:
+{% endfor %}
+        overcloud_ipmi_ibm:
+          hosts:
+{% for host in groups.overcloud if hostvars[host].ipmi_group == "ibm" %}
+            {{ hostvars[host].ipmi_host }}:
+{% endfor %}

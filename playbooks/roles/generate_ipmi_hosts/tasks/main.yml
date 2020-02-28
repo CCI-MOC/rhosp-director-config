@@ -1,0 +1,5 @@
+---
+- name: generate ipmi inventory
+  template:
+    src: hosts.j2.yml
+    dest: inventory/ipmi.yml

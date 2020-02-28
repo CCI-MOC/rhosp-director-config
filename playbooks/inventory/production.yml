@@ -25,6 +25,7 @@ all:
           vars:
             ansible_user: root
             ctlplane_interface: p3p1
+            ipmi_group: dell
         network:
           hosts:
             neu-19-11-nc1.kzn.moc:
@@ -36,6 +37,7 @@ all:
           vars:
             ansible_user: root
             ctlplane_interface: p3p1
+            ipmi_group: dell
         compute:
           children:
             gpucompute:
@@ -61,6 +63,7 @@ all:
                   ooo_name: overcloud-compute-29
               vars:
                 ctlplane_interface: ens803f0
+                ipmi_group: ibm
           hosts:
             neu-3-34-stackcomp.kzn.moc:
               ipmi_host: 10.0.3.34
@@ -140,49 +143,4 @@ all:
           vars:
             ansible_user: root
             ctlplane_interface: p3p1
-    overcloud_ipmi:
-      vars:
-        ansible_user: "{{ ipmi_user }}"
-        ansible_ssh_pass: "{{ ipmi_pass }}"
-      children:
-        controller_ipmi:
-          hosts:
-            10.0.3.39:
-            10.0.5.39:
-            10.0.15.39:
-        network_ipmi:
-          hosts:
-            10.0.19.11:
-            10.0.17.11:
-        compute_ipmi:
-          hosts:
-            10.0.15.12:
-            10.0.15.34:
-            10.0.15.35:
-            10.0.15.36:
-            10.0.15.37:
-            10.0.15.38:
-            10.0.17.1:
-            10.0.17.12:
-            10.0.17.2:
-            10.0.17.3:
-            10.0.17.4:
-            10.0.17.5:
-            10.0.17.8:
-            10.0.19.1:
-            10.0.19.12:
-            10.0.19.2:
-            10.0.19.3:
-            10.0.19.4:
-            10.0.19.5:
-            10.0.19.8:
-            10.0.3.34:
-            10.0.3.35:
-            10.0.3.36:
-            10.0.3.37:
-            10.0.3.38:
-            10.0.5.34:
-            10.0.5.35:
-            10.0.5.36:
-            10.0.5.37:
-            10.0.5.38:
+            ipmi_group: dell
