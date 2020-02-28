@@ -140,21 +140,21 @@ all:
           vars:
             ansible_user: root
             ctlplane_interface: p3p1
-    overcloud-ipmi:
+    overcloud_ipmi:
       vars:
         ansible_user: "{{ ipmi_user }}"
         ansible_ssh_pass: "{{ ipmi_pass }}"
       children:
-        controller-ipmi:
+        controller_ipmi:
           hosts:
             10.0.3.39:
             10.0.5.39:
             10.0.15.39:
-        network-ipmi:
+        network_ipmi:
           hosts:
             10.0.19.11:
             10.0.17.11:
-        compute-ipmi:
+        compute_ipmi:
           hosts:
             10.0.15.12:
             10.0.15.34:
