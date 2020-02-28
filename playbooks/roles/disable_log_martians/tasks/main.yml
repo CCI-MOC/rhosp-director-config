@@ -1,0 +1,45 @@
+---
+- name: remove any log_martians setting from 99-sysctl.conf
+  lineinfile:
+    path: /etc/sysctl.d/99-sysctl.conf
+    regexp: log_martians
+    state: absent
+
+- name: get a list of sysctl settings
+  shell: >-
+    sysctl -a 2> /dev/null | grep log_martians
+  changed_when: false
+  register: sysctl_cmd
+
+- name: build sysctl list
+  set_fact:
+    log_martians: >-
+      {{
+        log_martians|default([]) + [
+          {'name': item.split()[0], 'value': item.split()[-1]}
+        ]
+      }}
+  loop: "{{ sysctl_cmd.stdout_lines }}"
+
+- name: remove existing config file
+  file:
+    path: "{{ log_martians_sysctl_file }}"
+    state: absent
+  when: refresh_sysctl_file|default(false)|bool
+
+- name: disable log_martians (persistent)
+  sysctl:
+    name: "{{ item }}"
+    value: "0"
+    sysctl_file: "{{ log_martians_sysctl_file }}"
+    sysctl_set: true
+  loop:
+    - net.ipv4.conf.all.log_martians
+    - net.ipv4.conf.default.log_martians
+
+- name: disable log_martians (runtime)
+  command: >-
+    sysctl -w {{ item.name }}=0
+  when: >-
+    item.value == "1"
+  loop: "{{ log_martians }}"
