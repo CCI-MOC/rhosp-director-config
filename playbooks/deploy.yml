@@ -4,9 +4,10 @@
   gather_facts: false
   any_errors_fatal: true
   tasks:
-    - name: gather facts from overcloud hosts
+    - name: force gather facts from overcloud hosts
       tags: [always]
       setup:
+      when: not skip_facts|default(false)|bool
 
 - name: generate files
   hosts: localhost
