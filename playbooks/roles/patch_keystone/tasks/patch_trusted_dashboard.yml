@@ -1,0 +1,15 @@
+---
+- name: patch keystone trusted_dashboard
+  tags: [keystone]
+  command: >-
+    patch {{ patch_args|default('') }} -r - --batch --forward {{ item }}
+  args:
+    stdin: >-
+      {{ lookup('file', 'keystone-conf-trusted_dashboard.patch') }}
+  register: result
+  changed_when: result.rc == 0
+  failed_when: result.rc != 0 and 'previously applied' not in result.stdout
+  loop:
+    - /var/lib/config-data/keystone/etc/keystone/keystone.conf
+    - /var/lib/config-data/puppet-generated/keystone/etc/keystone/keystone.conf
+  notify: restart keystone

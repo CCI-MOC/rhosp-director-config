@@ -1,0 +1,15 @@
+--- keystone.conf       2020-02-21 13:22:40.532273711 -0500
++++ /var/lib/config-data-backup/keystone/etc/keystone/keystone.conf     2020-02-14 11:16:36.848923953 -0500
+@@ -978,9 +978,11 @@
+ # configuration option may be repeated for multiple values. You must set this
+ # in order to use web-based SSO flows. For example:
+ # trusted_dashboard=https://acme.example.com/auth/websso
+-trusted_dashboard=http://onboarding.massopen.cloud/auth/websso/
+ # trusted_dashboard=https://beta.example.com/auth/websso (multi valued)
+ #trusted_dashboard =
++trusted_dashboard=http://onboarding.massopen.cloud/auth/websso/
++trusted_dashboard=https://onboarding.massopen.cloud/auth/websso/
++trusted_dashboard=https://kaizen.massopen.cloud/dashboard/auth/websso/
+ 
+ # Absolute path to an HTML file used as a Single Sign-On callback handler. This
+ # page is expected to redirect the user from keystone back to a trusted

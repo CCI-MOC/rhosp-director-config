@@ -1,3 +1,7 @@
 ---
-- import_playbook: fetch-overcloud-credentials.yml
-- import_playbook: create-overcloud-resources.yml
+- hosts: controller
+  tasks:
+    - name: patch keystone trusted_dashboard
+      include_role:
+        name: patch_keystone
+        tasks_from: patch_trusted_dashboard.yml
