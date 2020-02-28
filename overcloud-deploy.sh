@@ -84,6 +84,7 @@ deploy_args=(
 
 	# Most of our custom configuration.
 	-e $PWD/templates/deploy.yaml
+	-e $PWD/templates/controller_extraconfig.yaml
 	-e $PWD/templates/services.yaml
 	-e $PWD/templates/rolecount.yaml
 	-e $PWD/templates/credentials.yaml

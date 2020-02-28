@@ -12,8 +12,9 @@ puppet-modules.tar.gz
 seed/credentials/
 tempest-deployer-input.conf
 templates/puppet_modules.yaml
-templates/deploy.yaml
+templates/controller-extraconfig.yaml
 .facts/
+templates/controller_extraconfig.yaml
 templates/deployedserverportmap.yaml
 templates/fencing.yaml
 templates/hostnamemap.yaml

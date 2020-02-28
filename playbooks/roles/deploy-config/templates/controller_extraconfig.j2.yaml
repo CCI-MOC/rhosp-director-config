@@ -1,0 +1,85 @@
+---
+paramater_defaults:
+  # Additional Hiera configuration to be placed on the controllers.
+  ControllerDeployedServerExtraConfig:
+    keystone::federation::openidc::openidc_enable_oauth: true
+    keystone::federation::openidc::openidc_introspection_endpoint: >-
+      https://sso.massopen.cloud/auth/realms/moc/protocol/openid-connect/token/introspect
+    keystone::federation::openidc::methods: >-
+      password,token,openid,application_credential
+    swift::keystone::auth::auth_name: ceph
+    tripleo::haproxy::ssl_cipher_suite:
+      ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:!RSA+AESGCM:!RSA+AES:!aNULL:!MD5:!DSS
+    cinder::image_conversion_dir: /var/lib/cinder/conversion
+    horizon::file_upload_temp_dir: /var/lib/horizon
+    horizon::websso_enabled: "True"
+    horizon::websso_choices:
+      - ["moc_openid", "Institution Account"]
+    horizon::websso_idp_mapping:
+      moc_openid: ["moc", "openid"]
+    horizon::help_url:
+      https://osticket.massopen.cloud/open.php
+    cinder::api::default_volume_type: default
+    horizon::keystone_url: https://kaizen.massopen.cloud:13000/v3
+    keystone::config::keystone_config:
+      auth/methods:
+        value: password,token,openid,application_credential
+      openid/remote_id_attribute:
+        value: HTTP_OIDC_ISS
+      federation/trusted_dashboard:
+        value:
+          - http://onboarding.massopen.cloud/auth/websso/
+          - https://onboarding.massopen.cloud/auth/websso/
+          - https://kaizen.massopen.cloud/dashboard/auth/websso/
+
+    keystone::wsgi::apache::vhost_custom_fragment: |
+      LoadModule auth_openidc_module modules/mod_auth_openidc.so
+      OIDCClaimPrefix "OIDC-"
+      OIDCResponseType "id_token"
+      OIDCScope "openid email profile"
+      OIDCProviderMetadataURL "https://sso.massopen.cloud/auth/realms/moc/.well-known/openid-configuration"
+      OIDCClientID "kaizen"
+      OIDCClientSecret "{{ oidc_client_secret }}"
+      OIDCCryptoPassphrase "{{ oidc_crypto_passphrase }}"
+
+      OIDCCacheType memcache
+      OIDCMemCacheServers "172.16.32.10:11211 172.16.32.11:11211 172.16.32.28:11211"
+
+      # The following directives are necessary to support websso from Horizon
+      # (Per https://docs.openstack.org/keystone/pike/advanced-topics/federation/websso.html)
+      OIDCRedirectURI "https://kaizen.massopen.cloud:13000/v3/auth/OS-FEDERATION/identity_providers/moc/protocols/openid/websso"
+      OIDCRedirectURI "https://kaizen.massopen.cloud:13000/v3/auth/OS-FEDERATION/websso/openid"
+
+      <LocationMatch "/v3/auth/OS-FEDERATION/websso/openid">
+          AuthType "openid-connect"
+          Require valid-user
+      </LocationMatch>
+
+      <LocationMatch "/v3/auth/OS-FEDERATION/identity_providers/moc/protocols/openid/websso">
+          AuthType "openid-connect"
+          Require valid-user
+      </LocationMatch>
+
+      OIDCOAuthClientID "kaizen"
+      OIDCOAuthClientSecret "{{ oidc_oauth_client_secret }}"
+      OIDCOAuthIntrospectionEndpoint "https://sso.massopen.cloud/auth/realms/moc/protocol/openid-connect/token/introspect"
+
+      <Location ~ "/v3/OS-FEDERATION/identity_providers/moc/protocols/openid/auth">
+          AuthType oauth20
+          Require valid-user
+      </Location>
+
+    tripleo::haproxy::haproxy_globals_override:
+      tune.ssl.default-dh-param: 2048
+      ssl-default-bind-options: no-sslv3 no-tlsv10
+      ssl-default-server-options: no-sslv3 no-tlsv10
+
+    nova::api::pci_alias:
+      - vendor_id: "10de"
+        product_id: "15f7"
+        device_type: "type-PCI"
+        name: "tesla-p100"
+      - vendor_id: "8086"
+        product_id: "09c4"
+        device_type: "type-PCI"
+        name: "intel-fpga"

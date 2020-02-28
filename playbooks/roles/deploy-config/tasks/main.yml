@@ -1,4 +1,10 @@
 ---
+- name: overcloud-env.yaml
+  tags: [template, overcloud-env.yaml]
+  template:
+    src: overcloud-env.j2.sh
+    dest: "../overcloud-env.sh"
+
 - name: hostnamemap.yaml
   tags: [template, hostnamemap.yaml]
   template:
@@ -17,11 +23,11 @@
     src: fencing.j2.yaml
     dest: "../templates/fencing.yaml"
 
-- name: overcloud-env.yaml
-  tags: [template, overcloud-env.yaml]
+- name: generate rolecount.yaml
+  tags: [template, rolecount.yaml]
   template:
-    src: overcloud-env.j2.sh
-    dest: "../overcloud-env.sh"
+    src: rolecount.j2.yaml
+    dest: "../templates/rolecount.yaml"
 
 - name: generate credentials.yaml
   tags: [template, credentials.yaml]
@@ -29,14 +35,8 @@
     src: credentials.j2.yaml
     dest: "../templates/credentials.yaml"
 
-- name: generate rolecount.yaml
-  tags: [template, rolecount.yaml]
+- name: generate controller_extraconfig.yaml
+  tags: [template, controller_extraconfig.yaml]
   template:
-    src: rolecount.j2.yaml
-    dest: "../templates/rolecount.yaml"
-
-- name: generate deploy.yaml
-  tags: [template, deploy.yaml]
-  template:
-    src: deploy.j2.yaml
-    dest: "../templates/deploy.yaml"
+    src: controller_extraconfig.j2.yaml
+    dest: "../templates/controller_extraconfig.yaml"
