@@ -1,0 +1,4 @@
+.tox
+.xdist_results
+report.html
+assets
