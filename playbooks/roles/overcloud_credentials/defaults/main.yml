@@ -1,0 +1,3 @@
+---
+cloud_basename: overcloud
+local_clouds_yaml: ./clouds.yaml
