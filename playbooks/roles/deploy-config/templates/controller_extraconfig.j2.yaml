@@ -50,6 +50,10 @@ paramater_defaults:
       OIDCRedirectURI "https://kaizen.massopen.cloud:13000/v3/auth/OS-FEDERATION/identity_providers/moc/protocols/openid/websso"
       OIDCRedirectURI "https://kaizen.massopen.cloud:13000/v3/auth/OS-FEDERATION/websso/openid"
 
+      # https://github.com/zmartzone/mod_auth_openidc/issues/373
+      # https://bugzilla.redhat.com/show_bug.cgi?id=1810213
+      RequestHeader append X-Forwarded-Port 13000 early
+
       <LocationMatch "/v3/auth/OS-FEDERATION/websso/openid">
           AuthType "openid-connect"
           Require valid-user
