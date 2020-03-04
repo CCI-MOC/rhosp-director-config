@@ -1,5 +1,5 @@
 ---
-paramater_defaults:
+parameter_defaults:
   # Additional Hiera configuration to be placed on the controllers.
   ControllerDeployedServerExtraConfig:
     keystone::federation::openidc::openidc_enable_oauth: true
