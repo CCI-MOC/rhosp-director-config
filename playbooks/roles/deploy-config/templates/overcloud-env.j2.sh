@@ -14,7 +14,7 @@ export ComputeDeployedServer_hosts="
 {% endfor %}
 "
 export NetworkerDeployedServer_hosts="
-{% for host in groups.network|hostname_sort(hostvars) %}
+{% for host in groups.networker|hostname_sort(hostvars) %}
 {{host}}
 {% endfor %}
 "

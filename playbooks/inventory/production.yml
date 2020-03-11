@@ -26,7 +26,7 @@ all:
             ansible_user: root
             ctlplane_interface: p3p1
             ipmi_group: dell
-        network:
+        networker:
           hosts:
             neu-19-11-nc1.kzn.moc:
               ipmi_host: 10.0.19.11

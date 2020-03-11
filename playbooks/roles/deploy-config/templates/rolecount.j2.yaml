@@ -4,5 +4,5 @@ parameter_defaults:
   # ComputeCount, but since we're using pre-provisioned servers the
   # roles have different names.
   ControllerDeployedServerCount: {{ groups.controller|length }}
-  NetworkerDeployedServerCount: {{ groups.network|length }}
+  NetworkerDeployedServerCount: {{ groups.networker|length }}
   ComputeDeployedServerCount: {{ groups.compute|length }}
