@@ -87,3 +87,8 @@ parameter_defaults:
         product_id: "09c4"
         device_type: "type-PCI"
         name: "intel-fpga"
+
+    # https://osticket.massopen.cloud/scp/tickets.php?id=486
+    octavia::config::octavia_config:
+      controller_worker/amp_secgroup_allowed_projects:
+        value: "e34555572f9549e1bac3e9d923a895b3"

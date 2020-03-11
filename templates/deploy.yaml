@@ -41,6 +41,11 @@ parameter_defaults:
     - 2.rhel.pool.ntp.org
     - 3.rhel.pool.ntp.org
 
+  # Recommended by
+  # https://docs.openshift.com/container-platform/4.3/installing/installing_openstack/installing-openstack-installer-kuryr.html#installation-osp-default-kuryr-deployment_installing-openstack-installer-kuryr
+  OctaviaTimeoutClientData: 1200000
+  OctaviaTimeoutMemberData: 1200000
+
   ##
   ## Network configuration
   ##
