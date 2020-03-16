@@ -29,6 +29,12 @@ parameter_defaults:
     - 172.16.0.3
     - 172.16.0.8
 
+  ExtraSysctlSettings:
+    net.ipv4.conf.default.log_martians:
+      value: 0
+    net.ipv4.conf.all.log_martians:
+      value: 0
+
   KeystoneRegion: moc-kzn
 
   # Allow Grafana to access Gnocchi
