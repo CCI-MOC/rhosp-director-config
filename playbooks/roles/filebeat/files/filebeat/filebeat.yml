@@ -1,0 +1,163 @@
+---
+filebeat.config:
+  modules:
+    path: ${path.config}/modules.d/*.yml
+    reload.enabled: false
+filebeat.inputs:
+  - exclude_lines:
+      - .*could not get softnet statistics.*
+    paths:
+      - /var/log/messages
+      - /var/log/secure
+    tags:
+      - syslog
+    type: log
+  - paths:
+      - /var/log/audit/audit.log
+    tags:
+      - audit
+    type: log
+  - paths:
+      - /var/log/zabbix/zabbix_agentd.log
+    tags:
+      - zabbix
+    type: log
+  - paths:
+      - /var/log/pcsd/pcsd.log
+    tags:
+      - pacemaker
+    type: log
+  - paths:
+      - /var/log/cluster/corosync.log
+    tags:
+      - corosync
+    type: log
+  - paths:
+      - /var/log/openvswitch/*.log
+    tags:
+      - ovs
+    type: log
+  - paths:
+      - /var/log/containers/aodh/*log
+    tags:
+      - aodh
+      - openstack
+    type: log
+  - paths:
+      - /var/log/containers/barbican/*log
+    tags:
+      - barbican
+      - openstack
+    type: log
+  - paths:
+      - /var/log/containers/ceilometer/*log
+    tags:
+      - openstack
+      - ceilometer
+    type: log
+  - paths:
+      - /var/log/containers/cinder/*log
+    tags:
+      - openstack
+      - cinder
+    type: log
+  - paths:
+      - /var/log/containers/ec2_api/*log
+    tags:
+      - openstack
+      - ec2_api
+    type: log
+  - paths:
+      - /var/log/containers/ec2_api_metadata/*log
+    tags:
+      - openstack
+      - ec2_api
+      - ec2_api_metadata
+    type: log
+  - paths:
+      - /var/log/containers/glance/*log
+    tags:
+      - openstack
+      - glance
+    type: log
+  - paths:
+      - /var/log/containers/gnocchi/*log
+    tags:
+      - openstack
+      - gnocchi
+    type: log
+  - paths:
+      - /var/log/containers/haproxy/*log
+    tags:
+      - haproxy
+    type: log
+  - paths:
+      - /var/log/containers/heat/*log
+    tags:
+      - openstack
+      - heat
+    type: log
+  - paths:
+      - /var/log/containers/horizon/*log
+    tags:
+      - openstack
+      - horizon
+    type: log
+  - paths:
+      - /var/log/containers/httpd/*/*log
+    tags:
+      - httpd
+    type: log
+  - paths:
+      - /var/log/containers/keystone/*log
+    tags:
+      - openstack
+      - keystone
+    type: log
+  - paths:
+      - /var/log/libvirt/qemu/*log
+    tags:
+      - libvirt
+    type: log
+  - paths:
+      - /var/log/containers/mysql/*log
+    tags:
+      - mysql
+    type: log
+  - paths:
+      - /var/log/containers/nova/*log
+    tags:
+      - openstack
+      - nova
+    type: log
+  - paths:
+      - /var/log/containers/octavia/*log
+    tags:
+      - openstack
+      - octavia
+    type: log
+  - paths:
+      - /var/log/containers/panko/*log
+    tags:
+      - openstack
+      - panko
+    type: log
+  - paths:
+      - /var/log/containers/rabbitmq/*log
+    tags:
+      - rabbitmq
+    type: log
+  - paths:
+      - /var/log/containers/redis/*log
+    tags:
+      - redis
+    type: log
+  - paths:
+      - /var/log/containers/sahara/*log
+    tags:
+      - openstack
+      - sahara
+    type: log
+output.logstash:
+  hosts:
+    - ${LOGSTASH_SERVER}:${LOGSTASH_PORT:5044}

@@ -1,0 +1,39 @@
+---
+- hosts: undercloud
+  gather_facts: false
+  vars:
+    filebeat_tags:
+      - cluster.kaizen
+      - role.undercloud
+  roles:
+    - filebeat
+
+- hosts: controller
+  gather_facts: false
+  vars:
+    filebeat_tags:
+      - cluster.kaizen
+      - role.overcloud
+      - role.openstack-controller
+  roles:
+    - filebeat
+
+- hosts: networker
+  gather_facts: false
+  vars:
+    filebeat_tags:
+      - cluster.kaizen
+      - role.overcloud
+      - role.openstack-networker
+  roles:
+    - filebeat
+
+- hosts: compute
+  gather_facts: false
+  vars:
+    filebeat_tags:
+      - cluster.kaizen
+      - role.overcloud
+      - role.openstack-compute
+  roles:
+    - filebeat

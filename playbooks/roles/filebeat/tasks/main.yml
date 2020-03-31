@@ -1,0 +1,32 @@
+---
+- name: install filebeat configuration
+  tags: [filebeat.config]
+  synchronize:
+    src: filebeat/
+    dest: /etc/filebeat/
+    owner: false
+    delete: true
+  notify: restart filebeat
+
+- name: start filebeat container
+  tags: [filebeat.docker]
+  docker_container:
+    name: filebeat
+    state: started
+    image: elastic/filebeat:{{ filebeat_version }}
+    network_mode: host
+    volumes:
+      - /etc/filebeat:/etc/filebeat
+      - /var/log:/var/log
+      - filebeat_data:/var/lib/filebeat
+    env:
+      LOGSTASH_SERVER: elk.massopen.cloud
+    user: root
+    command:
+      - run
+      - --path.config /etc/filebeat
+      - --path.data /var/lib/filebeat
+      - --path.logs /var/log/filebeat
+      - -E
+      - tags="{{ filebeat_tags|default([])|to_json }}"
+    restart_policy: unless-stopped
