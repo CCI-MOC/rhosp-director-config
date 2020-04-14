@@ -51,6 +51,7 @@ parameter_defaults:
   # https://docs.openshift.com/container-platform/4.3/installing/installing_openstack/installing-openstack-installer-kuryr.html#installation-osp-default-kuryr-deployment_installing-openstack-installer-kuryr
   OctaviaTimeoutClientData: 1200000
   OctaviaTimeoutMemberData: 1200000
+  OctaviaGenerateCerts: true
 
   ##
   ## Network configuration
