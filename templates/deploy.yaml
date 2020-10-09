@@ -163,6 +163,11 @@ parameter_defaults:
   # Set timezone of deployed hosts
   TimeZone: "US/Eastern"
 
+  CinderApiPolicies:
+    allow_owners_to_reset:
+      key: 'volume_extension:volume_admin_actions:reset_status'
+      value: 'rule:admin_or_owner'
+
   NovaApiPolicies:
     # Allow Nova instance owners to use the "reset-state" command.
     # Note that the key here ("allow_owners_to_reset") is not
