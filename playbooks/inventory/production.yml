@@ -46,6 +46,7 @@ all:
                   ipmi_host: 10.0.15.12
                   ooo_name: overcloud-compute-15
                 neu-17-12-gcomp.kzn.moc:
+                  disabled: true
                   ipmi_host: 10.0.17.12
                   ooo_name: overcloud-compute-26
                 neu-19-12-gcomp.kzn.moc:
@@ -56,9 +57,11 @@ all:
             fpgacompute:
               hosts:
                 neu-17-8-fpga.kzn.moc:
+                  disabled: true
                   ipmi_host: 10.0.17.8
                   ooo_name: overcloud-compute-28
                 neu-19-8-fpga.kzn.moc:
+                  disabled: true
                   ipmi_host: 10.0.19.8
                   ooo_name: overcloud-compute-29
               vars:
@@ -123,6 +126,7 @@ all:
               ipmi_host: 10.0.17.4
               ooo_name: overcloud-compute-19
             neu-17-5-stackcomp.kzn.moc:
+              disabled: true
               ipmi_host: 10.0.17.5
               ooo_name: overcloud-compute-20
             neu-19-1-stackcomp.kzn.moc:
