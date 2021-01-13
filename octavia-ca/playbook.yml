@@ -1,0 +1,78 @@
+---
+- hosts: controller[0]
+  gather_facts: false
+  tags: [gather]
+  tasks:
+    - name: read service configs
+      command: >-
+        cat /etc/puppet/hieradata/service_configs.json
+      register: service_configs_raw
+
+    - name: convert configs to json
+      set_fact:
+        service_configs: "{{ service_configs_raw.stdout|from_json }}"
+
+    - name: extract passphrases
+      set_fact:
+        server_certs_key_passphrase: >-
+          {{
+            service_configs['octavia::certificates::server_certs_key_passphrase']
+          }}
+        ca_private_key_passphrase: >-
+          {{
+            service_configs['octavia::certificates::ca_private_key_passphrase']
+          }}
+
+- hosts: localhost
+  gather_facts: false
+  collections:
+    - moc.ops_common
+
+  vars:
+    ca_dir: ./ca
+    ca_subject: /CN=octavia_ca
+    ca_passphrase: "{{ hostvars[groups.controller.0].ca_private_key_passphrase }}"
+
+    certificates:
+      - crt_name: octavia_client
+        crt_subject: /CN=octavia_client
+
+  roles:
+    - certificate-authority
+
+  tasks:
+    - include_role:
+        name: certificate-authority
+        tasks_from: certificate.yml
+      vars:
+        crt_name: "{{ item.crt_name }}"
+        crt_subject: "{{ item.crt_subject }}"
+      loop: "{{ certificates }}"
+
+- hosts: controller
+  gather_facts: false
+  tags: [install]
+  tasks:
+    - name: copy ca certificate
+      copy:
+        src: ca/ca.crt
+        dest: /var/lib/config-data/puppet-generated/octavia/etc/octavia/certs/ca_01.pem
+
+    - name: copy ca key
+      copy:
+        src: ca/ca.key
+        dest: /var/lib/config-data/puppet-generated/octavia/etc/octavia/certs/private/cakey.pem
+
+    - name: copy client certificate
+      copy:
+        src: ca/certs/octavia_client.combined.crt
+        dest: /var/lib/config-data/puppet-generated/octavia/etc/octavia/certs/client.pem
+
+    - name: restart containers
+      command: >-
+        docker restart {{ item }}
+      loop:
+        - octavia_health_manager
+        - octavia_api
+        - octavia_housekeeping
+        - octavia_worker
