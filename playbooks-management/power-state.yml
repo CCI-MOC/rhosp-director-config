@@ -1,7 +1,5 @@
 - hosts: overcloud
   gather_facts: false
-  roles:
-    - ansible-modules-bitwarden
   tasks:
     - name: change power state
       delegate_to: ipmi-gw
