@@ -45,6 +45,6 @@ six==1.14.0
 stevedore==1.32.0
 termcolor==1.1.0
 testinfra==4.1.0
-urllib3==1.25.8
+urllib3==1.26.5
 wcwidth==0.1.8
 zipp==3.0.0
