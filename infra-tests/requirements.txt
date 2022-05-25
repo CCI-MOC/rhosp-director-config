@@ -1,5 +1,5 @@
 -i https://pypi.org/simple
-ansible==2.9.5
+ansible==4.2.0
 apipkg==1.5
 appdirs==1.4.3
 attrs==19.3.0
