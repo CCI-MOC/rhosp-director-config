@@ -18,7 +18,7 @@ jmespath==0.9.5
 jsonpatch==1.25
 jsonpointer==2.0
 keystoneauth1==3.18.0
-lxml==4.5.0
+lxml==4.9.1
 markupsafe==1.1.1
 more-itertools==8.2.0
 munch==2.5.0
